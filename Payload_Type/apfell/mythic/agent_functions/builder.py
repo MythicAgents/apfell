@@ -50,6 +50,8 @@ class Apfell(PayloadType):
                     for key, val in c2.get_parameters_dict().items():
                         if isinstance(val, dict):
                             c2_code = c2_code.replace(key, val["enc_key"] if val["enc_key"] is not None else "")
+                        elif not isinstance(val, str):
+                            c2_code = c2_code.replace(key, json.dumps(val))
                         else:
                             c2_code = c2_code.replace(key, val)
                 except Exception as p:
