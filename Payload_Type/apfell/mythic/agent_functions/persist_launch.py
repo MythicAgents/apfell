@@ -59,12 +59,6 @@ class PersistLaunchCommand(CommandBase):
     help_cmd = "persist_launch"
     description = "Create a launch agent or daemon plist file and either automatically put it in ~/Library/LaunchAgents or if LocalAgent is false, save it to the specified location. If you want an elevated launch agent or launch daemon( /Library/LaunchAgents or /Library/LaunchDaemons), you either need to be in an elevated context already and specify the path or use something like shell_elevated to copy it there. If the first arg is 'apfell-jxa' then the agent will automatically construct a plist appropriate oneliner to use where arg1 should be the URL to reach out to for the payload."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1159", "T1160"]
     argument_class = PersistLaunchArguments

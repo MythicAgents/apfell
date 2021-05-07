@@ -26,7 +26,7 @@ exports.list_apps = function(task, command, params){
             }
             names.push(info);
         }
-        return {"user_output":JSON.stringify(names, null, 2), "completed": true};
+        return {"user_output":JSON.stringify(names, null, 2), "processes": names, "completed": true};
     }catch(error){
         return {"user_output":error.toString(), "completed": true, "status": "error"};
     }

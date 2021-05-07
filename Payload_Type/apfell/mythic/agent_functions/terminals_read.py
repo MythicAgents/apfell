@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class TerminalsReadArguments(TaskArguments):
@@ -34,12 +34,6 @@ class TerminalsReadCommand(CommandBase):
 Ex: terminals_read history
     """
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1139", "T1056"]
     argument_class = TerminalsReadArguments
@@ -48,8 +42,8 @@ Ex: terminals_read history
     )
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="Target Application of Terminal",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="Target Application of Terminal",
             artifact_type="AppleEvent Sent",
         )
         return task

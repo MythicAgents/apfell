@@ -1,6 +1,7 @@
 from mythic_payloadtype_container.MythicCommandBase import *
-from mythic_payloadtype_container.MythicFileRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 import json
+import base64
 
 
 class JsimportArguments(TaskArguments):
@@ -31,27 +32,21 @@ class JsimportCommand(CommandBase):
     help_cmd = "jsimport"
     description = "import a JXA file into memory. Only one can be imported at a time."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = []
     argument_class = JsimportArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         original_file_name = json.loads(task.original_params)["file"]
-        response = await MythicFileRPC(task).register_file(
-            file=task.args.get_arg("file"),
-            saved_file_name=original_file_name,
-            delete_after_fetch=True,
+        file_resp = await MythicRPC().execute("create_file", task_id=task.id,
+            file=base64.b64encode(task.args.get_arg("file")).decode(),
+            saved_file_name=original_file_name
         )
-        if response.status == MythicStatus.Success:
-            task.args.add_arg("file", response.agent_file_id)
+        if file_resp.status == MythicStatus.Success:
+            task.args.add_arg("file", file_resp.response["agent_file_id"])
+            task.display_params = f"{original_file_name} into memory"
         else:
-            raise Exception("Error from Mythic: " + response.error_message)
+            raise Exception("Error from Mythic: " + str(file_resp.error))
         return task
 
     async def process_response(self, response: AgentResponse):

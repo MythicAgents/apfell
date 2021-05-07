@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class TerminalsSendArguments(TaskArguments):
@@ -42,25 +42,19 @@ class TerminalsSendCommand(CommandBase):
     This uses AppleEvents to inject the shell command, {command}, into the specified terminal shell as if the user typed it from the keyboard. This is pretty powerful. Consider the instance where the user is SSH-ed into another machine via terminal - with this you can inject commands to run on the remote host. Just remember, the user will be able to see the command, but you can always see what they see as well with the "terminals_read contents" command.
     """
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1059", "T1184"]
     argument_class = TerminalsSendArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="{}".format(
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="{}".format(
                 task.args.get_arg("command"),
             ),
             artifact_type="Process Create",
         )
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="Target Application of Terminal",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="Target Application of Terminal",
             artifact_type="AppleEvent Sent",
         )
         return task

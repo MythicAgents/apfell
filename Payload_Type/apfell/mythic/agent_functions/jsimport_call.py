@@ -30,12 +30,6 @@ class JsimportCallCommand(CommandBase):
     help_cmd = "jsimport_call function_call();"
     description = "call a function from within the JS file that was imported with 'jsimport'. This function call is appended to the end of the jsimport code and called via eval."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1155", "T1064"]
     argument_class = JsimportCallArguments

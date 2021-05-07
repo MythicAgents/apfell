@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class RmArguments(TaskArguments):
@@ -36,19 +36,14 @@ class RmCommand(CommandBase):
     help_cmd = "rm [path]"
     description = "Remove a file, no quotes are necessary and relative paths are fine"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = True
-    is_upload_file = False
+    supported_ui_features = ["file_browser:remove"]
     author = "@its_a_feature_"
     attackmapping = ["T1106", "T1107"]
     argument_class = RmArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="fileManager.removeItemAtPathError",
+        resp = MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="fileManager.removeItemAtPathError",
             artifact_type="API Called",
         )
         return task

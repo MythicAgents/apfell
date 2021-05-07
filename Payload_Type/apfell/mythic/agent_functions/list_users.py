@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class ListUsersArguments(TaskArguments):
@@ -40,25 +40,19 @@ class ListUsersCommand(CommandBase):
     help_cmd = 'list_users'
     description = "This uses JXA to list the non-service user accounts on the system. You can specify a GID to look at the users of a certain group or you can specify 'groups' to be true and enumerate users by groups"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1087", "T1069"]
     argument_class = ListUsersArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         if task.args.get_arg("gid") < 0:
-            resp = await MythicResponseRPC(task).register_artifact(
-                artifact_instance="$.CSGetLocalIdentityAuthority, $.CSIdentityQueryCreate, $.CSIdentityQueryExecute",
+            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+                artifact="$.CSGetLocalIdentityAuthority, $.CSIdentityQueryCreate, $.CSIdentityQueryExecute",
                 artifact_type="API Called",
             )
         else:
-            resp = await MythicResponseRPC(task).register_artifact(
-                artifact_instance="$.CBIdentityAuthority.defaultIdentityAuthority, $.CBGroupIdentity.groupIdentityWithPosixGIDAuthority",
+            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+                artifact="$.CBIdentityAuthority.defaultIdentityAuthority, $.CBGroupIdentity.groupIdentityWithPosixGIDAuthority",
                 artifact_type="API Called",
             )
         return task

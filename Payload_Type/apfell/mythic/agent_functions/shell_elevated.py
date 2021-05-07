@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class ShellElevatedArguments(TaskArguments):
@@ -53,35 +53,29 @@ class ShellElevatedCommand(CommandBase):
 WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!
     """
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1059", "T1141", "T1169"]
     argument_class = ShellElevatedArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="/usr/libexec/security_authtrampoline /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid auth 15 /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="/usr/libexec/security_authtrampoline /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid auth 15 /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
             artifact_type="Process Create",
         )
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
             artifact_type="Process Create",
         )
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
             artifact_type="Process Create",
         )
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="/bin/sh -c {}".format(task.args.get_arg("command")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="/bin/sh -c {}".format(task.args.get_arg("command")),
             artifact_type="Process Create",
         )
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="{}".format(task.args.get_arg("command")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="{}".format(task.args.get_arg("command")),
             artifact_type="Process Create",
         )
         return task

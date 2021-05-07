@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import sys
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class PwdArguments(TaskArguments):
@@ -18,19 +18,13 @@ class PwdCommand(CommandBase):
     help_cmd = "pwd"
     description = "Prints the current working directory for the agent"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1083"]
     argument_class = PwdArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="fileManager.currentDirectoryPath",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="fileManager.currentDirectoryPath",
             artifact_type="API Called",
         )
         return task

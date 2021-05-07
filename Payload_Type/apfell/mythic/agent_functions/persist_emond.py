@@ -52,12 +52,6 @@ class PersistEmondCommand(CommandBase):
     help_cmd = "persist_emond"
     description = "Create persistence with an emond plist file in /etc/emond.d/rules/ and a .DS_Store file to trigger it"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1150"]
     argument_class = PersistEmondArguments

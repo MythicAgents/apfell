@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class CurrentUserArguments(TaskArguments):
@@ -33,25 +33,19 @@ class CurrentUserCommand(CommandBase):
     help_cmd = "current_user"
     description = "This uses AppleEvents or ObjectiveC APIs to get information about the current user."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1033"]
     argument_class = CurrentUserArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         if task.args.get_arg("method") == "jxa":
-            resp = await MythicResponseRPC(task).register_artifact(
-                artifact_instance="Target Application of System Events",
+            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+                artifact="Target Application of System Events",
                 artifact_type="AppleEvent Sent",
             )
         else:
-            resp = await MythicResponseRPC(task).register_artifact(
-                artifact_instance="NSUserName, NSFullUserName, NSHomeDirectory",
+            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+                artifact="NSUserName, NSFullUserName, NSHomeDirectory",
                 artifact_type="API Called",
             )
         return task

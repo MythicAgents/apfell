@@ -1,6 +1,5 @@
 from mythic_payloadtype_container.MythicCommandBase import *
-import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class CdArguments(TaskArguments):
@@ -30,19 +29,13 @@ class CdCommand(CommandBase):
     help_cmd = "cd [path]"
     description = "Change the current working directory to another directory. No quotes are necessary and relative paths are fine"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     argument_class = CdArguments
     attackmapping = ["T1083"]
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="fileManager.changeCurrentDirectoryPath",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifac="fileManager.changeCurrentDirectoryPath",
             artifact_type="API Called",
         )
         return task

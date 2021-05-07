@@ -14,11 +14,12 @@ class Apfell(PayloadType):
     note = """This payload uses JavaScript for Automation (JXA) for execution on macOS boxes."""
     supports_dynamic_loading = True
     build_parameters = {}
-    c2_profiles = ["http", "dynamichttp", "smbserver"]
+    c2_profiles = ["http", "dynamichttp"]
+    mythic_encrypts = True
     support_browser_scripts = [
         BrowserScript(script_name="create_table", author="@its_a_feature_")
     ]
-    translation_container = None #"translator"
+    translation_container = None # "translator"
 
     async def build(self) -> BuildResponse:
         # this function gets called to create an instance of your payload
@@ -37,6 +38,10 @@ class Apfell(PayloadType):
             base_code = base_code.replace("UUID_HERE", self.uuid)
             base_code = base_code.replace("COMMANDS_HERE", command_code)
             all_c2_code = ""
+            if len(self.c2info) != 1:
+                resp.build_stderr = "Apfell only supports one C2 Profile at a time"
+                resp.set_status(BuildStatus.Error)
+                return resp
             for c2 in self.c2info:
                 c2_code = ""
                 try:
@@ -59,9 +64,12 @@ class Apfell(PayloadType):
                 all_c2_code += c2_code
             base_code = base_code.replace("C2PROFILE_HERE", all_c2_code)
             resp.payload = base_code.encode()
-            resp.message = "Successfully built!\n"
-            resp.build_error = build_msg
+            if build_msg != "":
+                resp.build_stderr = build_msg
+                resp.set_status(BuildStatus.Error)
+            else:
+                resp.build_message = "Successfully built!\n"
         except Exception as e:
             resp.set_status(BuildStatus.Error)
-            resp.set_message("Error building payload: " + str(e))
+            resp.build_stderr = "Error building payload: " + str(e)
         return resp

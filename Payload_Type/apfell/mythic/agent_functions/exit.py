@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class ExitArguments(TaskArguments):
@@ -18,19 +18,14 @@ class ExitCommand(CommandBase):
     help_cmd = "exit"
     description = "This exits the current apfell agent by leveraging the ObjectiveC bridge's NSApplication terminate function."
     version = 1
-    is_exit = True
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
+    supported_ui_features = ["callback_table:exit"]
     author = "@its_a_feature_"
     attackmapping = []
     argument_class = ExitArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.NSApplication.sharedApplication.terminate",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.NSApplication.sharedApplication.terminate",
             artifact_type="API Called",
         )
         return task

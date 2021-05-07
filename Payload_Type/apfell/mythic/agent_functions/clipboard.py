@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class ClipboardArguments(TaskArguments):
@@ -36,12 +36,6 @@ class ClipboardCommand(CommandBase):
     help_cmd = "clipboard [data]"
     description = "Get all the types of contents on the clipboard, return specific types, or set the contents of the clipboard. Root has no clipboard!"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1115"]
     argument_class = ClipboardArguments
@@ -49,13 +43,13 @@ class ClipboardCommand(CommandBase):
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         if task.args.get_arg("data") != "":
-            resp = await MythicResponseRPC(task).register_artifact(
-                artifact_instance="$.NSPasteboard.generalPasteboard.setStringForType",
+            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+                artifact="$.NSPasteboard.generalPasteboard.setStringForType",
                 artifact_type="API Called",
             )
         else:
-            resp = await MythicResponseRPC(task).register_artifact(
-                artifact_instance="$.NSPasteboard.generalPasteboard.dataForType",
+            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+                artifact="$.NSPasteboard.generalPasteboard.dataForType",
                 artifact_type="API Called",
             )
         return task

@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class SystemInfoArguments(TaskArguments):
@@ -18,19 +18,13 @@ class SystemInfoCommand(CommandBase):
     help_cmd = "system_info"
     description = "This uses JXA to get some system information. It doesn't send Apple Events to any other applications though, so it shouldn't cause popups."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1082"]
     argument_class = SystemInfoArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="currentApp.systemInfo()",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="currentApp.systemInfo()",
             artifact_type="API Called",
         )
         return task

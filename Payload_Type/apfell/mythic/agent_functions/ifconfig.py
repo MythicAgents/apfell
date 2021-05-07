@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class IfconfigArguments(TaskArguments):
@@ -18,19 +18,13 @@ class IfconfigCommand(CommandBase):
     help_cmd = "ifconfig"
     description = "Return all the IP addresses associated with the host"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = []
     argument_class = IfconfigArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.NSHost.currentHost.addresses",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.NSHost.currentHost.addresses",
             artifact_type="API Called",
         )
         return task

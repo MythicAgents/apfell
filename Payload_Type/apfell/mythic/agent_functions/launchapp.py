@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class LaunchAppArguments(TaskArguments):
@@ -31,19 +31,13 @@ class LaunchAppCommand(CommandBase):
     help_cmd = "launchapp {bundle name}"
     description = "This uses the Objective C bridge to launch the specified app asynchronously and 'hidden' (it'll still show up in the dock for now). An example of the bundle name is 'com.apple.itunes' for launching iTunes."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = []
     argument_class = LaunchAppArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="xpcproxy {}".format(
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="xpcproxy {}".format(
                 task.args.get_arg("bundle"),
             ),
             artifact_type="Process Create",

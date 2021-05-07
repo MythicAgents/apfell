@@ -23,6 +23,7 @@ exports.ls = function(task, command, params){
             path = $(path).stringByExpandingTildeInPath.js;
         }
         output['host'] = ObjC.unwrap(apfell.procInfo.hostName);
+        output['update_deleted'] = true;
         let attributes = ObjC.deepUnwrap(fileManager.attributesOfItemAtPathError($(path), error));
         if (attributes !== undefined) {
             output['is_file'] = true;

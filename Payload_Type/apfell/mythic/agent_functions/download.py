@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class DownloadArguments(TaskArguments):
@@ -26,12 +26,7 @@ class DownloadCommand(CommandBase):
     help_cmd = "download {path to remote file}"
     description = "Download a file from the victim machine to the Mythic server in chunks (no need for quotes in the path)."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = True
-    is_remove_file = False
-    is_upload_file = False
+    supported_ui_features = ["file_browser:download"]
     author = "@its_a_feature_"
     parameters = []
     attackmapping = ["T1020", "T1030", "T1041"]
@@ -39,8 +34,8 @@ class DownloadCommand(CommandBase):
     browser_script = BrowserScript(script_name="download", author="@its_a_feature_")
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.NSFileHandle.fileHandleForReadingAtPath, readDataOfLength",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.NSFileHandle.fileHandleForReadingAtPath, readDataOfLength",
             artifact_type="API Called",
         )
         return task

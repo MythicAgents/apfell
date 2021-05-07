@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class RunArguments(TaskArguments):
@@ -35,19 +35,13 @@ class RunCommand(CommandBase):
     help_cmd = "run"
     description = "The command uses the ObjectiveC bridge to spawn that process with those arguments on the computer and get your output back. It is not interactive and does not go through a shell, so be sure to specify the full path to the binary you want to run."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1106"]
     argument_class = RunArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="{} {}".format(
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="{} {}".format(
                 task.args.get_arg("path"),
                 " ".join(task.args.get_arg("args"))
             ),

@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class ListAppsArguments(TaskArguments):
@@ -18,20 +18,15 @@ class ListAppsCommand(CommandBase):
     help_cmd = "list_apps"
     description = "This uses NSApplication.RunningApplications api to get information about running applications."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = True
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
+    supported_ui_features = ["process_browser:list"]
     author = "@its_a_feature_"
     attackmapping = ["T1057"]
     argument_class = ListAppsArguments
     browser_script = BrowserScript(script_name="list_apps", author="@its_a_feature_")
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.NSWorkspace.sharedWorkspace.runningApplications",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.NSWorkspace.sharedWorkspace.runningApplications",
             artifact_type="API Called",
         )
         return task

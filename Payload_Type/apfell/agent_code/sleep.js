@@ -8,7 +8,7 @@ exports.sleep = function(task, command, params){
             C2.jitter = command_params['jitter'];
         }
         let sleep_response = "Sleep interval updated to " + C2.interval + " and sleep jitter updated to " + C2.jitter;
-        return {"user_output":sleep_response, "completed": true, "process_container": sleep_response};
+        return {"user_output":sleep_response, "completed": true, "process_response": sleep_response};
     }catch(error){
         return {"user_output":error.toString(), "completed": true, "status": "error"};
     }

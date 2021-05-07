@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class CatArguments(TaskArguments):
@@ -30,19 +30,13 @@ class CatCommand(CommandBase):
     help_cmd = "cat /path/to/file"
     description = "Read the contents of a file and display it to the user. No need for quotes and relative paths are fine"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     argument_class = CatArguments
     attackmapping = ["T1081", "T1106"]
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.NSString.stringWithContentsOfFileEncodingError",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.NSString.stringWithContentsOfFileEncodingError",
             artifact_type="API Called",
         )
         return task

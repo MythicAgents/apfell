@@ -51,17 +51,12 @@ class PromptCommand(CommandBase):
     help_cmd = "prompt"
     description = "Create a custom prompt to ask the user for credentials where you can provide titles, icons, text and default answer."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1141"]
     argument_class = PromptArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
+        task.display_params = f"user with title \"{task.args.get_arg('title')}\" and message \"{task.args.get_arg('text')}\""
         return task
 
     async def process_response(self, response: AgentResponse):

@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class PlistArguments(TaskArguments):
@@ -38,19 +38,13 @@ class PlistCommand(CommandBase):
     help_cmd = "plist"
     description = "Read plists and their associated attributes for attempts to privilege escalate."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1083", "T1007"]
     argument_class = PlistArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.NSMutableDictionary.alloc.initWithContentsOfFile, fileManager.attributesOfItemAtPathError",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.NSMutableDictionary.alloc.initWithContentsOfFile, fileManager.attributesOfItemAtPathError",
             artifact_type="API Called",
         )
         return task

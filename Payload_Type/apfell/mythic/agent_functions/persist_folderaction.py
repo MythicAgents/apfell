@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class PersistFolderactionArguments(TaskArguments):
@@ -53,19 +53,13 @@ class PersistFolderactionCommand(CommandBase):
     help_cmd = "persist_folderaction"
     description = "Use Folder Actions to persist a compiled script on disk. You can either specify a 'URL' and automatically do a backgrounding one-liner, or supply your own code and language."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = []
     argument_class = PersistFolderactionArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="Target Application of System Events",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="Target Application of System Events",
             artifact_type="AppleEvent Sent",
         )
         return task

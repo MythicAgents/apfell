@@ -1,4 +1,5 @@
 from mythic_payloadtype_container.MythicCommandBase import *
+from mythic_payloadtype_container.MythicRPC import *
 import json
 
 
@@ -17,6 +18,7 @@ class SleepArguments(TaskArguments):
                 validation_func=positiveTime,
                 required=False,
                 description="Percentage of C2's interval to use as jitter",
+                ui_position=2
             ),
             "interval": CommandParameter(
                 name="interval",
@@ -24,6 +26,7 @@ class SleepArguments(TaskArguments):
                 required=False,
                 validation_func=positiveTime,
                 description="Number of seconds between checkins",
+                ui_position=1
             ),
         }
 
@@ -47,18 +50,16 @@ class SleepCommand(CommandBase):
     help_cmd = "sleep [interval] [jitter]"
     description = "Modify the time between callbacks in seconds."
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1029"]
     argument_class = SleepArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
+        task.display_params = str(task.args.get_arg("interval")) + "s"
+        if task.args.get_arg("jitter") is not None:
+            task.display_params += " with " + str(task.args.get_arg("interval")) + "% jitter"
         return task
 
     async def process_response(self, response: AgentResponse):
-        pass
+        resp = await MythicRPC().execute("update_callback", sleep_info=response.response)
+

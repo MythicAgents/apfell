@@ -1,7 +1,5 @@
 from mythic_payloadtype_container.MythicCommandBase import *
-import sys
-import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class ShellArguments(TaskArguments):
@@ -29,34 +27,37 @@ class ShellOPSEC(CommandOPSEC):
     authentication = ""
 
     async def opsec_pre(self, task: MythicTask):
-
-        processes = await MythicResponseRPC(task).search_database(
-            table="process",
-            search={"host": task.callback.host}
-        )
-        if len(processes.response) == 0:
-            task.opsec_pre_blocked = True
-            task.opsec_pre_message = f"This spawns {self.process_creation} and there is no process data on the host yet."
-            task.opsec_pre_message += "\nRun \"list_apps\" first to check for dangerous processes"
-            task.opsec_pre_bypass_role = "operator"
-            return
-        else:
-            processes = await MythicResponseRPC(task).search_database(
-                table="process",
-                search={"name": "Microsoft Defender", "host": task.callback.host}
-            )
-            if len(processes.response) > 0:
-                task.opsec_pre_blocked = True
-                task.opsec_pre_message = f"Microsoft Defender spotted on the host in running processes. Don't spawn commands this way"
+        # processes = await MythicRPC().execute("search_database", task_id=task.id, table="process",
+        #                                       host=task.callback.host)
+        # if processes.status == MythicStatus.Success:
+        #     if len(processes.response) == 0:
+        #         task.opsec_pre_blocked = True
+        #         task.opsec_pre_message = f"This spawns {self.process_creation} and there is no process data on the host yet."
+        #         task.opsec_pre_message += "\nRun \"list_apps\" first to check for dangerous processes"
+        #         task.opsec_pre_bypass_role = "operator"
+        #         return
+        #     else:
+        #         processes = await MythicRPC().execute("search_database", task_id=task.id, table="process",
+        #                                               name="Microsoft Defender", host=task.callback.host)
+        #         if len(processes.response) > 0:
+        #             task.opsec_pre_blocked = True
+        #             task.opsec_pre_message = f"Microsoft Defender spotted on the host in running processes. Don't spawn commands this way"
+        # else:
+        #     task.opsec_pre_blocked = True
+        #     task.opsec_pre_message = f"Failed to query processes from Mythic:\n{processes}"
+        pass
 
     async def opsec_post(self, task: MythicTask):
-        processes = await MythicResponseRPC(task).search_database(
-            table="process",
-            search={"name": "Microsoft Defender", "host": task.callback.host}
-        )
-        if len(processes.response) > 0:
-            task.opsec_post_blocked = True
-            task.opsec_post_message = f"Microsoft Defender spotted on the host in running processes. Really, don't do this"
+        # processes = await MythicRPC().execute("search_database", task_id=task.id,
+        #     table="process", name="Microsoft Defender", host=task.callback.host)
+        # if processes.status == MythicStatus.Success:
+        #     if len(processes.response) > 0:
+        #         task.opsec_post_blocked = True
+        #         task.opsec_post_message = f"Microsoft Defender spotted on the host in running processes. Really, don't do this"
+        # else:
+        #     task.opsec_post_blocked = True
+        #     task.opsec_post_message = f"Failed to query processes from Mythic:\n{processes}"
+        pass
 
 
 class ShellCommand(CommandBase):
@@ -66,12 +67,6 @@ class ShellCommand(CommandBase):
     description = """This runs {command} in a terminal by leveraging JXA's Application.doShellScript({command}).
 WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!"""
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1059"]
     argument_class = ShellArguments
@@ -82,19 +77,16 @@ WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!"""
     )
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="/bin/sh -c {}".format(task.args.get_arg("command")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="/bin/sh -c {}".format(task.args.get_arg("command")),
             artifact_type="Process Create",
         )
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="{}".format(task.args.get_arg("command")),
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="{}".format(task.args.get_arg("command")),
             artifact_type="Process Create",
         )
+        task.display_params = task.args.get_arg("command")
         return task
 
     async def process_response(self, response: AgentResponse):
-        #print(response.response)
-        #sys.stdout.flush()
-        #resp = await MythicResponseRPC(response.task).callback_tokens(host=response.task.callback.host,
-        #                                                     add=response.response, remove=[])
         pass

@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
-from mythic_payloadtype_container.MythicResponseRPC import *
+from mythic_payloadtype_container.MythicRPC import *
 
 
 class TestPasswordArguments(TaskArguments):
@@ -36,23 +36,17 @@ class TestPasswordCommand(CommandBase):
     help_cmd = "test_password username password"
     description = "Tests a password against a user to see if it's valid via an API call"
     version = 1
-    is_exit = False
-    is_file_browse = False
-    is_process_list = False
-    is_download_file = False
-    is_remove_file = False
-    is_upload_file = False
     author = "@its_a_feature_"
     attackmapping = ["T1110"]
     argument_class = TestPasswordArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="$.CBIdentity.identityWithNameAuthority",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="$.ODNode.nodeWithSessionTypeError, recordWithRecordTypeNameAttributesError",
             artifact_type="API Called",
         )
-        resp = await MythicResponseRPC(task).register_artifact(
-            artifact_instance="user.authenticateWithPassword",
+        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
+            artifact="user.verifyPasswordError",
             artifact_type="API Called",
         )
         return task
