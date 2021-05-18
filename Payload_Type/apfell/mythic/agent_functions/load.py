@@ -36,10 +36,10 @@ class LoadCommand(CommandBase):
             except Exception as e:
                 raise Exception("Failed to find code for '{}'".format(cmd))
         resp = await MythicRPC().execute("create_file", task_id=task.id,
-            file=base64.b64encode(total_code).decode()
+            file=base64.b64encode(total_code.encode()).decode()
         )
         if resp.status == MythicStatus.Success:
-            task.args.add_arg("file_id", resp.response["file"]["agent_file_id"])
+            task.args.add_arg("file_id", resp.response["agent_file_id"])
             task.args.add_arg("cmds", task.args.command_line)
         else:
             raise Exception("Failed to register file: " + resp.error)
