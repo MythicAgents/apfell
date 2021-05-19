@@ -57,7 +57,7 @@ class SleepCommand(CommandBase):
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         task.display_params = str(task.args.get_arg("interval")) + "s"
         if task.args.get_arg("jitter") is not None:
-            task.display_params += " with " + str(task.args.get_arg("interval")) + "% jitter"
+            task.display_params += " with " + str(task.args.get_arg("jitter")) + "% jitter"
         return task
 
     async def process_response(self, response: AgentResponse):
