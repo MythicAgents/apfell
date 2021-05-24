@@ -127,7 +127,7 @@ var exports = {};  // get stuff ready for initial command listing
 COMMANDS_HERE
 //console.log("about to load commands");
 var commands_dict = exports;
-var jsimports = "";
+var jsimport = "";
 
 //-------------GET IP AND CHECKIN ----------------------------------
 if( $.NSDate.date.compare(C2.kill_date) === $.NSOrderedDescending ){
