@@ -18,7 +18,7 @@ class PromptArguments(TaskArguments):
                 type=ParameterType.String,
                 required=False,
                 description="full path to .icns file to use",
-                default_value="/System/Library/CoreServices/Software Update.app/Contents/Resources/SoftwareUpdate.icns",
+                default_value="/System/Library/PreferencePanes/SoftwareUpdate.prefPane/Contents/Resources/SoftwareUpdate.icns",
             ),
             "text": CommandParameter(
                 name="text",
