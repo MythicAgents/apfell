@@ -35,6 +35,7 @@ class SleepArguments(TaskArguments):
             pieces = self.command_line.split(" ")
             if len(pieces) == 1:
                 self.add_arg("interval", pieces[0])
+                self.remove_arg("jitter")
             elif len(pieces) == 2:
                 self.add_arg("interval", pieces[0])
                 self.add_arg("jitter", pieces[1])
