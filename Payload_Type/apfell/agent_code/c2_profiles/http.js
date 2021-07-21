@@ -424,6 +424,9 @@ class customC2 extends baseC2{
             	let pieces = ObjC.deepUnwrap(fm.componentsToDisplayForPath(params));
             	full_path = "/" + pieces.slice(1).join("/");
                 var handle = $.NSFileHandle.fileHandleForReadingAtPath(full_path);
+                if(handle.js === undefined){
+                	return {"status": "error", "user_output": "Access denied or path was to a folder", "completed": true};
+				}
                 // Get the file size by seeking;
                 var fileSize = handle.seekToEndOfFile;
             }catch(error){

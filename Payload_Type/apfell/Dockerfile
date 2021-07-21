@@ -1,1 +1,1 @@
-FROM itsafeaturemythic/python38_payload:0.0.6
+FROM itsafeaturemythic/python38_payload:0.0.7

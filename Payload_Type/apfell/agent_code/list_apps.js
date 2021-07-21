@@ -24,6 +24,9 @@ exports.list_apps = function(task, command, params){
             else if(procs[i].executableArchitecture === "16777234"){
                 info['architecture'] = "x86_64_PPC";
             }
+            else {
+                info['architecture'] = procs[i].executableArchitecture;
+            }
             names.push(info);
         }
         return {"user_output":JSON.stringify(names, null, 2), "processes": names, "completed": true};

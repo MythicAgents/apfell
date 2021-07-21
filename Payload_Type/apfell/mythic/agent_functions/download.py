@@ -18,6 +18,8 @@ class DownloadArguments(TaskArguments):
                     self.command_line = temp_json["path"] + "/" + temp_json["file"]
                 else:
                     raise Exception("Unsupported JSON")
+        else:
+            raise Exception("Must provide a path to download")
 
 
 class DownloadCommand(CommandBase):
