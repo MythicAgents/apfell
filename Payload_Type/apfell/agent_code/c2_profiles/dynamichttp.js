@@ -334,7 +334,7 @@ class customC2 extends baseC2{
         }
         if(method === "POST") {
             req.setHTTPMethod($.NSString.alloc.initWithUTF8String("POST"));
-            let postData = $(body).dataUsingEncodingAllowLossyConversion($.NSString.NSASCIIStringEncoding, true);
+            let postData = $(body).dataUsingEncodingAllowLossyConversion($.NSASCIIStringEncoding, true);
             let postLength = $.NSString.stringWithFormat("%d", postData.length);
             req.addValueForHTTPHeaderField(postLength, $.NSString.alloc.initWithUTF8String('Content-Length'));
             req.setHTTPBody(postData);
