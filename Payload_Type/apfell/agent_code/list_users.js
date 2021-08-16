@@ -9,7 +9,6 @@ exports.list_users = function(task, command, params){
     }
     ObjC.import('Collaboration');
     ObjC.import('CoreServices');
-    ObjC.import("OpenDirectory");
     if (gid < 0) {
         var defaultAuthority = $.CBIdentityAuthority.defaultIdentityAuthority;
         var grouptolook = 1000 //Most systems don't have groups past 700s
