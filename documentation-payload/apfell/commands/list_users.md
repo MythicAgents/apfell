@@ -7,7 +7,7 @@ hidden = false
 
 ## Summary
 
-This uses JXA to list the non-service user accounts on the system. You can specify a GID to look at the users of a certain group or you can specify 'groups' to be true and enumerate users by groups 
+This uses JXA to list the non-service user accounts on the system. You can specify a GID to look at the users of a certain group or you can use '-1' for GID to enumerate users for groups 0-1000
 - Needs Admin: False  
 - Version: 1  
 - Author: @its_a_feature_  
