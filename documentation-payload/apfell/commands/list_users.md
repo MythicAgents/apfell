@@ -20,12 +20,6 @@ This uses JXA to list the non-service user accounts on the system. You can speci
 - Required Value: False  
 - Default Value: None  
 
-#### groups
-
-- Description: Enumerate groups and their members 
-- Required Value: False  
-- Default Value: None  
-
 ## Usage
 
 ```
@@ -38,9 +32,7 @@ list_users
 - T1069  
 ## Detailed Summary
 
-- If gid is -1 and groups is false, enumerates all users and prints their info
-- If gid is -1 and groups is true, enumerate all groups and their members
+- If gid is -1, enumerates all users and prints their info
 - If gid > 0, enumerate all users within the specified group 
 
 All of these options are done via the Collaboration and CoreServices Frameworks and queried via API calls.
-
