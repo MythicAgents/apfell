@@ -34,7 +34,6 @@ exports.list_users = function(task, command, params){
                         "UUID": idObj.UUIDString.js
                     };
                     all_users.push(info);
-                    x++
                 }
 
             }
