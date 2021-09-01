@@ -33,17 +33,7 @@ class CookieThiefArguments(TaskArguments):
         }
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                temp_json = json.loads(self.command_line)
-                if "host" in temp_json:
-                    # this means we have tasking from the file browser rather than the popup UI
-                    # the apfell agent doesn't currently have the ability to do _remote_ listings, so we ignore it
-                    self.command_line = temp_json["path"] + "/" + temp_json["file"]
-                else:
-                    raise Exception("Unsupported JSON")
-        else:
-            raise Exception("Must provide a path to download")
+            pass
 
 
 class CookieThiefCommand(CommandBase):
