@@ -33,7 +33,7 @@ class CookieThiefArguments(TaskArguments):
         }
 
     async def parse_arguments(self):
-            pass
+        self.load_args_from_json_string(self.command_line)
 
 
 class CookieThiefCommand(CommandBase):
