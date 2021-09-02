@@ -50,7 +50,15 @@ class CookieThiefCommand(CommandBase):
     browser_script = BrowserScript(script_name="cookie_theif", author="@antman1p")
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
+        task.completed_callback_function = self.downloads_complete
         return task
 
     async def process_response(self, response: AgentResponse):
         pass
+
+    async define downloads_complete(self, task:MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
+        resp = await MythicRPC().execute("get_responses", task_id=subtask["id"]);
+        resp - await MythichRPC().execute("create_output", task_id=task.id,
+                                           output=f"Cookie_Thief's subtask, {subtask['command']}, is done!  Had output of:\n" +json.dumps(resp.response)
+                                           );
+       return task;
