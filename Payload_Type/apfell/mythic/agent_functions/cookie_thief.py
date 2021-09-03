@@ -27,7 +27,7 @@ class CookieThiefArguments(TaskArguments):
                 name="Username",
                 type=ParameterType.String,
                 description="Victim's username from whom to steal the cookies",
-                required=False,
+                required=True,
                 ui_position=3
             ),
         }
