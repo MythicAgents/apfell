@@ -9,7 +9,7 @@ class CookieThiefArguments(TaskArguments):
         self.args = {
             "password": CommandParameter(
                 name="User Login Password",
-                type=ParameterType.String,
+                type=ParameterType.Credential_Value,
                 description="p@55w0rd_here for user login",
                 required=True,
                 ui_position=1
