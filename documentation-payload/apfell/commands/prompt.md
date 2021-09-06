@@ -13,6 +13,12 @@ Create a custom prompt to ask the user for credentials where you can provide tit
 - Version: 1  
 - Author: @its_a_feature_  
 
+
+{{% notice warning %}}   
+This can potentially hang the agent as dependent on user interaction, so be careful  
+{{% /notice %}}
+
+
 ### Arguments
 
 #### title

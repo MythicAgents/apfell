@@ -14,13 +14,6 @@ class ListUsersArguments(TaskArguments):
                 default_value=-1,
                 description="Enumerate users in a specific group or -1 for all groups",
             ),
-            "groups": CommandParameter(
-                name="groups",
-                type=ParameterType.Boolean,
-                required=False,
-                default_value=False,
-                description="Enumerate groups and their members ",
-            ),
         }
 
     async def parse_arguments(self):
@@ -47,7 +40,7 @@ class ListUsersCommand(CommandBase):
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         if task.args.get_arg("gid") < 0:
             resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="$.CSGetLocalIdentityAuthority, $.CSIdentityQueryCreate, $.CSIdentityQueryExecute",
+                artifact="$.CBIdentityAuthority.defaultIdentityAuthority, $.CBGroupIdentity.groupIdentityWithPosixGIDAuthority",
                 artifact_type="API Called",
             )
         else:

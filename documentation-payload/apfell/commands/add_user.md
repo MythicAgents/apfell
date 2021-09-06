@@ -12,6 +12,12 @@ Add a local user to the system by wrapping the Apple binary, dscl.
 - Version: 1  
 - Author: @its_a_feature_  
 
+
+{{% notice tip %}}   
+For `Authenticate as this user` and `Authenticate with this password` dropdowns to be available, add credentials under the Operational Views tab in Mythic
+{{% /notice %}}  
+
+
 ### Arguments
 
 #### password
