@@ -58,6 +58,13 @@ class CookieThiefCommand(CommandBase):
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
         dlResponses = await MythicRPC().execute("get_responses", task_id=task.id)
-        print(str(dlResponses.response))
-        sys.stdout.flush()
-        return task
+        if dlResponses.status == "success":
+            dlResponses = dlResponses.response
+            print(dlResponses["files"][0]["filename"])
+            print(dlResponses["files"][1]["filename"])
+            sys.stdout.flush()
+            return task
+        else:
+            print("Encountered an error attempting to get responses from tasks: " + dlResponses.error)
+            sys.stdout.flush()
+            return task
