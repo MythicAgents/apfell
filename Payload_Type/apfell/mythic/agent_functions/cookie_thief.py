@@ -61,7 +61,13 @@ class CookieThiefCommand(CommandBase):
                                           output="Files Downloaded"
                                           )
         dlResponses = MythicRPC().execute("get_responses", task_id=task.id)
-        print(dlResponses["files"][0]["filename"])
-        print(dlResponses["files"][1]["filename"])
-        sys.stdout.flush()
-        return task
+        if dlResponses.status == "success":
+            dlResponses = dlResponses.response
+            print(dlResponses["files"][0]["filename"])
+            print(dlResponses["files"][1]["filename"])
+            sys.stdout.flush()
+            return task
+        else:
+            print("Hit an error trying to get the responses from the task: " + dlResponses.error)
+            sys.stdout.flush()
+            return task
