@@ -62,4 +62,5 @@ class CookieThiefCommand(CommandBase):
                                           )
         dlResponses = await MythicRPC().execute("get_responses", task_id=task.id)
         print(dlResponses.response)
+        sys.stdout.flush()
         return task
