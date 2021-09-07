@@ -58,7 +58,8 @@ class CookieThiefCommand(CommandBase):
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
         dlResponses = await MythicRPC().execute("get_responses", task_id=task.id)
+        agentFileId = dlResponses["files"][0]["agent_file_id"]
         resp = await MythicRPC().execute("create_output", task_id=task.id,
-                                          output=dlResponses["files"][0]["agent_file_id"]
+                                          output=agentFileId
                                           )
         return task
