@@ -2,7 +2,7 @@ from mythic_payloadtype_container.MythicCommandBase import *
 import json
 import os
 from mythic_payloadtype_container.MythicRPC import *
-import chainbreaker
+from chainbreaker import *
 
 
 class CookieThiefArguments(TaskArguments):
