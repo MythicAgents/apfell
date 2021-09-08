@@ -73,7 +73,13 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
-            os.remove('./tmp_login.keychain-db')
+            if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
+                os.remove('/Mythic/mythic/tmp_login.keychain-db')
+                print("Temp KeychainDB file removed.")
+                sys.stdout.flush()
+            else:
+                print("Temp KeychainDB file does not exist.")
+                sys.stdout.flush()
         except Exception as e:
             print("Encountered an error attempting to removing the temporary keychainDB file: " + e)
             sys.stdout.flush()
