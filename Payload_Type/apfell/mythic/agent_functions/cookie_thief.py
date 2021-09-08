@@ -1,7 +1,7 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
 import os
-import apfell.mythic.chainbreaker
+import chainbreaker
 from mythic_payloadtype_container.MythicRPC import *
 
 
