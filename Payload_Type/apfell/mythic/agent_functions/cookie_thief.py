@@ -72,13 +72,13 @@ class CookieThiefCommand(CommandBase):
             f.write(base64.b64decode(getkeychainDBResp["contents"]))
             f.close()
         except Exception as e:
-            print("Encountered an error attempting to write the keychainDB to a file: " + e)
+            print("Encountered an error attempting to write the keychainDB to a file: " + str(e)
             sys.stdout.flush()
 
         try:
             chainbreaker.main("-h")
         except Exception as e:
-            print("Chainbreaker script failed with error: " + e)
+            print("Chainbreaker script failed with error: " + str(e)
             sys.stdout.flush()
 
         try:
@@ -88,7 +88,7 @@ class CookieThiefCommand(CommandBase):
                 print("Temp KeychainDB file does not exist.")
                 sys.stdout.flush()
         except Exception as e:
-            print("Encountered an error attempting to removing the temporary keychainDB file: " + e)
+            print("Encountered an error attempting to removing the temporary keychainDB file: " + str(e))
             sys.stdout.flush()
 
         return task
