@@ -1,7 +1,9 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 import json
 import os
+import sys
 from mythic_payloadtype_container.MythicRPC import *
+sys.path.append('../chainbreaker')
 import chainbreaker
 from chainbreaker import Chainbreaker
 
