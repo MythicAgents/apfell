@@ -78,7 +78,7 @@ class CookieThiefCommand(CommandBase):
         try:
             keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
                                     unlock_file=None)
-            dir(keychain)
+                                    
             if keychain.locked:
                 print("Keychain failed to unlock.")
                 sys.stdout.flush()
