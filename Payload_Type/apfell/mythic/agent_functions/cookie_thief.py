@@ -95,6 +95,7 @@ class CookieThiefCommand(CommandBase):
 
         except Exception as e:
             #print("Chainbreaker script failed with error: " + str(e))
+            ###DEBUG:
             traceback.print_exc()
             sys.stdout.flush()
 
