@@ -98,6 +98,7 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         print("THIS IS A TEST")
+        sys.stdout.flush()
         print(keychainoutput["records"])
         sys.stdout.flush()
 
