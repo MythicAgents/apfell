@@ -94,22 +94,21 @@ class CookieThiefCommand(CommandBase):
 
 
         except Exception as e:
-            #print("Chainbreaker script failed with error: " + str(e))
-            ###DEBUG:
-            traceback.print_exc()
+            print("Chainbreaker script failed with error: " + str(e))
             sys.stdout.flush()
 
+        print("THIS IS A TEST")
         print(keychainoutput["records"])
         sys.stdout.flush()
 
-        # try:
-        #     if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
-        #         os.remove('/Mythic/mythic/tmp_login.keychain-db')
-        #     else:
-        #         print("Temp KeychainDB file does not exist.")
-        #         sys.stdout.flush()
-        # except Exception as e:
-        #     print("Encountered an error attempting to removing the temporary keychainDB file: " + str(e))
-        #     sys.stdout.flush()
+        try:
+            if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
+                os.remove('/Mythic/mythic/tmp_login.keychain-db')
+            else:
+                print("Temp KeychainDB file does not exist.")
+                sys.stdout.flush()
+        except Exception as e:
+            print("Encountered an error attempting to removing the temporary keychainDB file: " + str(e))
+            sys.stdout.flush()
 
         return task
