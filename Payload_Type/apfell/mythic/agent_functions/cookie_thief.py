@@ -73,7 +73,9 @@ class CookieThiefCommand(CommandBase):
         if getkeychainDBResp.status == "success":
             getkeychainDBResp = getkeychainDBResp.response[0]
         else:
-            print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
+            #print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
+            ##DEBUG:
+            print_exc()
             sys.stdout.flush()
 
         try:
