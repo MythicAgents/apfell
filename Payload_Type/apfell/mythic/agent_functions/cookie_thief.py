@@ -103,7 +103,6 @@ class CookieThiefCommand(CommandBase):
 
 
         fndstr = "Password: "
-        ccs_b64_str = ""
         ccs_password = ""
         try:
             ccs_keyfile = open("/Mythic/mythic/passwords/generic/ChromeSafeStorage.txt", "r")
@@ -113,7 +112,7 @@ class CookieThiefCommand(CommandBase):
 
         for line in ccs_keyfile:
             if fndstr in line:
-                ccs_b64_str = line.split(':', 1)[1].strip()
+                ccs_password = line.split(':', 1)[1].strip()
                 break
 
         ccs_keyfile.close()
@@ -124,9 +123,13 @@ class CookieThiefCommand(CommandBase):
             print("Failed to delete dumped keys directory with error: " + str(e))
             sys.stdout.flush()
 
+        ##DEBUG:
+        print(ccs_password)
+        sys.stdout.flush()
+
         cred = mythic_rest.Credential(type="plaintext",
                                       account="Chrome Safe Storage",
-                                      credential=ccs_keyfile,
+                                      credential=ccs_password,
                                       realm="user",
                                       comment="User Chrome Safe Storage Key")
         ccs_resp = await mythic.create_credential(cred)
