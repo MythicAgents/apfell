@@ -124,7 +124,7 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
         create_cred_resp = await MythicRPC().execute("create_credential",task_id=task.id,credential_type="plaintext",account="Chrome Safe Storage",realm="local",credential=ccs_password,metadata="",comment="Chrome Safe Storage Key")
-        if create_cred_resp == MythicStatus.Success:
+        if create_cred_resp.status == MythicStatus.Success:
             await MythicRPC().execute("create_output",task_id=task.id,output="Chrome Safe Storage Key added to credentials.")
 
 
