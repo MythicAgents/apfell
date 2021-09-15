@@ -3,6 +3,7 @@ import json
 import os
 from mythic_payloadtype_container.MythicRPC import *
 import traceback
+import subprocess
 
 class CookieThiefArguments(TaskArguments):
     def __init__(self, command_line):
