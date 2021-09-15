@@ -106,7 +106,7 @@ class CookieThiefCommand(CommandBase):
         ccs_b64_str = ""
         ccs_password = ""
         try:
-            ccs_keyfile = open("/Mythic/mythic/chainbreaker/passwords/generic/ChromeSafeStorage.txt", "r")
+            ccs_keyfile = open("/Mythic/mythic/passwords/generic/ChromeSafeStorage.txt", "r")
         except Exception as e:
             print("Chrome Safe Storage key file failed to open with error: " + str(e))
             sys.stdout.flush()
@@ -123,7 +123,7 @@ class CookieThiefCommand(CommandBase):
         sys.stdout.flush()
 
         try:
-            shutil.rmtree("/Mythic/mythic/chainbreaker/passwords")
+            shutil.rmtree("/Mythic/mythic/passwords")
         except Exception as e:
             print("Failed to delete dumped keys directory with error: " + str(e))
             sys.stdout.flush()
