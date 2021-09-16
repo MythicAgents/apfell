@@ -31,7 +31,7 @@ def decrypt(encrypted_value, key) -> str:
     return clean(decrypted)
 
 
-def main(args: dict) -> None:
+def crisp(args: dict) -> None:
     """This function accepts a path to a Cookies db file and key to decrypt chrome cookies"""
     cookies_db = args.get("cookies_file")
     key = args.get("key")
@@ -77,5 +77,4 @@ def main(args: dict) -> None:
         print("Cookies file doesn't exist")
 
 if __name__ == "__main__":
-    args: dict = parse_args()
-    main(args=args)
+    crisp(args=args)

