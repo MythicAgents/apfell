@@ -39,7 +39,7 @@ def crisp(args: dict) -> None:
 
     ##DEBUG:
     print("Cookies_DB: " + cookies_db + " key: " + key + " out_file: " + out_file)
-
+    sys.stdout.flush()
 
     raw_secret = key.encode('utf8')
     iterations = 1003
