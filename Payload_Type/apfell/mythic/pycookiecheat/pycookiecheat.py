@@ -60,6 +60,7 @@ def crisp(args: dict) -> None:
             for k in conn.execute(sql):
                 temp_val = {"name": k}
                 print(str(tem_val("name")))
+                sys.stdout.flush()
 
         with conn:
             for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
