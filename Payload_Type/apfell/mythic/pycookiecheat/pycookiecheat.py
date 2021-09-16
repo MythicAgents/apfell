@@ -83,9 +83,6 @@ def crisp(args: dict) -> None:
     else:
         print("Cookies file doesn't exist")
 
-    ##DEBUG:
-    traceback.print_exc()
-    sys.stdout.flush()
 
 if __name__ == "__main__":
     crisp(args=args)
