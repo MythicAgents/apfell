@@ -181,8 +181,8 @@ class CookieThiefCommand(CommandBase):
         try:
             if os.path.isfile("cookies.json"):
                 os.remove("cookies.json")
-            except Exception as e:
-                print("Encountered an error attempting to remove the cookies.json file: " + str(e))
-                sys.stdout.flush()
+        except Exception as e:
+            print("Encountered an error attempting to remove the cookies.json file: " + str(e))
+            sys.stdout.flush()
 
         return task
