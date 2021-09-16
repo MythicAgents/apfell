@@ -37,6 +37,9 @@ def crisp(args: dict) -> None:
     key = args.get("key")
     out_file = args.get("output")
 
+    ##DEBUG:
+    print("Cookies_DB: " + cookies_db + " key: " + key + " out_file: " + out_file)
+
 
     raw_secret = key.encode('utf8')
     iterations = 1003
@@ -51,8 +54,6 @@ def crisp(args: dict) -> None:
         cookies_list = []
 
         with conn:
-            ##DEBUG:
-            print("Cookies_DB: " + cookies_db + " key: " + key + " out_file: " + out_file)
             for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
                 temp_val = {"name": k, "value": v, "path": path, "domain": domain, "expirationDate": expirationDate, "httpOnly": httpOnly, "samesite": samesite, "secure": secure, "id": priority, "session": is_persistent, "hostOnly": False, "storeId":"firefox-default", "sameSite":"no_restriction","firstPartyDomain":""}
                 temp_val["httpOnly"] = False if httpOnly == 0 else True
