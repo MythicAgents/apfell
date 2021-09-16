@@ -8,7 +8,6 @@ import sys
 import json
 from Crypto.Cipher import AES
 from Crypto.Protocol.KDF import PBKDF2
-import argparse
 
 salt = b'saltysalt'
 iv = b' ' * 16
@@ -31,34 +30,6 @@ def decrypt(encrypted_value, key) -> str:
 
     return clean(decrypted)
 
-def parse_args() -> dict:
-    """Returns a dict of arguments"""
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument(
-        "--cookies-file",
-        "-c",
-        help="Full path to the cookies db file",
-        required=True
-    )
-
-    parser.add_argument(
-        "--key",
-        "-k",
-        help="Chrome safe storage key",
-        required=True
-    )
-
-    parser.add_argument(
-        "--output",
-        "-o",
-        help="Path of the output json file",
-        required=True
-    )
-
-    args_raw = parser.parse_args()
-    args: dict = vars(args_raw)
-    return args
 
 def main(args: dict) -> None:
     """This function accepts a path to a Cookies db file and key to decrypt chrome cookies"""
