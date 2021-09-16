@@ -55,6 +55,11 @@ def crisp(args: dict) -> None:
         cookies = {}
         cookies_list = []
 
+        ##DEBUG:
+        with conn:
+            for k in conn.execute(sql):
+                temp_val = {"name": k}
+                print(str(tem_val("name")))
 
         with conn:
             for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
