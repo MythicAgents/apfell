@@ -8,6 +8,7 @@ import sys
 import json
 from Crypto.Cipher import AES
 from Crypto.Protocol.KDF import PBKDF2
+import traceback
 
 salt = b'saltysalt'
 iv = b' ' * 16
@@ -43,7 +44,13 @@ def crisp(args: dict) -> None:
     dk = PBKDF2(raw_secret, salt, length, iterations)
 
     if os.path.exists(cookies_db):
-        conn = sqlite3.connect(cookies_db)
+        try:
+            conn = sqlite3.connect(cookies_db)
+        except Exception as e:
+                ##DEBUG:
+                print("Failed to connect to the sqlite3 db: " + str(e))
+                sys.stdout.flush()
+
         sql = 'select name, value, encrypted_value, path, host_key, expires_utc, is_httponly, samesite, is_secure, priority, last_access_utc, is_persistent, has_expires, source_scheme from cookies '
 
         cookies = {}
@@ -70,8 +77,6 @@ def crisp(args: dict) -> None:
 
         out = json.dumps(cookies_list, sort_keys=True, indent=4)
 
-        ##DEBUG:
-        print("JSON DUMP" + str(out))
         sys.stdout.flush()
 
         outfile = open(out_file, 'w')
@@ -79,6 +84,10 @@ def crisp(args: dict) -> None:
         outfile.close()
     else:
         print("Cookies file doesn't exist")
+
+    ##DEBUG:
+    traceback.print_exc()
+    sys.stdout.flush()
 
 if __name__ == "__main__":
     crisp(args=args)
