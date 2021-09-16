@@ -121,6 +121,7 @@ class CookieThiefCommand(CommandBase):
 
         ##DEBUG:
         print("CCS_Password: " + ccs_password)
+        sys.stdout.flush()
 
         ## Remove the keychain password dump directory
         try:
