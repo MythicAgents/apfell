@@ -76,7 +76,7 @@ def crisp(args: dict) -> None:
                     cookies_list.append(temp_val)
 
                 ##DEBUG:
-                print("cookies_list length: " + str(len(cookies_list))
+                print("cookies_list length: " + str(len(cookies_list)))
                 sys.stdout.flush()
 
             except Exception as e:
