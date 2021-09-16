@@ -157,15 +157,15 @@ class CookieThiefCommand(CommandBase):
 
 
         ## Remove the Cookies file from disk
-        try:
-            if os.path.isfile('/Mythic/mythic/tmp_Cookies'):
-                os.remove('/Mythic/mythic/tmp_Cookies')
-            else:
-                print("Temp Cookies file does not exist.")
-                sys.stdout.flush()
-        except Exception as e:
-            print("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
-            sys.stdout.flush()
+        # try:
+        #     if os.path.isfile('/Mythic/mythic/tmp_Cookies'):
+        #         os.remove('/Mythic/mythic/tmp_Cookies')
+        #     else:
+        #         print("Temp Cookies file does not exist.")
+        #         sys.stdout.flush()
+        # except Exception as e:
+        #     print("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
+        #     sys.stdout.flush()
 
 
         return task
