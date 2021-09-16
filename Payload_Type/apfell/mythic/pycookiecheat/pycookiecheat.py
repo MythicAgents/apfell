@@ -58,6 +58,11 @@ def crisp(args: dict) -> None:
         with conn:
             try:
                 for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
+
+                    ##DEBUG:
+                    print("cookie name: " + k)
+                    sys.stdout.flush()
+
                     temp_val = {"name": k, "value": v, "path": path, "domain": domain, "expirationDate": expirationDate, "httpOnly": httpOnly, "samesite": samesite, "secure": secure, "id": priority, "session": is_persistent, "hostOnly": False, "storeId":"firefox-default", "sameSite":"no_restriction","firstPartyDomain":""}
                     temp_val["httpOnly"] = False if httpOnly == 0 else True
                     temp_val["secure"] = False if httpOnly == 0 else True
@@ -75,9 +80,6 @@ def crisp(args: dict) -> None:
 
                     cookies_list.append(temp_val)
 
-                ##DEBUG:
-                print("cookies_list length: " + str(len(cookies_list)))
-                sys.stdout.flush()
 
             except Exception as e:
                 print("Failed to query the sqlite3 db: " + str(e))
