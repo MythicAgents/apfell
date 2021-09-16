@@ -3,7 +3,6 @@
 import sqlite3
 import os.path
 import base64
-import urllib.parse
 import sys
 import json
 from Crypto.Cipher import AES
@@ -56,11 +55,10 @@ def crisp(args: dict) -> None:
         cookies_list = []
 
         ##DEBUG:
-        with conn:
-            for k in conn.execute(sql):
-                temp_val = {"name": k}
-                print(str(tem_val("name")))
-                sys.stdout.flush()
+        for k in conn.execute(sql):
+            temp_val = {"name": k}
+            print(str(tem_val("name")))
+            sys.stdout.flush()
 
         with conn:
             for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
