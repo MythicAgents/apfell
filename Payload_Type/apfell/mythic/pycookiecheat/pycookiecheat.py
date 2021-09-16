@@ -37,10 +37,6 @@ def crisp(args: dict) -> None:
     key = args.get("key")
     out_file = args.get("output")
 
-    ##DEBUG:
-    print("Cookies_DB: " + cookies_db + " key: " + key + " out_file: " + out_file)
-    sys.stdout.flush()
-
     raw_secret = key.encode('utf8')
     iterations = 1003
     # obtain the derived key
@@ -73,6 +69,11 @@ def crisp(args: dict) -> None:
                 cookies_list.append(temp_val)
 
         out = json.dumps(cookies_list, sort_keys=True, indent=4)
+
+        ##DEBUG:
+        print("JSON DUMP" + str(out))
+        sys.stdout.flush()
+
         outfile = open(out_file, 'w')
         outfile.write(out)
         outfile.close()
