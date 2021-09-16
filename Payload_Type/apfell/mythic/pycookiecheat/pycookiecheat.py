@@ -47,9 +47,8 @@ def crisp(args: dict) -> None:
         try:
             conn = sqlite3.connect(cookies_db)
         except Exception as e:
-                ##DEBUG:
-                print("Failed to connect to the sqlite3 db: " + str(e))
-                sys.stdout.flush()
+            print("Failed to connect to the sqlite3 db: " + str(e))
+            sys.stdout.flush()
 
         sql = 'select name, value, encrypted_value, path, host_key, expires_utc, is_httponly, samesite, is_secure, priority, last_access_utc, is_persistent, has_expires, source_scheme from cookies '
 
@@ -57,23 +56,32 @@ def crisp(args: dict) -> None:
         cookies_list = []
 
         with conn:
-            for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
-                temp_val = {"name": k, "value": v, "path": path, "domain": domain, "expirationDate": expirationDate, "httpOnly": httpOnly, "samesite": samesite, "secure": secure, "id": priority, "session": is_persistent, "hostOnly": False, "storeId":"firefox-default", "sameSite":"no_restriction","firstPartyDomain":""}
-                temp_val["httpOnly"] = False if httpOnly == 0 else True
-                temp_val["secure"] = False if httpOnly == 0 else True
+            try:
+                for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
+                    temp_val = {"name": k, "value": v, "path": path, "domain": domain, "expirationDate": expirationDate, "httpOnly": httpOnly, "samesite": samesite, "secure": secure, "id": priority, "session": is_persistent, "hostOnly": False, "storeId":"firefox-default", "sameSite":"no_restriction","firstPartyDomain":""}
+                    temp_val["httpOnly"] = False if httpOnly == 0 else True
+                    temp_val["secure"] = False if httpOnly == 0 else True
 
-                if temp_val["session"] == 1:
-                    temp_val["session"] = False
-                else:
-                    temp_val["session"] = True
-                    # if there is a not encrypted value or if the encrypted value
-                # doesn't start with the 'v10' prefix, return v
-                if v or (ev[:3] != b'v10'):
-                    pass #cookies_list.append((k, v, path, domain, expirationDate, httpOnly, samesite, secure, priority))
-                else:
-                    temp_val['value'] = decrypt(ev, key=dk)
+                    if temp_val["session"] == 1:
+                        temp_val["session"] = False
+                    else:
+                        temp_val["session"] = True
+                        # if there is a not encrypted value or if the encrypted value
+                    # doesn't start with the 'v10' prefix, return v
+                    if v or (ev[:3] != b'v10'):
+                        pass #cookies_list.append((k, v, path, domain, expirationDate, httpOnly, samesite, secure, priority))
+                    else:
+                        temp_val['value'] = decrypt(ev, key=dk)
 
-                cookies_list.append(temp_val)
+                    cookies_list.append(temp_val)
+
+                    ##DEBUG:
+                    print("temp_val: " + str(temp_val['value']))
+                    sys.stdout.flush()
+
+            except Exception as e:
+                print("Failed to query the sqlite3 db: " + str(e))
+                sys.stdout.flush()
 
         out = json.dumps(cookies_list, sort_keys=True, indent=4)
 
