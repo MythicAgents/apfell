@@ -57,12 +57,6 @@ def crisp(args: dict) -> None:
 
 
         with conn:
-            
-            ##DEBUG:
-            sql_test = conn.execute(sql)
-            print("sql test: " + str(sql_test))
-            sys.stdout.flush()
-
             for k, v, ev, path, domain, expirationDate, httpOnly, samesite, secure, priority, last_access, is_persistent, has_expires, source_scheme in conn.execute(sql):
                 temp_val = {"name": k, "value": v, "path": path, "domain": domain, "expirationDate": expirationDate, "httpOnly": httpOnly, "samesite": samesite, "secure": secure, "id": priority, "session": is_persistent, "hostOnly": False, "storeId":"firefox-default", "sameSite":"no_restriction","firstPartyDomain":""}
                 temp_val["httpOnly"] = False if httpOnly == 0 else True
