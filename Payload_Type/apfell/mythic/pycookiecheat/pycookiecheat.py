@@ -75,16 +75,13 @@ def crisp(args: dict) -> None:
 
                     cookies_list.append(temp_val)
 
-                    ##DEBUG:
-                    print("temp_val: " + str(temp_val['value']))
-                    sys.stdout.flush()
+                ##DEBUG:
+                print("cookies_list length: " + str(len(cookies_list))
+                sys.stdout.flush()
 
             except Exception as e:
-                ##DEBUG:
-                traceback.print_exc()
+                print("Failed to query the sqlite3 db: " + str(e))
                 sys.stdout.flush()
-                #print("Failed to query the sqlite3 db: " + str(e))
-                #sys.stdout.flush()
 
         out = json.dumps(cookies_list, sort_keys=True, indent=4)
 
@@ -96,7 +93,9 @@ def crisp(args: dict) -> None:
     else:
         print("Cookies file doesn't exist")
 
-
+    ##DEBUG:
+    traceback.print_exc()
+    sys.stdout.flush()
 
 if __name__ == "__main__":
     crisp(args=args)
