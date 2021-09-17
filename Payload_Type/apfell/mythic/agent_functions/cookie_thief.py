@@ -169,7 +169,8 @@ class CookieThiefCommand(CommandBase):
             else:
                 await MythicRPC().execute("create_output",task_id=task.id,output="cookie.json file failed on creation")
         except Exception as e:
-            print("PyCookieCheat script failed with error: " + str(e))
+            # print("PyCookieCheat script failed with error: " + str(e))
+            traceback.print_enc()
             sys.stdout.flush()
 
 
