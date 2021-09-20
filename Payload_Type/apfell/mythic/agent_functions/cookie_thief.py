@@ -187,7 +187,7 @@ class CookieThiefCommand(CommandBase):
             else:
                 raise Exception("Temp Cookies file does not exist.")
         except Exception as e:
-            rasie Exception("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
+            raise Exception("Encountered an error attempting to remove the temporary Cookies file: " + str(e))
 
         try:
             if os.path.isfile("cookies.json"):
