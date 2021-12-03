@@ -4,34 +4,53 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class ChromeJsArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "window": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="window",
                 type=ParameterType.Number,
                 description="Window # from chrome_tabs",
+                default_value=0,
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False
+                )]
             ),
-            "javascript": CommandParameter(
+            CommandParameter(
                 name="javascript",
                 type=ParameterType.String,
                 description="javascript to execute",
+                parameter_group_info=[ParameterGroupInfo()]
             ),
-            "tab": CommandParameter(
+            CommandParameter(
                 name="tab",
                 type=ParameterType.Number,
                 description="Tab # from chrome_tabs",
+                default_value=0,
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False
+                )]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                raise ValueError("Missing JSON arguments")
+        if len(self.command_line) == 0:
+            raise ValueError("Need to specify command to run")
+        self.add_arg("javascript", self.command_line)
+
+    async def parse_dictionary(self, dictionary_arguments):
+        if "javascript" in dictionary_arguments:
+            self.add_arg("javascript", dictionary_arguments["javascript"])
         else:
-            raise ValueError("Missing arguments")
+            raise ValueError("Missing 'javascript' argument")
+        if "window" in dictionary_arguments:
+            self.add_arg("window", dictionary_arguments["window"])
+        else:
+            self.add_arg("window", 0)
+        if "tab" in dictionary_arguments:
+            self.add_arg("tab", dictionary_arguments["tab"])
+        else:
+            self.add_arg("tab", 0)
 
 
 class ChromeJsCommand(CommandBase):

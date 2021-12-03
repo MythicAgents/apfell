@@ -1,5 +1,6 @@
 from mythic_payloadtype_container.PayloadBuilder import *
 from mythic_payloadtype_container.MythicCommandBase import *
+from mythic_payloadtype_container.MythicRPC import *
 import sys
 import json
 
@@ -13,13 +14,13 @@ class Apfell(PayloadType):
     wrapped_payloads = []
     note = """This payload uses JavaScript for Automation (JXA) for execution on macOS boxes."""
     supports_dynamic_loading = True
-    build_parameters = {}
     c2_profiles = ["http", "dynamichttp"]
     mythic_encrypts = True
     support_browser_scripts = [
         BrowserScript(script_name="create_table", author="@its_a_feature_")
     ]
     translation_container = None # "translator"
+    build_parameters = []
 
     async def build(self) -> BuildResponse:
         # this function gets called to create an instance of your payload
@@ -29,9 +30,12 @@ class Apfell(PayloadType):
         try:
             command_code = ""
             for cmd in self.commands.get_commands():
-                command_code += (
-                    open(self.agent_code_path / "{}.js".format(cmd), "r").read() + "\n"
-                )
+                try:
+                    command_code += (
+                        open(self.agent_code_path / "{}.js".format(cmd), "r").read() + "\n"
+                    )
+                except Exception as p:
+                    pass
             base_code = open(
                 self.agent_code_path / "base" / "apfell-jxa.js", "r"
             ).read()
@@ -61,6 +65,7 @@ class Apfell(PayloadType):
                             c2_code = c2_code.replace(key, val)
                 except Exception as p:
                     build_msg += str(p)
+                    pass
                 all_c2_code += c2_code
             base_code = base_code.replace("C2PROFILE_HERE", all_c2_code)
             resp.payload = base_code.encode()

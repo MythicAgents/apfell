@@ -17,16 +17,19 @@ exports.shell_elevated = function(task, command, params){
         }
         let use_creds = false;
         let prompt = "An application needs permission to update";
-        if(pieces.hasOwnProperty('use_creds') && typeof pieces['use_creds'] === "boolean"){ use_creds = pieces['use_creds'];}
-        if(!use_creds){
-            if(pieces.hasOwnProperty('prompt') && pieces['prompt'] !== ""){ prompt = pieces['prompt'];}
-            try{
-                response = currentApp.doShellScript(cmd, {administratorPrivileges:true,withPrompt:prompt});
-            }
-            catch(error){
+        if(pieces.hasOwnProperty('prompt') && pieces['prompt'] !== ""){
+            prompt = pieces['prompt'];
+            use_creds = false;
+        }else{
+            use_creds = true;
+        }
+        if(!use_creds) {
+            try {
+                response = currentApp.doShellScript(cmd, {administratorPrivileges: true, withPrompt: prompt});
+            } catch (error) {
                 // shell output uses \r instead of \n or \r\n to line endings, fix this nonsense
                 response = error.toString().replace(/\r/g, "\n");
-                return {"user_output":response, "completed": true, "status": "error"};
+                return {"user_output": response, "completed": true, "status": "error"};
             }
         }
         else{

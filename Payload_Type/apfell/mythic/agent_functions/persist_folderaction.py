@@ -4,47 +4,65 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class PersistFolderactionArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "code": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="code",
                 type=ParameterType.String,
                 description="osascript code",
-                required=False,
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                    group_name="code"
+                )]
             ),
-            "url": CommandParameter(
+            CommandParameter(
                 name="url",
-                required=False,
                 type=ParameterType.String,
                 description="http://url.of.host/payload",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                    group_name="url"
+                )]
             ),
-            "folder": CommandParameter(
+            CommandParameter(
                 name="folder",
                 type=ParameterType.String,
                 description="/path/to/folder/to/watch",
+                parameter_group_info=[
+                    ParameterGroupInfo(ui_position=1, group_name="url"),
+                    ParameterGroupInfo(ui_position=1, group_name="code")
+                ]
             ),
-            "script_path": CommandParameter(
+            CommandParameter(
                 name="script_path",
                 type=ParameterType.String,
                 description="/path/to/script/to/create/on/disk",
+                parameter_group_info=[
+                    ParameterGroupInfo(ui_position=2, group_name="url"),
+                    ParameterGroupInfo(ui_position=2, group_name="code")
+                ]
             ),
-            "language": CommandParameter(
+            CommandParameter(
                 name="language",
                 type=ParameterType.ChooseOne,
                 choices=["JavaScript", "AppleScript"],
+                default_value="JavaScript",
                 description="If supplying custom 'code', this is the language",
+                parameter_group_info=[
+                    ParameterGroupInfo(ui_position=3, group_name="url", required=False),
+                    ParameterGroupInfo(ui_position=3, group_name="code", required=False)
+                ]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                raise ValueError("Missing JSON argument")
-        else:
-            raise ValueError("Missing arguments")
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply arguments")
+        raise ValueError("Must supply named arguments or use the modal")
+
+    async def parse_dictionary(self, dictionary_arguments):
+        self.load_args_from_dictionary(dictionary_arguments)
 
 
 class PersistFolderactionCommand(CommandBase):

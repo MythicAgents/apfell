@@ -5,15 +5,16 @@ import base64
 
 
 class JsimportArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "file": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="file",
                 type=ParameterType.File,
                 description="Select a JXA file to upload",
+                parameter_group_info=[ParameterGroupInfo()]
             )
-        }
+        ]
 
     async def parse_arguments(self):
         if len(self.command_line) > 0:
@@ -24,6 +25,12 @@ class JsimportArguments(TaskArguments):
         else:
             raise ValueError("Missing arguments")
         pass
+
+    async def parse_dictionary(self, dictionary_arguments):
+        if "file" in dictionary_arguments:
+            self.add_arg("file", dictionary_arguments["file"])
+        else:
+            raise ValueError("Missing 'file' argument")
 
 
 class JsimportCommand(CommandBase):

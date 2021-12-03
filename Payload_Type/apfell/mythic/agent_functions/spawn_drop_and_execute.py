@@ -5,25 +5,24 @@ import asyncio
 
 
 class SpawnDropAndExecuteArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "template": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="template",
                 type=ParameterType.Payload,
                 description="apfell agent to use as template to generate a new payload",
                 supported_agents=["apfell"],
             )
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                raise ValueError("Missing JSON arguments")
-        else:
-            raise ValueError("Missing arguments")
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply arguments")
+        raise ValueError("Must use the modal")
+
+    async def parse_dictionary(self, dictionary_arguments):
+        self.load_args_from_dictionary(dictionary_arguments)
 
 
 class SpawnDropAndExecuteCommand(CommandBase):

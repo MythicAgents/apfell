@@ -4,94 +4,118 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class AddUserArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "password": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="New Password",
                 type=ParameterType.String,
                 description="p@55w0rd_here for new user",
-                required=False,
                 default_value="p@55w0rd_here",
-                ui_position=4
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                    ui_position=4
+                )]
             ),
-            "passwd": CommandParameter(
+            CommandParameter(
                 name="Authenticate with this password",
                 type=ParameterType.Credential_Value,
                 description="password of the user that will execute the commands",
-                ui_position=2
+                parameter_group_info=[ParameterGroupInfo(
+                    ui_position=2
+                )]
             ),
-            "user": CommandParameter(
+            CommandParameter(
                 name="Authenticate as this user",
                 type=ParameterType.Credential_Account,
                 description="username that will execute the commands",
-                ui_position=1
+                parameter_group_info=[ParameterGroupInfo(
+                    ui_position=1
+                )]
             ),
-            "createprofile": CommandParameter(
+            CommandParameter(
                 name="createprofile",
                 type=ParameterType.Boolean,
-                required=False,
                 default_value=False,
                 description="create a user profile or not",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                )]
             ),
-            "usershell": CommandParameter(
+            CommandParameter(
                 name="usershell",
                 type=ParameterType.String,
                 description="which shell environment should the new user have",
-                required=False,
                 default_value="/bin/bash",
-                ui_position=5
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                    ui_position=5
+                )]
             ),
-            "primarygroupid": CommandParameter(
+            CommandParameter(
                 name="primarygroupid",
                 type=ParameterType.Number,
-                required=False,
                 description="POSIX primary group id for the new account",
                 default_value=80,
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                )]
             ),
-            "uniqueid": CommandParameter(
+            CommandParameter(
                 name="uniqueid",
                 type=ParameterType.Number,
-                required=False,
                 default_value=403,
                 description="POSIX unique id for the user",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                )]
             ),
-            "homedir": CommandParameter(
+            CommandParameter(
                 name="homedir",
                 type=ParameterType.String,
-                required=False,
                 description="/Users/.jamf_support",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                )]
             ),
-            "realname": CommandParameter(
+            CommandParameter(
                 name="realname",
                 type=ParameterType.String,
-                required=False,
                 default_value="Jamf Support User",
                 description="Full user name",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                )]
             ),
-            "username": CommandParameter(
+            CommandParameter(
                 name="New Username",
                 type=ParameterType.String,
-                required=False,
                 default_value=".jamf_support",
                 description="POSIX username for account",
-                ui_position=3
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                    ui_position=3
+                )]
             ),
-            "hidden": CommandParameter(
+            CommandParameter(
                 name="hidden",
                 type=ParameterType.Boolean,
-                required=False,
                 default_value=False,
                 description="Should the account be hidden from the logon screen",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                )]
             ),
-            "admin": CommandParameter(
+            CommandParameter(
                 name="admin",
                 type=ParameterType.Boolean,
-                required=False,
                 default_value=True,
                 description="Should the account be an admin account",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                )]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
         self.load_args_from_json_string(self.command_line)

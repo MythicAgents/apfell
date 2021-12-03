@@ -3,46 +3,45 @@ import json
 
 
 class PromptArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "title": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="title",
                 type=ParameterType.String,
                 description="Title of the dialog box",
-                required=False,
                 default_value="Application Needs to Update",
+                parameter_group_info=[ParameterGroupInfo(required=False)]
             ),
-            "icon": CommandParameter(
+            CommandParameter(
                 name="icon",
                 type=ParameterType.String,
-                required=False,
                 description="full path to .icns file to use",
                 default_value="/System/Library/PreferencePanes/SoftwareUpdate.prefPane/Contents/Resources/SoftwareUpdate.icns",
+                parameter_group_info=[ParameterGroupInfo(required=False)]
             ),
-            "text": CommandParameter(
+            CommandParameter(
                 name="text",
                 type=ParameterType.String,
-                required=False,
                 description="additional descriptive text to display",
                 default_value="An application needs permission to update",
+                parameter_group_info=[ParameterGroupInfo(required=False)]
             ),
-            "answer": CommandParameter(
+            CommandParameter(
                 name="answer",
                 type=ParameterType.String,
-                required=False,
                 description="Default answer to pre-populate",
+                parameter_group_info=[ParameterGroupInfo(required=False)]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                raise ValueError("Missing JSON argument")
-        else:
-            raise ValueError("Missing arguments")
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply arguments")
+        raise ValueError("Must supply named arguments or use the modal")
+
+    async def parse_dictionary(self, dictionary_arguments):
+        self.load_args_from_dictionary(dictionary_arguments)
 
 
 class PromptCommand(CommandBase):

@@ -6,9 +6,9 @@ from mythic_payloadtype_container.PayloadBuilder import *
 
 
 class ScreenshotArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {}
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = []
 
     async def parse_arguments(self):
         pass
@@ -24,7 +24,8 @@ class ScreenshotCommand(CommandBase):
     parameters = []
     attackmapping = ["T1113"]
     argument_class = ScreenshotArguments
-    browser_script = BrowserScript(script_name="screenshot", author="@its_a_feature_")
+    browser_script = [BrowserScript(script_name="screenshot", author="@its_a_feature_"),
+                      BrowserScript(script_name="screenshot_new", author="@its_a_feature_", for_new_ui=True)]
     supported_os = [SupportedOS.MacOS]
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

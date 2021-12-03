@@ -4,9 +4,9 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class ListAppsArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {}
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = []
 
     async def parse_arguments(self):
         pass
@@ -22,7 +22,8 @@ class ListAppsCommand(CommandBase):
     author = "@its_a_feature_"
     attackmapping = ["T1057"]
     argument_class = ListAppsArguments
-    browser_script = BrowserScript(script_name="list_apps", author="@its_a_feature_")
+    browser_script = [BrowserScript(script_name="list_apps", author="@its_a_feature_"),
+                      BrowserScript(script_name="list_apps_new", author="@its_a_feature_", for_new_ui=True)]
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         resp = await MythicRPC().execute("create_artifact", task_id=task.id,

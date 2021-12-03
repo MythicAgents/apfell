@@ -4,43 +4,45 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class ShellElevatedArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "command": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="command",
                 type=ParameterType.String,
                 description="Command to execute",
+                parameter_group_info=[
+                    ParameterGroupInfo(group_name="manual_creds"),
+                    ParameterGroupInfo(group_name="prompt_creds")
+                ]
             ),
-            "use_creds": CommandParameter(
-                name="use_creds",
-                type=ParameterType.Boolean,
-                description="Use supplied creds or prompt the user for creds",
+            CommandParameter(
+                name="user",
+                type=ParameterType.Credential_Account,
+                parameter_group_info=[ParameterGroupInfo(group_name="manual_creds")]
             ),
-            "user": CommandParameter(
-                name="user", type=ParameterType.Credential_Account,
-                required=False
+            CommandParameter(
+                name="credential",
+                type=ParameterType.Credential_Value,
+                parameter_group_info=[ParameterGroupInfo(group_name="manual_creds")]
             ),
-            "credential": CommandParameter(
-                name="credential", type=ParameterType.Credential_Value,
-                required=False
-            ),
-            "prompt": CommandParameter(
+            CommandParameter(
                 name="prompt",
                 type=ParameterType.String,
                 description="What prompt to display to the user when asking for creds",
-                required=False
+                parameter_group_info=[
+                    ParameterGroupInfo(group_name="prompt_creds")
+                ]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                raise ValueError("Missing JSON arguments")
-        else:
-            raise ValueError("Missing arguments")
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply arguments")
+        raise ValueError("Must supply named arguments or use the modal")
+
+    async def parse_dictionary(self, dictionary_arguments):
+        self.load_args_from_dictionary(dictionary_arguments)
 
 
 class ShellElevatedCommand(CommandBase):

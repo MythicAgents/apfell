@@ -1,22 +1,23 @@
 from mythic_payloadtype_container.MythicCommandBase import *
+import json
 from mythic_payloadtype_container.MythicRPC import *
 
 
-class CdArguments(TaskArguments):
+class CodeSignaturesArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
         self.args = [
             CommandParameter(
                 name="path",
                 type=ParameterType.String,
-                description="path to change directory to",
+                description="path to file (no quotes required)",
                 parameter_group_info=[ParameterGroupInfo()]
             ),
         ]
 
     async def parse_arguments(self):
         if len(self.command_line) == 0:
-            raise ValueError("Need to specify a path")
+            raise ValueError("Must supply a path to a file")
         self.add_arg("path", self.command_line)
 
     async def parse_dictionary(self, dictionary_arguments):
@@ -26,21 +27,19 @@ class CdArguments(TaskArguments):
             raise ValueError("Missing 'path' argument")
 
 
-class CdCommand(CommandBase):
-    cmd = "cd"
+class CodeSignaturesCommand(CommandBase):
+    cmd = "code_signatures"
     needs_admin = False
-    help_cmd = "cd [path]"
-    description = "Change the current working directory to another directory. No quotes are necessary and relative paths are fine"
+    help_cmd = 'code_signatures {/path/to/app.app | /path/to/binary}'
+    description = "This uses JXA to list the code signature information for a binary or bundle"
     version = 1
     author = "@its_a_feature_"
-    argument_class = CdArguments
-    attackmapping = ["T1083"]
+    attackmapping = []
+    argument_class = CodeSignaturesArguments
+    supported_ui_features = ["code_signatures:list"]
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifac="fileManager.changeCurrentDirectoryPath",
-            artifact_type="API Called",
-        )
+        task.display_params = " for " + task.args.get_arg("path")
         return task
 
     async def process_response(self, response: AgentResponse):

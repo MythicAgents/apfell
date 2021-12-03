@@ -4,20 +4,20 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class TestPasswordArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "password": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="password",
                 type=ParameterType.Credential_Value,
                 description="Password to test",
             ),
-            "username": CommandParameter(
+            CommandParameter(
                 name="username",
                 type=ParameterType.Credential_Account,
                 description="Local user to test against",
             ),
-        }
+        ]
 
     async def parse_arguments(self):
         if self.command_line[0] != "{":

@@ -4,34 +4,39 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class ListUsersArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "gid": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="gid",
                 type=ParameterType.Number,
-                required=False,
                 default_value=-1,
                 description="Enumerate users in a specific group or -1 for all groups",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False
+                )]
             ),
-            "groups": CommandParameter(
+            CommandParameter(
                 name="groups",
                 type=ParameterType.Boolean,
-                required=False,
                 default_value=False,
                 description="Enumerate groups and their members ",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False
+                )]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                raise ValueError("Missing JSON arguments")
-        else:
-            raise ValueError("Missing arguments")
-        pass
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply a path to a file")
+        self.add_arg("path", self.command_line)
+
+    async def parse_dictionary(self, dictionary_arguments):
+        if "gid" in dictionary_arguments:
+            self.add_arg("gid", dictionary_arguments["gid"])
+        if "groups" in dictionary_arguments:
+            self.add_arg("groups", dictionary_arguments["groups"])
 
 
 class ListUsersCommand(CommandBase):
