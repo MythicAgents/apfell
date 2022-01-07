@@ -19,7 +19,7 @@ class Apfell(PayloadType):
     support_browser_scripts = [
         BrowserScript(script_name="create_table", author="@its_a_feature_")
     ]
-    translation_container = None # "translator"
+    translation_container = None #"translator"
     build_parameters = []
 
     async def build(self) -> BuildResponse:

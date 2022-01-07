@@ -5,11 +5,6 @@ function(task, responses){
         }, "");
         return {'plaintext': combined};
     }else if(task.completed && responses.length > 0){
-        let folder = {
-                    backgroundColor: "mediumpurple",
-                    color: "white"
-                };
-        let file = {};
         let data = "";
         try{
             data = JSON.parse(responses[0]);
@@ -26,16 +21,17 @@ function(task, responses){
             ls_path = data["parent_path"] + "/" + data["name"];
         }
         let headers = [
-            {"plaintext": "name", "type": "string"},
-            {"plaintext": "size", "type": "size"},
-            {"plaintext": "owner", "type": "string"},
-            {"plaintext": "group", "type": "string"},
-            {"plaintext": "posix", "type": "string", "width": 8},
-            {"plaintext": "actions", "type": "button", "width": 10},
+            {"plaintext": "actions", "type": "button", "width": 100, "disableSort": true},
+            {"plaintext": "size", "type": "size", "width": 200},
+            {"plaintext": "name", "type": "string", "fillWidth": true},
+            {"plaintext": "owner", "type": "string", "width": 300},
+            {"plaintext": "group", "type": "string", "width": 300},
+            {"plaintext": "posix", "type": "string", "width": 100, "disableSort": true},
+
         ];
         let rows = [{
-            "rowStyle": data["is_file"] ? file : folder,
-            "name": {"plaintext": data["name"]},
+            "rowStyle":{},
+            "name": {"plaintext": data["name"], "startIcon": data["is_file"] ? "file": "folder"},
             "size": {"plaintext": data["size"]},
             "owner": {"plaintext": data["permissions"]["owner"]},
             "group": {"plaintext": data["permissions"]["group"]},
@@ -65,11 +61,12 @@ function(task, responses){
                             "parameters": ls_path
                         },
                         {
-                          "name": "Download File",
-                          "type": "task",
-                          "disabled": !data["is_file"],
-                          "ui_feature": "file_browser:download",
-                          "parameters": ls_path
+                            "name": "Download File",
+                            "type": "task",
+                            "disabled": !data["is_file"],
+                            "ui_feature": "file_browser:download",
+                            "parameters": ls_path,
+                            "startIcon": "download"
                         }
                     ]
                 }}
@@ -82,8 +79,8 @@ function(task, responses){
                 ls_path = data["parent_path"] + "/" + data["name"] + "/" + data["files"][i]["name"];
             }
             let row = {
-                "rowStyle": data["files"][i]["is_file"] ? file:  folder,
-                "name": {"plaintext": data["files"][i]["name"]},
+                "rowStyle": {},
+                "name": {"plaintext": data["files"][i]["name"], "startIcon": data["files"][i]["is_file"] ? "file": "folder"},
                 "size": {"plaintext": data["files"][i]["size"]},
                 "owner": {"plaintext": data["files"][i]["permissions"]["owner"]},
                 "group": {"plaintext": data["files"][i]["permissions"]["group"]},
@@ -117,11 +114,14 @@ function(task, responses){
                             "parameters": ls_path
                         },
                         {
-                          "name": "Download File",
-                          "type": "task",
-                          "disabled": !data["files"][i]["is_file"],
-                          "ui_feature": "file_browser:download",
-                          "parameters": ls_path
+                            "name": "Download File",
+                            "type": "task",
+                            "disabled": !data["files"][i]["is_file"],
+                            "ui_feature": "file_browser:download",
+                            "parameters": ls_path,
+                            "startIcon": "download",
+                            "startIconColor": "lightgreen",
+                            "hoverText": "Task agent to download"
                         }
                     ]
                 }}

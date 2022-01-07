@@ -8,10 +8,10 @@ function(task, responses){
         if(responses.length > 0){
 
             let headers = [
-            {"plaintext": "pid", "type": "string", "width": 10},
-            {"plaintext": "name", "type": "string"},
-            {"plaintext": "bundle", "type": "string"},
-            {"plaintext": "entitlements", "type": "button", "width": 14}];
+            {"plaintext": "pid", "type": "string", "width": 100},
+            {"plaintext": "name", "type": "string", "fillWidth": true},
+            {"plaintext": "bundle", "type": "string", "fillWidth": true},
+            {"plaintext": "entitlements", "type": "button", "width": 200}];
             let data = "";
             try{
                 data = JSON.parse(responses[0]);
@@ -26,9 +26,10 @@ function(task, responses){
                 let row = {
                     "name": {"plaintext": data[i]["name"]},
                     "pid": {"plaintext": data[i]["pid"]},
-                    "bundle": {"plaintext": data[i]["bundle"]},
+                    "bundle": {"plaintext": data[i]["bundle"], "copyIcon": true},
                     "entitlements": {"button": {
-                        "name": "View Entitlements",
+                        "name": "",
+                        "startIcon": "list",
                         "type": "dictionary",
                         "value": data[i]["entitlements"],
                         "disabled": Object.keys(data[i]["entitlements"]).length === 0,

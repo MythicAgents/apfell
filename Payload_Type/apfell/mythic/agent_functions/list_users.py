@@ -16,15 +16,6 @@ class ListUsersArguments(TaskArguments):
                     required=False
                 )]
             ),
-            CommandParameter(
-                name="groups",
-                type=ParameterType.Boolean,
-                default_value=False,
-                description="Enumerate groups and their members ",
-                parameter_group_info=[ParameterGroupInfo(
-                    required=False
-                )]
-            ),
         ]
 
     async def parse_arguments(self):

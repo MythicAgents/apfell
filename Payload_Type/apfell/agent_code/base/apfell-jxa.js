@@ -69,8 +69,8 @@ does_file_exist = function(strPath){
 };
 convert_to_nsdata = function(strData){
     // helper function to convert UTF8 strings to NSData objects
-    var tmpString = $.NSString.alloc.initWithCStringEncoding(strData, $.NSData.NSUnicodeStringEncoding);
-    return tmpString.dataUsingEncoding($.NSData.NSUTF16StringEncoding);
+    var tmpString = $.NSString.alloc.initWithCStringEncoding(strData, $.NSUnicodeStringEncoding);
+    return tmpString.dataUsingEncoding($.NSUTF16StringEncoding);
 };
 write_data_to_file = function(data, file_path){
     try{

@@ -82,8 +82,8 @@ function(task, responses){
                                 "headers": [
                                     {"plaintext": "key", "type": "string"},
                                     {"plaintext": "value", "type": "string"},
-                                    {"plaintext": "fetch", "type": "button", "width": 10},
-                                    {"plaintext": "view", "type": "button", "width": 5}
+                                    {"plaintext": "fetch", "type": "button", "width": 100, "disableSort": true},
+                                    {"plaintext": "view", "type": "button", "width": 100, "disableSort": true}
                                 ],
                                 "rows": output_table,
                                 "title": "Clipboard Data"

@@ -13,7 +13,7 @@ function(task, responses){
                         output_table.push({
                             "name":{"plaintext": data[i]["name"]},
                             "pid": {"plaintext": data[i]["process_id"]},
-                            "bundle": {"plaintext": data[i]["bundle"]},
+                            "bundle": {"plaintext": data[i]["bundle"], "copyIcon": true},
                             "arch": {"plaintext": data[i]["architecture"]},
                             "rowStyle": {"backgroundColor": data[i]["frontmost"] ? "mediumpurple": ""},
                             "actions": {"button": {
@@ -45,11 +45,11 @@ function(task, responses){
                         "table": [
                             {
                                 "headers": [
-                                    {"plaintext": "pid", "type": "number", "width": 9},
-                                    {"plaintext": "name", "type": "string"},
-                                    {"plaintext": "bundle", "type": "string"},
-                                    {"plaintext": "arch", "type": "string", "width": 7},
-                                    {"plaintext": "actions", "type": "button", "width": 8},
+                                    {"plaintext": "pid", "type": "number", "width": 100},
+                                    {"plaintext": "name", "type": "string", "fillWidth": true},
+                                    {"plaintext": "bundle", "type": "string", "fillWidth": true},
+                                    {"plaintext": "arch", "type": "string", "width": 100},
+                                    {"plaintext": "actions", "type": "button", "width": 100},
                                 ],
                                 "rows": output_table,
                                 "title": "Process Data"

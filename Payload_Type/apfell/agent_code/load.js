@@ -16,7 +16,7 @@ exports.load = function(task, command, params){
         for(let i = 0; i < parsed_params['commands'].length; i++){
             cmd_list.push({"action": "add", "cmd": parsed_params['commands'][i]})
         }
-        return {"user_output": "Loaded " +parsed_params['commands'], "commands": cmd_list, "completed": true};
+        return {"user_output": "Loaded " + parsed_params['commands'], "commands": cmd_list, "completed": true};
     }
     catch(error){
         return {"user_output":error.toString(), "completed": true, "status": "error"};

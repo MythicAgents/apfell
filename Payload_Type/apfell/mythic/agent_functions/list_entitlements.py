@@ -26,8 +26,6 @@ class ListEntitlementsArguments(TaskArguments):
     async def parse_dictionary(self, dictionary_arguments):
         if "pid" in dictionary_arguments:
             self.add_arg("pid", dictionary_arguments["pid"])
-        else:
-            raise ValueError("Missing 'pid' argument")
 
 
 class ListEntitlementsCommand(CommandBase):
