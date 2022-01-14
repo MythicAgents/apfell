@@ -1,8 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 from mythic_payloadtype_container.MythicRPC import *
-import json
 import sys
-import base64
 
 class UploadArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
@@ -93,21 +91,19 @@ class UploadCommand(CommandBase):
         try:
             groupName = task.args.get_parameter_group_name()
             if groupName == "Default":
-                original_file_name = json.loads(task.original_params)["file"]
-                if len(task.args.get_arg("remote_path")) == 0:
-                    task.args.add_arg("remote_path", original_file_name)
-                elif task.args.get_arg("remote_path")[-1] == "/":
-                    task.args.add_arg("remote_path", task.args.get_arg("remote_path") + original_file_name)
-                file_resp = await MythicRPC().execute("create_file", task_id=task.id,
-                    file=base64.b64encode(task.args.get_arg("file")).decode(),
-                    saved_file_name=original_file_name,
-                    delete_after_fetch=False,
-                )
+                file_resp = await MythicRPC().execute("get_file",
+                                                    file_id=task.args.get_arg("file"),
+                                                    task_id=task.id,
+                                                    get_contents=False)
                 if file_resp.status == MythicRPCStatus.Success:
-                    task.args.add_arg("file", file_resp.response["agent_file_id"])
+                    original_file_name = file_resp.response[0]["filename"]
+                    if len(task.args.get_arg("remote_path")) == 0:
+                        task.args.add_arg("remote_path", original_file_name)
+                    elif task.args.get_arg("remote_path")[-1] == "/":
+                        task.args.add_arg("remote_path", task.args.get_arg("remote_path") + original_file_name)
                     task.display_params = f"{original_file_name} to {task.args.get_arg('remote_path')}"
                 else:
-                    raise Exception("Error from Mythic trying to register file: " + str(file_resp.error))
+                    raise Exception("Error from Mythic trying to get file: " + str(file_resp.error))
             elif groupName == "specify already uploaded file by name":
                 # we're trying to find an already existing file and use that
                 file_resp = await MythicRPC().execute("get_file", task_id=task.id,

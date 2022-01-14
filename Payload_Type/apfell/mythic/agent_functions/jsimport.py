@@ -1,7 +1,5 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 from mythic_payloadtype_container.MythicRPC import *
-import json
-import base64
 
 
 class JsimportArguments(TaskArguments):
@@ -44,16 +42,20 @@ class JsimportCommand(CommandBase):
     argument_class = JsimportArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        original_file_name = json.loads(task.original_params)["file"]
-        file_resp = await MythicRPC().execute("create_file", task_id=task.id,
-            file=base64.b64encode(task.args.get_arg("file")).decode(),
-            saved_file_name=original_file_name
-        )
-        if file_resp.status == MythicStatus.Success:
-            task.args.add_arg("file", file_resp.response["agent_file_id"])
-            task.display_params = f"{original_file_name} into memory"
+        file_resp = await MythicRPC().execute("get_file",
+                                              file_id=task.args.get_arg("file"),
+                                              task_id=task.id,
+                                              get_contents=False)
+        if file_resp.status == MythicRPCStatus.Success:
+            original_file_name = file_resp.response[0]["filename"]
         else:
             raise Exception("Error from Mythic: " + str(file_resp.error))
+        task.display_params = f"{original_file_name} into memory"
+        file_resp = await MythicRPC().execute("update_file",
+                                              file_id=task.args.get_arg("file"),
+                                              delete_after_fetch=True,
+                                              comment="Uploaded into memory for jsimport")
+
         return task
 
     async def process_response(self, response: AgentResponse):
