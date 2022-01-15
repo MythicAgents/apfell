@@ -13,6 +13,13 @@ This uses AppleEvents or ObjectiveC APIs to get information about the current us
 - Version: 1  
 - Author: @its_a_feature_  
 
+
+{{% notice warning %}}   
+If the `JXA` method is selected:
+In Mojave+ (10.14+) this will cause a popup the first time asking for permission for your process to access System Events.
+{{% /notice %}}  
+
+
 ### Arguments
 
 #### method
