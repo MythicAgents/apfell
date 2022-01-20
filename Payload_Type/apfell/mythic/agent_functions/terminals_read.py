@@ -34,7 +34,7 @@ Ex: terminals_read history
     """
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1139", "T1056"]
+    attackmapping = ["T1552.003", "T1056", "T1552", "T1559"]
     argument_class = TerminalsReadArguments
     browser_script = BrowserScript(
         script_name="terminals_read", author="@its_a_feature_"

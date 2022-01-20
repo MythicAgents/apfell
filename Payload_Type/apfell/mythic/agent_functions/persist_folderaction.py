@@ -72,7 +72,7 @@ class PersistFolderactionCommand(CommandBase):
     description = "Use Folder Actions to persist a compiled script on disk. You can either specify a 'URL' and automatically do a backgrounding one-liner, or supply your own code and language."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1546"]
     argument_class = PersistFolderactionArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

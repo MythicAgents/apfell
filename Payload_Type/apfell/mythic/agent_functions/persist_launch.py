@@ -59,7 +59,7 @@ class PersistLaunchCommand(CommandBase):
     description = "Create a launch agent or daemon plist file and either automatically put it in ~/Library/LaunchAgents or if LocalAgent is false, save it to the specified location. If you want an elevated launch agent or launch daemon( /Library/LaunchAgents or /Library/LaunchDaemons), you either need to be in an elevated context already and specify the path or use something like shell_elevated to copy it there. If the first arg is 'apfell-jxa' then the agent will automatically construct a plist appropriate oneliner to use where arg1 should be the URL to reach out to for the payload."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1159", "T1160"]
+    attackmapping = ["T1543.001", "T1543.004"]
     argument_class = PersistLaunchArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

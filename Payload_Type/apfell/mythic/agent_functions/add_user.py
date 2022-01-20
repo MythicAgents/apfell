@@ -129,7 +129,7 @@ class AddUserCommand(CommandBase):
     version = 2
     author = "@its_a_feature_"
     argument_class = AddUserArguments
-    attackmapping = ["T1136", "T1169"]
+    attackmapping = ["T1136", "T1136.001", "T1548.004", "T1564.002"]
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         if task.args.get_arg("hidden"):

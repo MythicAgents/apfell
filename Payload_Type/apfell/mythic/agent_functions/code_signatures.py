@@ -34,7 +34,7 @@ class CodeSignaturesCommand(CommandBase):
     description = "This uses JXA to list the code signature information for a binary or bundle"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1518"]
     argument_class = CodeSignaturesArguments
     supported_ui_features = ["code_signatures:list"]
 

@@ -37,7 +37,7 @@ class TestPasswordCommand(CommandBase):
     description = "Tests a password against a user to see if it's valid via an API call"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1110"]
+    attackmapping = ["T1110", "T1110.001"]
     argument_class = TestPasswordArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

@@ -60,7 +60,7 @@ class ChromeJsCommand(CommandBase):
     description = "This uses AppleEvents to execute the specified JavaScript code into a specific browser tab. The chrome_tabs function will specify for each tab the window/tab numbers that you can use for this function. Note: by default this ability is disabled in Chrome now, you will need to go to view->Developer->Allow JavaScript from Apple Events."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1106", "T1064"]
+    attackmapping = ["T1059.002", "T1559"]
     argument_class = ChromeJsArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

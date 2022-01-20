@@ -34,7 +34,7 @@ class LaunchAppCommand(CommandBase):
     description = "This uses the Objective C bridge to launch the specified app asynchronously and 'hidden' (it'll still show up in the dock for now). An example of the bundle name is 'com.apple.itunes' for launching iTunes."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1564.003"]
     argument_class = LaunchAppArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

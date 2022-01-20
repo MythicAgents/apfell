@@ -37,7 +37,7 @@ class LoadCommand(CommandBase):
     version = 1
     author = "@its_a_feature_"
     parameters = []
-    attackmapping = ["T1030", "T1129"]
+    attackmapping = ["T1030", "T1129", "T1059.002", "T1620"]
     argument_class = LoadArguments
     attributes = CommandAttributes(
         suggested_command=True

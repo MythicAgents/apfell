@@ -35,7 +35,7 @@ class ListEntitlementsCommand(CommandBase):
     description = "This uses JXA to list the entitlements for a running process"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1057"]
     argument_class = ListEntitlementsArguments
     supported_ui_features = ["list_entitlements:list"]
     browser_script = [BrowserScript(script_name="list_entitlements_new", author="@its_a_feature_", for_new_ui=True)]

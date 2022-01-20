@@ -56,7 +56,7 @@ WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!
     """
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1059", "T1141", "T1169"]
+    attackmapping = ["T1059", "T1059.004", "T1548.004"]
     argument_class = ShellElevatedArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

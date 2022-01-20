@@ -19,7 +19,7 @@ class SecurityInfoCommand(CommandBase):
     description = 'This uses JXA to list some security information about the system by contacting the "System Events" application via Apple Events. This can cause a popup or be denied in Mojave and later'
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1201"]
+    attackmapping = ["T1082"]
     argument_class = SecurityInfoArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

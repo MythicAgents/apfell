@@ -37,7 +37,7 @@ class ListUsersCommand(CommandBase):
     description = "This uses JXA to list the non-service user accounts on the system. You can specify a GID to look at the users of a certain group or you can specify 'groups' to be true and enumerate users by groups"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1087", "T1069"]
+    attackmapping = ["T1087", "T1087.001", "T1087.002", "T1069", "T1069.001", "T1069.002"]
     argument_class = ListUsersArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

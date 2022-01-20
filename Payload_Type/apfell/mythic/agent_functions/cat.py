@@ -35,7 +35,7 @@ class CatCommand(CommandBase):
     version = 1
     author = "@its_a_feature_"
     argument_class = CatArguments
-    attackmapping = ["T1081", "T1106"]
+    attackmapping = ["T1005", "T1552.001"]
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         resp = await MythicRPC().execute("create_artifact", task_id=task.id,

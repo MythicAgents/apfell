@@ -32,7 +32,7 @@ class SpawnDropAndExecuteCommand(CommandBase):
     description = "Generate a new payload, drop it to a temp location, execute it with osascript as a background process, and then delete the file. Automatically reports back the temp file it created"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1059.002", "T1553.001"]
     argument_class = SpawnDropAndExecuteArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

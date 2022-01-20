@@ -38,7 +38,7 @@ class JsimportCommand(CommandBase):
     description = "import a JXA file into memory. Only one can be imported at a time."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1020", "T1030", "T1041", "T1620", "T1105"]
     argument_class = JsimportArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

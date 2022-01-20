@@ -47,7 +47,7 @@ class TerminalsSendCommand(CommandBase):
     """
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1059", "T1184"]
+    attackmapping = ["T1552", "T1559", "T1548.003", "T1059.004"]
     argument_class = TerminalsSendArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

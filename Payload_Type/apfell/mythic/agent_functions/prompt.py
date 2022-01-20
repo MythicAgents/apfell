@@ -51,7 +51,7 @@ class PromptCommand(CommandBase):
     description = "Create a custom prompt to ask the user for credentials where you can provide titles, icons, text and default answer."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1141"]
+    attackmapping = ["T1056.002"]
     argument_class = PromptArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

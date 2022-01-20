@@ -30,7 +30,7 @@ class SpawnDownloadCradleCommand(CommandBase):
     description = "Spawn a new osascript download cradle as a backgrounded process to launch a new callback"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1059.002", "T1553.001", "T1620"]
     argument_class = SpawnDownloadCradleArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

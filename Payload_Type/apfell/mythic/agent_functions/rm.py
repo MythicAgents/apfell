@@ -39,7 +39,7 @@ class RmCommand(CommandBase):
     version = 1
     supported_ui_features = ["file_browser:remove"]
     author = "@its_a_feature_"
-    attackmapping = ["T1106", "T1107"]
+    attackmapping = ["T1106", "T1070.004"]
     argument_class = RmArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

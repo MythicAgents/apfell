@@ -65,7 +65,7 @@ class ShellCommand(CommandBase):
 WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!"""
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1059"]
+    attackmapping = ["T1059", "T1059.004"]
     argument_class = ShellArguments
     opsec_class = ShellOPSEC
     attributes = CommandAttributes(

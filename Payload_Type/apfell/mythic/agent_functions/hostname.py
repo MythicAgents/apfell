@@ -19,7 +19,7 @@ class HostnameCommand(CommandBase):
     description = "Get the various hostnames associated with the host, including the NETBIOS name if the computer is domain joined"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1082"]
     argument_class = HostnameArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

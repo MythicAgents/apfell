@@ -19,7 +19,7 @@ class IfconfigCommand(CommandBase):
     description = "Return all the IP addresses associated with the host"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1082"]
     argument_class = IfconfigArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

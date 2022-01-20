@@ -33,7 +33,7 @@ class JscriptCommand(CommandBase):
     description = "This runs the JavaScript command, {command}, and returns its output via an eval(). The output will get passed through ObjC.deepUnwrap to parse out basic data types from ObjectiveC and get strings back"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1064"]
+    attackmapping = ["T1059.002"]
     argument_class = JscriptArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

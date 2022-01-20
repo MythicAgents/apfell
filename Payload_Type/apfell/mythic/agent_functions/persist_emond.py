@@ -58,7 +58,7 @@ class PersistEmondCommand(CommandBase):
     description = "Create persistence with an emond plist file in /etc/emond.d/rules/ and a .DS_Store file to trigger it"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1150"]
+    attackmapping = ["T1547.011", "T1053", "T1546.014"]
     argument_class = PersistEmondArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

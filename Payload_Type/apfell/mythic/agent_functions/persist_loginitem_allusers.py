@@ -35,7 +35,7 @@ class PersistLoginItemAllUsersCommand(CommandBase):
     description = "Add a login item for all users via the LSSharedFileListInsertItemURL. The kLSSharedFileListGlobalLoginItems constant is used when creating the shared list in the LSSharedFileListCreate function. Before calling LSSharedFileListInsertItemURL, AuthorizationCreate is called to obtain the necessary rights. If the current user is not an administrator, the LSSharedFileListInsertItemURL function will fail"
     version = 1
     author = "@xorrior"
-    attackmapping = []
+    attackmapping = ["T1547.015"]
     argument_class = PersistLoginItemAllUsersArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

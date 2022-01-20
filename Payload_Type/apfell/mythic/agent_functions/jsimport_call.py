@@ -33,7 +33,7 @@ class JsimportCallCommand(CommandBase):
     description = "call a function from within the JS file that was imported with 'jsimport'. This function call is appended to the end of the jsimport code and called via eval."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1155", "T1064"]
+    attackmapping = ["T1059.002"]
     argument_class = JsimportCallArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
