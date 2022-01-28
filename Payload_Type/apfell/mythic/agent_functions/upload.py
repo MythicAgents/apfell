@@ -11,7 +11,8 @@ class UploadArguments(TaskArguments):
                 parameter_group_info=[
                     ParameterGroupInfo(
                         required=True,
-                        group_name="Default"
+                        group_name="Default",
+                        ui_position=0
                     )
                 ]
             ),
@@ -22,6 +23,7 @@ class UploadArguments(TaskArguments):
                 parameter_group_info=[
                     ParameterGroupInfo(
                         required=True,
+                        ui_position=0,
                         group_name="specify already uploaded file by name"
                     )
                 ]
@@ -64,10 +66,13 @@ class UploadArguments(TaskArguments):
         if file_resp.status == MythicRPCStatus.Success:
             file_names = []
             for f in file_resp.response:
+                # await MythicRPC().execute("get_file_contents", agent_file_id=f["agent_file_id"])
                 if f["filename"] not in file_names:
                     file_names.append(f["filename"])
             return file_names
         else:
+            await MythicRPC().execute("create_event_message", warning=True,
+                                      message=f"Failed to get files: {file_resp.error}")
             return []
 
 
@@ -96,12 +101,15 @@ class UploadCommand(CommandBase):
                                                     task_id=task.id,
                                                     get_contents=False)
                 if file_resp.status == MythicRPCStatus.Success:
-                    original_file_name = file_resp.response[0]["filename"]
-                    if len(task.args.get_arg("remote_path")) == 0:
-                        task.args.add_arg("remote_path", original_file_name)
-                    elif task.args.get_arg("remote_path")[-1] == "/":
-                        task.args.add_arg("remote_path", task.args.get_arg("remote_path") + original_file_name)
-                    task.display_params = f"{original_file_name} to {task.args.get_arg('remote_path')}"
+                    if len(file_resp.response) > 0:
+                        original_file_name = file_resp.response[0]["filename"]
+                        if len(task.args.get_arg("remote_path")) == 0:
+                            task.args.add_arg("remote_path", original_file_name)
+                        elif task.args.get_arg("remote_path")[-1] == "/":
+                            task.args.add_arg("remote_path", task.args.get_arg("remote_path") + original_file_name)
+                        task.display_params = f"{original_file_name} to {task.args.get_arg('remote_path')}"
+                    else:
+                        raise Exception("Failed to find that file")
                 else:
                     raise Exception("Error from Mythic trying to get file: " + str(file_resp.error))
             elif groupName == "specify already uploaded file by name":

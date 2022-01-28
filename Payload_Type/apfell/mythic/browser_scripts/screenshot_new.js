@@ -8,7 +8,7 @@ function(task, responses){
         if(responses.length > 0){
             let data = JSON.parse(responses[0]);
             return {"screenshot":[{
-                "agent_file_id": data["file_id"],
+                "agent_file_id": [data["file_id"]],
                 "variant": "contained",
                 "name": "View Screenshot"
             }]};
@@ -21,7 +21,7 @@ function(task, responses){
         if(responses.length > 0){
             let data = JSON.parse(responses[0]);
             return {"screenshot":[{
-                "agent_file_id": data["file_id"],
+                "agent_file_id": [data["file_id"]],
                 "variant": "contained",
                 "name": "View Partial Screenshot"
             }]};

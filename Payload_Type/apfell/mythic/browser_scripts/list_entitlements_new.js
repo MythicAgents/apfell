@@ -11,7 +11,8 @@ function(task, responses){
             {"plaintext": "pid", "type": "string", "width": 100},
             {"plaintext": "name", "type": "string", "fillWidth": true},
             {"plaintext": "bundle", "type": "string", "fillWidth": true},
-            {"plaintext": "entitlements", "type": "button", "width": 200}];
+            {"plaintext": "entitlements", "type": "button", "width": 200},
+                {"plaintext": "test", "type": "button", "width": 200}];
             let data = "";
             try{
                 data = JSON.parse(responses[0]);
@@ -36,7 +37,7 @@ function(task, responses){
                         "leftColumnTitle": "Entitlements",
                         "rightColumnTitle": "Value",
                         "title": "Viewing Entitlements"
-                    }}
+                    }},
                 };
                 rows.push(row);
             }
