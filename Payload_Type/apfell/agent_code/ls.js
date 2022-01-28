@@ -16,7 +16,7 @@ exports.ls = function(task, command, params){
                 };
             }
         }
-        if (path[0] === '"') {
+        if (path[0] === '"' || path[0] === "'") {
             path = path.substring(1, path.length - 1);
         }
         if(path[0] === '~'){
@@ -76,12 +76,24 @@ exports.ls = function(task, command, params){
                 }
             }
             let nsposix = attributes['NSFilePosixPermissions'];
-            let components =  ObjC.deepUnwrap( fileManager.componentsToDisplayForPath(path) ).slice(1, -1);
+            let components =  ObjC.deepUnwrap( fileManager.componentsToDisplayForPath(path) ).slice(1);
             if( components.length > 0 && components[0] === "Macintosh HD"){
                 components.pop();
             }
-            output['parent_path'] = "/" + components.join("/");
-            output['name'] = fileManager.displayNameAtPath(path).js;
+            // say components = "etc, krb5.keytab"
+            // check all components to see if they're symlinks
+            let parent_path = "/";
+            for(let p = 0; p < components.length; p++){
+                let resolvedSymLink = fileManager.destinationOfSymbolicLinkAtPathError( $( parent_path + components[p] ), $.nil ).js;
+                if(resolvedSymLink){
+                    parent_path = parent_path + resolvedSymLink + "/";
+                }else{
+                    parent_path = parent_path + components[p] + "/";
+                }
+            }
+            output['name'] = fileManager.displayNameAtPath(parent_path).js;
+            output['parent_path'] = parent_path.slice(0, -(output["name"].length + 1));
+
             if(output['name'] === "Macintosh HD"){output['name'] = "/";}
             if(output['name'] === output['parent_path']){output['parent_path'] = "";}
             output['size'] = attributes['NSFileSize'];
