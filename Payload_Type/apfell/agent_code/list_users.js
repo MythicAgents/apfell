@@ -50,6 +50,7 @@ exports.list_users = function(task, command, params){
         for (let i = 0; i < numResults; i++) {
             let idObj = results[i];
             let info = {
+
                 "POSIXName": idObj.posixName.js,
                 "POSIXID": idObj.posixUID,
                 "POSIXGID": group.posixGID,

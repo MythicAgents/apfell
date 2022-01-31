@@ -12,6 +12,11 @@ Use the built-in CGDisplay API calls to capture the display and send it back ove
 - Version: 1  
 - Author: @its_a_feature_  
 
+{{% notice warning %}}   
+In Catalina+ (10.15+) there are TCC protections against this, so be careful
+{{% /notice %}}  
+
+
 ### Arguments
 
 ## Usage
@@ -37,6 +42,4 @@ let bitmapimagerep = $.NSBitmapImageRep.alloc.initWithCGImage(cgimage);
 let capture = bitmapimagerep.representationUsingTypeProperties($.NSBitmapImageFileTypePNG, Ref());
 ```
 The screencapture is chunked and sent back to Mythic.
-
->**NOTE** With 10.15, there are protections against this, so be careful
 
