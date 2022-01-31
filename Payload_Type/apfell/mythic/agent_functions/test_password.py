@@ -4,20 +4,20 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class TestPasswordArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "password": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="password",
                 type=ParameterType.Credential_Value,
                 description="Password to test",
             ),
-            "username": CommandParameter(
+            CommandParameter(
                 name="username",
                 type=ParameterType.Credential_Account,
                 description="Local user to test against",
             ),
-        }
+        ]
 
     async def parse_arguments(self):
         if self.command_line[0] != "{":
@@ -37,7 +37,7 @@ class TestPasswordCommand(CommandBase):
     description = "Tests a password against a user to see if it's valid via an API call"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1110"]
+    attackmapping = ["T1110", "T1110.001"]
     argument_class = TestPasswordArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

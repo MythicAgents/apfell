@@ -4,25 +4,27 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class LaunchAppArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "bundle": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="bundle",
                 type=ParameterType.String,
                 description="The Bundle name to launch",
+                parameter_group_info=[ParameterGroupInfo()]
             )
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                self.add_arg("bundle", self.command_line)
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply a path to a file")
+        self.add_arg("bundle", self.command_line)
+
+    async def parse_dictionary(self, dictionary_arguments):
+        if "bundle" in dictionary_arguments:
+            self.add_arg("bundle", dictionary_arguments["bundle"])
         else:
-            raise ValueError("Missing arguments")
-        pass
+            raise ValueError("Missing 'bundle' argument")
 
 
 class LaunchAppCommand(CommandBase):
@@ -32,7 +34,7 @@ class LaunchAppCommand(CommandBase):
     description = "This uses the Objective C bridge to launch the specified app asynchronously and 'hidden' (it'll still show up in the dock for now). An example of the bundle name is 'com.apple.itunes' for launching iTunes."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1564.003"]
     argument_class = LaunchAppArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

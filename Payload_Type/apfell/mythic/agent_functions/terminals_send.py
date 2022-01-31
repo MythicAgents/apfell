@@ -4,34 +4,38 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class TerminalsSendArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "window": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="window",
                 type=ParameterType.Number,
+                default_value=0,
                 description="window # to send command to",
+                parameter_group_info=[ParameterGroupInfo(required=False)]
             ),
-            "tab": CommandParameter(
+            CommandParameter(
                 name="tab",
                 type=ParameterType.Number,
+                default_value=0,
                 description="tab # to send command to",
+                parameter_group_info=[ParameterGroupInfo(required=False)]
             ),
-            "command": CommandParameter(
+            CommandParameter(
                 name="command",
                 type=ParameterType.String,
                 description="command to execute",
+                parameter_group_info=[ParameterGroupInfo()]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                raise ValueError("Missing JSON arguments")
-        else:
-            raise ValueError("Missing arguments")
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply arguments")
+        raise ValueError("Must supply named arguments or use the modal")
+
+    async def parse_dictionary(self, dictionary_arguments):
+        self.load_args_from_dictionary(dictionary_arguments)
 
 
 class TerminalsSendCommand(CommandBase):
@@ -43,7 +47,7 @@ class TerminalsSendCommand(CommandBase):
     """
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1059", "T1184"]
+    attackmapping = ["T1552", "T1559", "T1548.003", "T1059.004"]
     argument_class = TerminalsSendArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

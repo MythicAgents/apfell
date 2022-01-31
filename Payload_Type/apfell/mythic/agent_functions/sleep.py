@@ -1,6 +1,6 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 from mythic_payloadtype_container.MythicRPC import *
-import json
+import sys
 
 
 def positiveTime(val):
@@ -9,26 +9,30 @@ def positiveTime(val):
 
 
 class SleepArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "jitter": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="jitter",
                 type=ParameterType.Number,
                 validation_func=positiveTime,
-                required=False,
                 description="Percentage of C2's interval to use as jitter",
-                ui_position=2
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                    ui_position=2
+                )]
             ),
-            "interval": CommandParameter(
+            CommandParameter(
                 name="interval",
                 type=ParameterType.Number,
-                required=False,
                 validation_func=positiveTime,
                 description="Number of seconds between checkins",
-                ui_position=1
+                parameter_group_info=[ParameterGroupInfo(
+                    required=False,
+                    ui_position=1
+                )]
             ),
-        }
+        ]
 
     async def parse_arguments(self):
         if self.command_line[0] != "{":

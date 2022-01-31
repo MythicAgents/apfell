@@ -16,7 +16,7 @@ exports.ls = function(task, command, params){
                 };
             }
         }
-        if (path[0] === '"') {
+        if (path[0] === '"' || path[0] === "'") {
             path = path.substring(1, path.length - 1);
         }
         if(path[0] === '~'){
@@ -25,6 +25,7 @@ exports.ls = function(task, command, params){
         output['host'] = ObjC.unwrap(apfell.procInfo.hostName);
         output['update_deleted'] = true;
         let attributes = ObjC.deepUnwrap(fileManager.attributesOfItemAtPathError($(path), error));
+        let time_attributes = ObjC.unwrap(fileManager.attributesOfItemAtPathError($(path), error));
         if (attributes !== undefined) {
             output['is_file'] = true;
             output['files'] = [];
@@ -41,6 +42,7 @@ exports.ls = function(task, command, params){
                     }
                     for (let i = 0; i < sub_files.length; i++) {
                         let attr = ObjC.deepUnwrap(fileManager.attributesOfItemAtPathError($(path + sub_files[i]), error));
+                        let time_attr = ObjC.unwrap(fileManager.attributesOfItemAtPathError($(path + sub_files[i]), error));
                         let file_add = {};
                         file_add['name'] = sub_files[i];
                         file_add['is_file'] = attr['NSFileType'] !== "NSFileTypeDirectory";
@@ -61,9 +63,9 @@ exports.ls = function(task, command, params){
                         file_add['permissions']['posix'] = ((nsposix >> 6) & 0x7).toString() + ((nsposix >> 3) & 0x7).toString() + (nsposix & 0x7).toString();
                         file_add['permissions']['owner'] = attr['NSFileOwnerAccountName'] + "(" + attr['NSFileOwnerAccountID'] + ")";
                         file_add['permissions']['group'] = attr['NSFileGroupOwnerAccountName'] + "(" + attr['NSFileGroupOwnerAccountID'] + ")";
-                        file_add['permissions']['hidden'] = attr['NSFileExtenionAttribute'] === true;
-                        file_add['permissions']['create_time'] = attributes['NSFileCreationDate'];
-                        file_add['modify_time'] = attributes['NSFileModificationDate'];
+                        file_add['permissions']['hidden'] = attr['NSFileExtensionAttribute'] === true;
+                        file_add['permissions']['create_time'] = Math.trunc(time_attr['NSFileCreationDate'].timeIntervalSince1970 * 1000);
+                        file_add['modify_time'] = Math.trunc(time_attr['NSFileModificationDate'].timeIntervalSince1970 * 1000);
                         file_add['access_time'] = "";
                         files_data.push(file_add);
                     }
@@ -74,17 +76,29 @@ exports.ls = function(task, command, params){
                 }
             }
             let nsposix = attributes['NSFilePosixPermissions'];
-            let components =  ObjC.deepUnwrap( fileManager.componentsToDisplayForPath(path) ).slice(1, -1);
+            let components =  ObjC.deepUnwrap( fileManager.componentsToDisplayForPath(path) ).slice(1);
             if( components.length > 0 && components[0] === "Macintosh HD"){
                 components.pop();
             }
-            output['parent_path'] = "/" + components.join("/");
-            output['name'] = fileManager.displayNameAtPath(path).js;
+            // say components = "etc, krb5.keytab"
+            // check all components to see if they're symlinks
+            let parent_path = "/";
+            for(let p = 0; p < components.length; p++){
+                let resolvedSymLink = fileManager.destinationOfSymbolicLinkAtPathError( $( parent_path + components[p] ), $.nil ).js;
+                if(resolvedSymLink){
+                    parent_path = parent_path + resolvedSymLink + "/";
+                }else{
+                    parent_path = parent_path + components[p] + "/";
+                }
+            }
+            output['name'] = fileManager.displayNameAtPath(parent_path).js;
+            output['parent_path'] = parent_path.slice(0, -(output["name"].length + 1));
+
             if(output['name'] === "Macintosh HD"){output['name'] = "/";}
             if(output['name'] === output['parent_path']){output['parent_path'] = "";}
             output['size'] = attributes['NSFileSize'];
             output['access_time'] = "";
-            output['modify_time'] = attributes['NSFileModificationDate'];
+            output['modify_time'] = Math.trunc(time_attributes['NSFileModificationDate'].timeIntervalSince1970 * 1000);
             if(attributes['NSFileExtendedAttributes'] !== undefined){
                 let extended = {};
                 let perms = attributes['NSFileExtendedAttributes'].js;
@@ -95,7 +109,7 @@ exports.ls = function(task, command, params){
             }else{
                 output['permissions'] = {};
             }
-            output['permissions']['create_time'] = attributes['NSFileCreationDate'];
+            output['permissions']['create_time'] = Math.trunc(time_attributes['NSFileCreationDate'].timeIntervalSince1970 * 1000);
             output['permissions']['posix'] =((nsposix >> 6) & 0x7).toString() + ((nsposix >> 3) & 0x7).toString() + (nsposix & 0x7).toString();
             output['permissions']['owner'] = attributes['NSFileOwnerAccountName'] + "(" + attributes['NSFileOwnerAccountID'] + ")";
             output['permissions']['group'] = attributes['NSFileGroupOwnerAccountName'] + "(" + attributes['NSFileGroupOwnerAccountID'] + ")";

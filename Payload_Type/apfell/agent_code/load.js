@@ -12,15 +12,13 @@ exports.load = function(task, command, params){
         commands_dict = Object.assign({}, commands_dict, new_dict);
         // update the config with our new information
         C2.commands = Object.keys(commands_dict);
-        let cmds = parsed_params['cmds'].split(" ")
         let cmd_list = [];
-        for(let i = 0; i < cmds.length; i++){
-            cmd_list.push({"action": "add", "cmd": cmds[i]})
+        for(let i = 0; i < parsed_params['commands'].length; i++){
+            cmd_list.push({"action": "add", "cmd": parsed_params['commands'][i]})
         }
-        return {"user_output": "Loaded " + parsed_params['cmds'], "commands": cmd_list, "completed": true};
+        return {"user_output": "Loaded " + parsed_params['commands'], "commands": cmd_list, "completed": true};
     }
     catch(error){
-        //console.log("errored in load function");
         return {"user_output":error.toString(), "completed": true, "status": "error"};
     }
 };

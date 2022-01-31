@@ -3,22 +3,19 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class ShellArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "command": CommandParameter(
-                name="command", type=ParameterType.String, description="Command to run"
-            ),
-        }
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(name="command", display_name="Command", type=ParameterType.String, description="Command to run"),
+        ]
 
     async def parse_arguments(self):
-        if len(self.command_line) > 0:
-            if self.command_line[0] == "{":
-                self.load_args_from_json_string(self.command_line)
-            else:
-                self.add_arg("command", self.command_line)
-        else:
-            raise ValueError("Missing arguments")
+        if len(self.command_line) == 0:
+            raise ValueError("Must supply a command to run")
+        self.add_arg("command", self.command_line)
+
+    async def parse_dictionary(self, dictionary_arguments):
+        self.load_args_from_dictionary(dictionary_arguments)
 
 
 class ShellOPSEC(CommandOPSEC):
@@ -68,12 +65,11 @@ class ShellCommand(CommandBase):
 WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!"""
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1059"]
+    attackmapping = ["T1059", "T1059.004"]
     argument_class = ShellArguments
     opsec_class = ShellOPSEC
     attributes = CommandAttributes(
-        spawn_and_injectable=True,
-        supported_os=[SupportedOS.MacOS]
+        suggested_command=True
     )
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:

@@ -1,19 +1,18 @@
 from mythic_payloadtype_container.MythicCommandBase import *
 from mythic_payloadtype_container.MythicRPC import *
-import json
-import base64
 
 
 class JsimportArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {
-            "file": CommandParameter(
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = [
+            CommandParameter(
                 name="file",
                 type=ParameterType.File,
                 description="Select a JXA file to upload",
+                parameter_group_info=[ParameterGroupInfo()]
             )
-        }
+        ]
 
     async def parse_arguments(self):
         if len(self.command_line) > 0:
@@ -25,6 +24,12 @@ class JsimportArguments(TaskArguments):
             raise ValueError("Missing arguments")
         pass
 
+    async def parse_dictionary(self, dictionary_arguments):
+        if "file" in dictionary_arguments:
+            self.add_arg("file", dictionary_arguments["file"])
+        else:
+            raise ValueError("Missing 'file' argument")
+
 
 class JsimportCommand(CommandBase):
     cmd = "jsimport"
@@ -33,20 +38,24 @@ class JsimportCommand(CommandBase):
     description = "import a JXA file into memory. Only one can be imported at a time."
     version = 1
     author = "@its_a_feature_"
-    attackmapping = []
+    attackmapping = ["T1020", "T1030", "T1041", "T1620", "T1105"]
     argument_class = JsimportArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
-        original_file_name = json.loads(task.original_params)["file"]
-        file_resp = await MythicRPC().execute("create_file", task_id=task.id,
-            file=base64.b64encode(task.args.get_arg("file")).decode(),
-            saved_file_name=original_file_name
-        )
-        if file_resp.status == MythicStatus.Success:
-            task.args.add_arg("file", file_resp.response["agent_file_id"])
-            task.display_params = f"{original_file_name} into memory"
+        file_resp = await MythicRPC().execute("get_file",
+                                              file_id=task.args.get_arg("file"),
+                                              task_id=task.id,
+                                              get_contents=False)
+        if file_resp.status == MythicRPCStatus.Success:
+            original_file_name = file_resp.response[0]["filename"]
         else:
             raise Exception("Error from Mythic: " + str(file_resp.error))
+        task.display_params = f"{original_file_name} into memory"
+        file_resp = await MythicRPC().execute("update_file",
+                                              file_id=task.args.get_arg("file"),
+                                              delete_after_fetch=True,
+                                              comment="Uploaded into memory for jsimport")
+
         return task
 
     async def process_response(self, response: AgentResponse):

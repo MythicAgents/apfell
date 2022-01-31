@@ -4,9 +4,9 @@ from mythic_payloadtype_container.MythicRPC import *
 
 
 class ITermArguments(TaskArguments):
-    def __init__(self, command_line):
-        super().__init__(command_line)
-        self.args = {}
+    def __init__(self, command_line, **kwargs):
+        super().__init__(command_line, **kwargs)
+        self.args = []
 
     async def parse_arguments(self):
         pass
@@ -19,7 +19,7 @@ class ITermCommand(CommandBase):
     description = "Read the contents of all open iTerm tabs if iTerms is open, otherwise just inform the operator that it's not currently running"
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1139", "T1056"]
+    attackmapping = ["T1552.003", "T1552", "T1056", "T1559"]
     argument_class = ITermArguments
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
