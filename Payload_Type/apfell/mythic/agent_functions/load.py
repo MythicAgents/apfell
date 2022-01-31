@@ -45,22 +45,45 @@ class LoadCommand(CommandBase):
 
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         total_code = ""
-        for cmd in task.args.get_arg("commands"):
-            cmd = cmd.strip()
-            try:
-                code_path = self.agent_code_path / "{}.js".format(cmd)
-                total_code += open(code_path, "r").read() + "\n"
-            except Exception as e:
-                raise Exception("Failed to find code for '{}'".format(cmd))
-        resp = await MythicRPC().execute("create_file", task_id=task.id,
-            file=base64.b64encode(total_code.encode()).decode(),
-            comment="Loading the following commands: " + task.args.command_line
-        )
-        if resp.status == MythicStatus.Success:
-            task.args.add_arg("file_id", resp.response["agent_file_id"])
-            task.display_params = f"the following commands: {' '.join(task.args.get_arg('commands'))}"
+        commands = await MythicRPC().execute("get_commands",
+                                             payload_type_name="apfell",
+                                             commands=task.args.get_arg("commands"),
+                                             os="macOS")
+        if commands.status == "success":
+            for cmd in commands.response:
+                if cmd["script_only"]:
+                    # trying to load a script only command, so just tell mythic to load it
+                    add_resp = await MythicRPC().execute("add_commands_to_callback",
+                                                         task_id=task.id,
+                                                         commands=[cmd["cmd"]])
+                    if add_resp.status != "success":
+                        await MythicRPC().execute("create_output", task_id=task.id,
+                                                  output="Failed to add command to callback: " + add_resp.error)
+                else:
+                    try:
+                        code_path = self.agent_code_path / "{}.js".format(cmd["cmd"])
+                        total_code += open(code_path, "r").read() + "\n"
+                    except Exception as e:
+                        await MythicRPC().execute("create_output",
+                                                  task_id=task.id,
+                                                  output=f"Failed to find code for {cmd['cmd']}, skipping it\n")
+            if total_code != "":
+                resp = await MythicRPC().execute("create_file", task_id=task.id,
+                    file=base64.b64encode(total_code.encode()).decode(),
+                    comment="Loading the following commands: " + task.args.command_line
+                )
+                if resp.status == MythicStatus.Success:
+                    task.args.add_arg("file_id", resp.response["agent_file_id"])
+                    task.display_params = f"the following commands: {' '.join(task.args.get_arg('commands'))}"
+                else:
+                    raise Exception("Failed to register file: " + resp.error)
+            else:
+                task.status = "completed"
+                task.display_params = f"the following commands: {' '.join(task.args.get_arg('commands'))}"
+                await MythicRPC().execute("create_output", task_id=task.id,
+                                          output="Loaded commands")
         else:
-            raise Exception("Failed to register file: " + resp.error)
+            raise Exception("Failed to fetch commands from Mythic: " + commands.error)
         return task
 
     async def process_response(self, response: AgentResponse):
