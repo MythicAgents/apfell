@@ -8,7 +8,8 @@ class ClipboardArguments(TaskArguments):
         super().__init__(command_line, **kwargs)
         self.args = [
             CommandParameter(
-                name="Clipboard Types",
+                display_name="Clipboard Types To Read",
+                name="read",
                 type=ParameterType.Array,
                 default_value=["public.utf8-plain-text"],
                 description="Types of clipboard data to retrieve, defaults to public.utf8-plain-text",
@@ -22,7 +23,7 @@ class ClipboardArguments(TaskArguments):
                 type=ParameterType.String,
                 description="Data to put on the clipboard",
                 parameter_group_info=[ParameterGroupInfo(
-                    required=False,
+                    required=True,
                     group_name="write",
                     ui_position=1
                 )]
@@ -38,8 +39,8 @@ class ClipboardArguments(TaskArguments):
             self.add_arg("data", dictionary_arguments["data"])
         else:
             self.remove_arg("data")
-        if "Clipboard Types" in dictionary_arguments:
-            self.add_arg("Clipboard Types", dictionary_arguments["Clipboard Types"])
+        if "read" in dictionary_arguments:
+            self.add_arg("read", dictionary_arguments["read"])
 
 
 class ClipboardCommand(CommandBase):
