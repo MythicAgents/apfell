@@ -18,12 +18,12 @@ function(task, responses){
                         if(k === "public.utf8-plain-text"){
                             output_table.push({
                                 "key":{"plaintext": k},
-                                "value": {"plaintext": atob(v)},
+                                "value": {"plaintext": atob(v), "copyIcon": v.length > 0},
                                 "fetch": {"button": {
                                     "name": "Fetch Data",
                                     "type": "task",
-                                    "ui_feature": "clipboard:fetch",
-                                    "parameters": JSON.stringify({"Clipboard Types": [k], "data": ""})
+                                    "ui_feature": "clipboard:list",
+                                    "parameters": JSON.stringify({"read": [k]})
                                 }},
                                 "view": {"button": {
                                     "name": v=== "" ? "Empty": "View",
@@ -38,12 +38,12 @@ function(task, responses){
                         }else{
                             output_table.push({
                                 "key":{"plaintext": k},
-                                "value": {"plaintext": v},
+                                "value": {"plaintext": v, "copyIcon": v.length > 0},
                                 "fetch": {"button": {
                                     "name": "Fetch Data",
                                     "type": "task",
-                                    "ui_feature": "clipboard:fetch",
-                                    "parameters": JSON.stringify({"Clipboard Types": [k], "data": ""})
+                                    "ui_feature": "clipboard:list",
+                                    "parameters": JSON.stringify({"read": [k]})
                                 }},
                                 "view": {"button": {
                                     "name": v=== "" ? "Empty": "View",
@@ -63,8 +63,8 @@ function(task, responses){
                         "fetch": {"button": {
                             "name": "Fetch All Data",
                             "type": "task",
-                            "ui_feature": "clipboard:fetch",
-                            "parameters": JSON.stringify({"Clipboard Types": all_keys, "data": ""})
+                            "ui_feature": "clipboard:list",
+                            "parameters": JSON.stringify({"read": ["*"]})
                         }},
                         "view": {"button": {
                             "name": "View",
@@ -80,10 +80,12 @@ function(task, responses){
                         "table": [
                             {
                                 "headers": [
-                                    {"plaintext": "key", "type": "string"},
-                                    {"plaintext": "value", "type": "string"},
-                                    {"plaintext": "fetch", "type": "button", "width": 100, "disableSort": true},
-                                    {"plaintext": "view", "type": "button", "width": 100, "disableSort": true}
+                                    {"plaintext": "fetch", "type": "button", "width": 150, "disableSort": true},
+                                    {"plaintext": "view", "type": "button", "width": 100, "disableSort": true},
+                                    {"plaintext": "key", "type": "string", "fillWidth": true},
+                                    {"plaintext": "value", "type": "string", "fillWidth": true},
+
+
                                 ],
                                 "rows": output_table,
                                 "title": "Clipboard Data"
