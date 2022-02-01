@@ -18,6 +18,7 @@ class ListUsersArguments(TaskArguments):
             ),
         ]
 
+
     async def parse_arguments(self):
         if len(self.command_line) == 0:
             raise ValueError("Must supply a path to a file")
@@ -43,7 +44,7 @@ class ListUsersCommand(CommandBase):
     async def create_tasking(self, task: MythicTask) -> MythicTask:
         if task.args.get_arg("gid") < 0:
             resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="$.CSGetLocalIdentityAuthority, $.CSIdentityQueryCreate, $.CSIdentityQueryExecute",
+                artifact="$.CBIdentityAuthority.defaultIdentityAuthority, $.CBGroupIdentity.groupIdentityWithPosixGIDAuthority",
                 artifact_type="API Called",
             )
         else:
