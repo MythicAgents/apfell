@@ -8,11 +8,10 @@ function(task, responses){
         if(responses.length > 0){
 
             let headers = [
-            {"plaintext": "pid", "type": "string", "width": 100},
+            {"plaintext": "pid", "type": "number", "width": 100},
             {"plaintext": "name", "type": "string", "fillWidth": true},
             {"plaintext": "bundle", "type": "string", "fillWidth": true},
-            {"plaintext": "entitlements", "type": "button", "width": 200},
-                {"plaintext": "test", "type": "button", "width": 200}];
+            {"plaintext": "entitlements", "type": "button", "width": 200}];
             let data = "";
             try{
                 data = JSON.parse(responses[0]);
