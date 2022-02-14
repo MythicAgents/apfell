@@ -35,7 +35,7 @@ class JsimportCommand(CommandBase):
     cmd = "jsimport"
     needs_admin = False
     help_cmd = "jsimport"
-    description = "import a JXA file into memory. Only one can be imported at a time."
+    description = "import a JXA file into memory"
     version = 1
     author = "@its_a_feature_"
     attackmapping = ["T1020", "T1030", "T1041", "T1620", "T1105"]
@@ -53,7 +53,7 @@ class JsimportCommand(CommandBase):
         task.display_params = f"{original_file_name} into memory"
         file_resp = await MythicRPC().execute("update_file",
                                               file_id=task.args.get_arg("file"),
-                                              delete_after_fetch=True,
+                                              delete_after_fetch=False,
                                               comment="Uploaded into memory for jsimport")
 
         return task
