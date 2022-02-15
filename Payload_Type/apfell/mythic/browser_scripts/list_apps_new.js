@@ -15,7 +15,7 @@ function(task, responses){
                             "pid": {"plaintext": data[i]["process_id"]},
                             "bundle": {"plaintext": data[i]["bundle"], "copyIcon": true},
                             "arch": {"plaintext": data[i]["architecture"]},
-                            "rowStyle": {"backgroundColor": data[i]["frontmost"] ? "mediumpurple": ""},
+                            "rowStyle": {"backgroundColor": data[i]["frontMost"] ? "mediumpurple": ""},
                             "actions": {"button": {
                                 "name": "Actions",
                                 "type": "menu",

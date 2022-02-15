@@ -1,8 +1,8 @@
 # Apfell
 
-Apfell is a JavaScript for Automation (JXA) payload for macOS. This version currently supports Mythic 2.2.12 and will update as necessary. It will not work with Mythic 2.1 and lower.
+Apfell is a JavaScript for Automation (JXA) payload for macOS. This version currently supports Mythic 2.3.7 and will update as necessary. It will not work with Mythic 2.2 and lower.
 
-The agent has `mythic_payloadtype_container==0.0.45` PyPi package installed and reports to Mythic as version "9".
+The agent has `mythic_payloadtype_container==0.1.7` PyPi package installed and reports to Mythic as version "12".
 
 
 ## How to install an agent in this format within Mythic
