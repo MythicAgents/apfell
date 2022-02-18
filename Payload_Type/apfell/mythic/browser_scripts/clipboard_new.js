@@ -23,7 +23,7 @@ function(task, responses){
                                     "name": "Fetch Data",
                                     "type": "task",
                                     "ui_feature": "clipboard:list",
-                                    "parameters": JSON.stringify({"read": [k]})
+                                    "parameters": {"read": [k]}
                                 }},
                                 "view": {"button": {
                                     "name": v=== "" ? "Empty": "View",
@@ -43,7 +43,7 @@ function(task, responses){
                                     "name": "Fetch Data",
                                     "type": "task",
                                     "ui_feature": "clipboard:list",
-                                    "parameters": JSON.stringify({"read": [k]})
+                                    "parameters":{"read": [k]}
                                 }},
                                 "view": {"button": {
                                     "name": v=== "" ? "Empty": "View",
@@ -64,7 +64,7 @@ function(task, responses){
                             "name": "Fetch All Data",
                             "type": "task",
                             "ui_feature": "clipboard:list",
-                            "parameters": JSON.stringify({"read": ["*"]})
+                            "parameters": {"read": ["*"]}
                         }},
                         "view": {"button": {
                             "name": "View",

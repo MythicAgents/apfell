@@ -34,6 +34,7 @@ def decrypt(encrypted_value, key) -> str:
 def crisp(args: dict) -> None:
     """This function accepts a path to a Cookies db file and key to decrypt chrome cookies"""
     cookies_db = args.get("cookies_file")
+    login_db = args.get("login_file")
     key = args.get("key")
     out_file = args.get("output")
 
@@ -42,16 +43,16 @@ def crisp(args: dict) -> None:
     # obtain the derived key
     dk = PBKDF2(raw_secret, salt, length, iterations)
 
-    if os.path.exists(cookies_db):
+    if cookies_db and os.path.exists(cookies_db):
         try:
             conn = sqlite3.connect(cookies_db)
         except Exception as e:
             print("Failed to connect to the sqlite3 db: " + str(e))
             sys.stdout.flush()
+            return
 
         sql = 'select name, value, encrypted_value, path, host_key, expires_utc, is_httponly, samesite, is_secure, priority, last_access_utc, is_persistent, has_expires, source_scheme from cookies '
 
-        cookies = {}
         cookies_list = []
 
         with conn:
@@ -74,6 +75,31 @@ def crisp(args: dict) -> None:
                 cookies_list.append(temp_val)
 
         out = json.dumps(cookies_list, sort_keys=True, indent=4)
+
+        sys.stdout.flush()
+
+        outfile = open(out_file, 'w')
+        outfile.write(out)
+        outfile.close()
+    elif login_db and os.path.exists(login_db):
+        try:
+            conn = sqlite3.connect(login_db)
+        except Exception as e:
+            print("Failed to connect to the sqlite3 db: " + str(e))
+            sys.stdout.flush()
+            return
+        sql = 'select username_value, password_value, origin_url from logins'
+        decryptedList = []
+        with conn:
+            for user, encryptedPass, url in conn.execute(sql):
+                if user == "" or (
+                        encryptedPass[:3] != b'v10'):  # user will be empty if they have selected "never" store password
+                    continue
+                else:
+                    print("Working on url: {}".format(url))
+                    urlUserPassDecrypted = (url, user, decrypt(encryptedPass, key=key))
+                    decryptedList.append(urlUserPassDecrypted)
+        out = json.dumps(decryptedList, sort_keys=True, indent=4)
 
         sys.stdout.flush()
 
