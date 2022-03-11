@@ -11,7 +11,11 @@ exports.prompt = function(task, command, params){
 	let answer = "";
 	if(config.hasOwnProperty("answer") && config['answer'] !== ""){answer = config['answer'];}
 	try{
-		let prompt = currentApp.displayDialog(text, {
+
+		let contextApp = currentApp.systemAttribute('__CFBundleIdentifier').toString()
+		var newApp = Application(contextApp)
+		newApp.includeStandardAdditions = true;
+		let prompt = contextApp.displayDialog(text, {
 			defaultAnswer: answer,
 			buttons: ['OK', 'Cancel'], 
 			defaultButton: 'OK',
