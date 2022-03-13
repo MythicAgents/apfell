@@ -58,6 +58,9 @@ prompt
 
 Uses JXA to issue a prompt to the user and returns the information they supply:
 ```JavaScript
+let cbID = currentApp.systemAttribute('__CFBundleIdentifier').toString()
+let contextApp = Application(cbID)
+contextApp.includeStandardAdditions = true;
 let prompt = currentApp.displayDialog(text, {
 			defaultAnswer: answer,
 			buttons: ['OK', 'Cancel'], 
