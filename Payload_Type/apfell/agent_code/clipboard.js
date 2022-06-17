@@ -29,8 +29,8 @@ exports.clipboard = function(task, command, params){
             for(let i = 0; i < types.length; i++){
                 let typejs = types[i].js;
                 clipboard[typejs] = pb.dataForType(types[i]);
-                console.log(clipboard[typejs].js)
-                console.log(clipboard[typejs].js !== undefined, parsed_params["read"], typejs, parsed_params["read"].includes(typejs));
+                //console.log(clipboard[typejs].js)
+                //console.log(clipboard[typejs].js !== undefined, parsed_params["read"], typejs, parsed_params["read"].includes(typejs));
                 if(clipboard[typejs].js !== undefined && (parsed_params['read'].includes(typejs) || parsed_params['read'][0] === "*")){
                     clipboard[typejs] = clipboard[typejs].base64EncodedStringWithOptions(0).js;
                 }else{
