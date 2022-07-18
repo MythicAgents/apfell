@@ -42,13 +42,13 @@ exports.persist_launch = function(task, command, params){
             if(!fileManager.fileExistsAtPath(path)){
                 $.fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(path, false, $(), $());
             }
-            path = $(path.js + "/" + label + ".plist");
-            response = write_data_to_file(template, path) + " to " + ObjC.deepUnwrap(path);
-            let artifacts = {'user_output': response, 'artifacts': [{'base_artifact': 'File Create', 'artifact': ObjC.deepUnwrap(path)}], "completed": true};
+            path = path.js + "/" + label + ".plist";
+            response = write_data_to_file(template, path) + " to " + path;
+            let artifacts = {'user_output': response, 'artifacts': [{'base_artifact': 'File Create', 'artifact': path}], "completed": true};
             return artifacts
         }
         else if(config.hasOwnProperty('LaunchPath') && config['LaunchPath'] !== ""){
-            response = write_data_to_file(template, $(config['LaunchPath'])) + " to " + config["LaunchPath"];
+            response = write_data_to_file(template, config['LaunchPath']) + " to " + config["LaunchPath"];
             let artifacts = {'user_output': response, 'artifacts': [{'base_artifact': 'File Create', 'artifact': config["LaunchPath"]}], "completed": true};
             return artifacts
         }

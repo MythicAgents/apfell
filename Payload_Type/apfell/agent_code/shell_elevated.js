@@ -6,7 +6,7 @@ exports.shell_elevated = function(task, command, params){
         if(params.length > 0){ pieces = JSON.parse(params); }
         else{ pieces = []; }
         if(pieces.hasOwnProperty('command') && pieces['command'] !== ""){
-            if(pieces['command'][command.length -1] === "&"){
+            if(pieces['command'][pieces['command'].length -1] === "&"){
                 cmd = pieces['command'] + "> /dev/null &";
             }else{
                 cmd = pieces['command'];
