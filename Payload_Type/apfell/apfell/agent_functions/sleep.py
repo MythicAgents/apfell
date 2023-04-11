@@ -65,6 +65,7 @@ class SleepCommand(CommandBase):
             task.display_params += " with " + str(task.args.get_arg("jitter")) + "% jitter"
         return task
 
-    async def process_response(self, response: AgentResponse):
-        resp = await MythicRPC().execute("update_callback", task_id=response.task.id, sleep_info=response.response)
-
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        await MythicRPC().execute("update_callback", task_id=task.Task.ID, sleep_info=response)
+        return resp
