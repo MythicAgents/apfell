@@ -59,13 +59,20 @@ class SleepCommand(CommandBase):
     attackmapping = ["T1029"]
     argument_class = SleepArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        task.display_params = str(task.args.get_arg("interval")) + "s"
-        if task.args.get_arg("jitter") is not None:
-            task.display_params += " with " + str(task.args.get_arg("jitter")) + "% jitter"
-        return task
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        response.DisplayParams = str(taskData.args.get_arg("interval")) + "s"
+        if taskData.args.get_arg("jitter") is not None:
+            response.DisplayParams += " with " + str(taskData.args.get_arg("jitter")) + "% jitter"
+        return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
         resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
-        await MythicRPC().execute("update_callback", task_id=task.Task.ID, sleep_info=response)
+        await SendMythicRPCCallbackUpdate(MythicRPCCallbackUpdateMessage(
+            TaskID=task.Task.ID,
+            SleepInfo=response,
+        ))
         return resp

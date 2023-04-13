@@ -463,7 +463,7 @@ class customC2 extends baseC2{
                     currentChunk += 1;
                     data = handle.readDataOfLength(chunkSize);
                 }
-                output = {"completed":true, "user_output": `{"file_id": "${registerFile['file_id']}"}`};
+                output = {"completed":true, "user_output": `{"file_id": "${registerFile['file_id']}", "completed": true}`, "file_id": registerFile['file_id']};
             }
             else{
                output = {'status': 'error', 'user_output': "Failed to register file to download", 'completed': true};

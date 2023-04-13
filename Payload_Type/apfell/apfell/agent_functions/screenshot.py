@@ -27,13 +27,19 @@ class ScreenshotCommand(CommandBase):
     browser_script = BrowserScript(script_name="screenshot_new", author="@its_a_feature_", for_new_ui=True)
     supported_os = [SupportedOS.MacOS]
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        task.args.command_line += str(datetime.datetime.utcnow())
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="$.CGDisplayCreateImage($.CGMainDisplayID());, $.NSBitmapImageRep.alloc.initWithCGImage(cgimage);",
-            artifact_type="API Called",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        return task
+        response.Params = str(f"screenshot:{datetime.datetime.utcnow()}")
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"$.CGDisplayCreateImage($.CGMainDisplayID());, $.NSBitmapImageRep.alloc.initWithCGImage(cgimage);",
+            BaseArtifactType="API"
+        ))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

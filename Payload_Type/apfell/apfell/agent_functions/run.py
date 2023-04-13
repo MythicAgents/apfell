@@ -38,15 +38,18 @@ class RunCommand(CommandBase):
     attackmapping = ["T1106"]
     argument_class = RunArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="{} {}".format(
-                task.args.get_arg("path"),
-                " ".join(task.args.get_arg("args"))
-            ),
-            artifact_type="Process Create",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        return task
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"{taskData.args.get_arg('path')} {taskData.args.get_arg('args')}",
+            BaseArtifactType="Process Create"
+        ))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

@@ -40,12 +40,18 @@ Ex: terminals_read history
         script_name="terminals_read", author="@its_a_feature_"
     )
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="Target Application of Terminal",
-            artifact_type="AppleEvent Sent",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        return task
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"Target Application of Terminal",
+            BaseArtifactType="AppleEvent"
+        ))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

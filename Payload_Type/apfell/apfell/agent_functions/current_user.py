@@ -37,18 +37,27 @@ class CurrentUserCommand(CommandBase):
     attackmapping = ["T1033"]
     argument_class = CurrentUserArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        if task.args.get_arg("method") == "jxa":
-            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="Target Application of System Events",
-                artifact_type="AppleEvent Sent",
-            )
-        else:
-            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="NSUserName, NSFullUserName, NSHomeDirectory",
-                artifact_type="API Called",
-            )
-        return task
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
 
-    async def process_response(self, response: AgentResponse):
-        pass
+        if taskData.args.get_arg("method") == "jxa":
+            await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+                TaskID=taskData.Task.ID,
+                ArtifactMessage=f"Target Application of System Events",
+                BaseArtifactType="AppleEvent"
+            ))
+        else:
+            await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+                TaskID=taskData.Task.ID,
+                ArtifactMessage=f"NSUserName, NSFullUserName, NSHomeDirectory",
+                BaseArtifactType="API"
+            ))
+
+        return response
+
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

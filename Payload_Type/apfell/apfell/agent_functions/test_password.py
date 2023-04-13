@@ -8,7 +8,7 @@ class TestPasswordArguments(TaskArguments):
         super().__init__(command_line, **kwargs)
         self.args = [
             CommandParameter(
-                name="password",
+                name="credential",
                 type=ParameterType.Credential_JSON,
                 description="Password to test",
             ),
@@ -40,18 +40,25 @@ class TestPasswordCommand(CommandBase):
     attackmapping = ["T1110", "T1110.001"]
     argument_class = TestPasswordArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="$.ODNode.nodeWithSessionTypeError, recordWithRecordTypeNameAttributesError",
-            artifact_type="API Called",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="user.verifyPasswordError",
-            artifact_type="API Called",
-        )
-        task.args.add_arg("username", task.args.get_arg("username")["account"])
-        task.args.add_arg("password", task.args.get_arg("password")["credential"])
-        return task
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"$.ODNode.nodeWithSessionTypeError, recordWithRecordTypeNameAttributesError",
+            BaseArtifactType="API"
+        ))
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"user.verifyPasswordError",
+            BaseArtifactType="API"
+        ))
+        taskData.args.add_arg("username", taskData.args.get_arg("username")["account"])
+        taskData.args.add_arg("password", taskData.args.get_arg("password")["credential"])
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

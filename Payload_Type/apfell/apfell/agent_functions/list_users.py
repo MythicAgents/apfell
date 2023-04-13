@@ -40,18 +40,25 @@ class ListUsersCommand(CommandBase):
     attackmapping = ["T1087", "T1087.001", "T1087.002", "T1069", "T1069.001", "T1069.002"]
     argument_class = ListUsersArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        if task.args.get_arg("gid") < 0:
-            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="$.CSGetLocalIdentityAuthority, $.CSIdentityQueryCreate, $.CSIdentityQueryExecute",
-                artifact_type="API Called",
-            )
+    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
+        response = PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        if taskData.args.get_arg("gid") < 0:
+            await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+                TaskID=taskData.Task.ID,
+                ArtifactMessage=f"$.CSGetLocalIdentityAuthority, $.CSIdentityQueryCreate, $.CSIdentityQueryExecute",
+                BaseArtifactType="API"
+            ))
         else:
-            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="$.CBIdentityAuthority.defaultIdentityAuthority, $.CBGroupIdentity.groupIdentityWithPosixGIDAuthority",
-                artifact_type="API Called",
-            )
-        return task
+            await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+                TaskID=taskData.Task.ID,
+                ArtifactMessage=f"$.CBIdentityAuthority.defaultIdentityAuthority, $.CBGroupIdentity.groupIdentityWithPosixGIDAuthority",
+                BaseArtifactType="API"
+            ))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

@@ -42,12 +42,18 @@ class RmCommand(CommandBase):
     attackmapping = ["T1106", "T1070.004"]
     argument_class = RmArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="fileManager.removeItemAtPathError",
-            artifact_type="API Called",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        return task
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"fileManager.removeItemAtPathError",
+            BaseArtifactType="API"
+        ))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

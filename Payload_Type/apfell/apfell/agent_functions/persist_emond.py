@@ -55,14 +55,20 @@ class PersistEmondCommand(CommandBase):
     cmd = "persist_emond"
     needs_admin = False
     help_cmd = "persist_emond"
-    description = "Create persistence with an emond plist file in /etc/emond.d/rules/ and a .DS_Store file to trigger it"
+    description = """Create persistence with an emond plist file in /etc/emond.d/rules/ and a .DS_Store file to trigger it.
+    WARNING: emond is NOT present on macOS Ventura!"""
     version = 1
     author = "@its_a_feature_"
     attackmapping = ["T1547.011", "T1053", "T1546.014"]
     argument_class = PersistEmondArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        return task
+    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
+        response = PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

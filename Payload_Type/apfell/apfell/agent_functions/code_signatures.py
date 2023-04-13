@@ -38,9 +38,14 @@ class CodeSignaturesCommand(CommandBase):
     argument_class = CodeSignaturesArguments
     supported_ui_features = ["code_signatures:list"]
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        task.display_params = " for " + task.args.get_arg("path")
-        return task
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        response.DisplayParams = " for " + taskData.args.get_arg("path")
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

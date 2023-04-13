@@ -1,7 +1,6 @@
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
-import base64
-import sys
+from mythic_container.MythicGoRPC.send_mythic_rpc_callback_add_command import *
 
 
 class LoadArguments(TaskArguments):
@@ -43,48 +42,64 @@ class LoadCommand(CommandBase):
         suggested_command=True
     )
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
+    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
+        response = PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
         total_code = ""
-        commands = await MythicRPC().execute("get_commands",
-                                             payload_type_name="apfell",
-                                             commands=task.args.get_arg("commands"),
-                                             os="macOS")
-        if commands.status == "success":
-            for cmd in commands.response:
-                if cmd["script_only"]:
+        commands = await SendMythicRPCCommandSearch(MythicRPCCommandSearchMessage(
+            SearchPayloadTypeName="apfell",
+            SearchCommandNames=taskData.args.get_arg("commands"),
+            SearchOS="macOS"
+        ))
+        if commands.Success:
+            loadingCommands = []
+            for cmd in commands.Commands:
+                if cmd.ScriptOnly:
                     # trying to load a script only command, so just tell mythic to load it
-                    add_resp = await MythicRPC().execute("add_commands_to_callback",
-                                                         task_id=task.id,
-                                                         commands=[cmd["cmd"]])
-                    if add_resp.status != "success":
-                        await MythicRPC().execute("create_output", task_id=task.id,
-                                                  output="Failed to add command to callback: " + add_resp.error)
+                    add_resp = await SendMythicRPCCallbackAddCommand(MythicRPCCallbackAddCommandMessage(
+                        TaskID=taskData.Task.ID,
+                        Commands=[cmd.Name]
+                    ))
+                    if not add_resp.Success:
+                        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                            TaskID=taskData.Task.ID,
+                            Response=f"Failed to add command to callback: {cmd.Name}\n".encode()
+                        ))
+                    else:
+                        loadingCommands.append(cmd.Name)
                 else:
                     try:
-                        code_path = self.agent_code_path / "{}.js".format(cmd["cmd"])
+                        code_path = self.agent_code_path / "{}.js".format(cmd.Name)
                         total_code += open(code_path, "r").read() + "\n"
+                        loadingCommands.append(cmd.Name)
                     except Exception as e:
-                        await MythicRPC().execute("create_output",
-                                                  task_id=task.id,
-                                                  output=f"Failed to find code for {cmd['cmd']}, skipping it\n")
+                        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                            TaskID=taskData.Task.ID,
+                            Response=f"Failed to find code for {cmd.Name}, skipping it\n".encode()
+                        ))
             if total_code != "":
-                resp = await MythicRPC().execute("create_file", task_id=task.id,
-                    file=base64.b64encode(total_code.encode()).decode(),
-                    comment="Loading the following commands: " + task.args.command_line
-                )
-                if resp.status == MythicStatus.Success:
-                    task.args.add_arg("file_id", resp.response["agent_file_id"])
-                    task.display_params = f"the following commands: {' '.join(task.args.get_arg('commands'))}"
+                resp = await SendMythicRPCFileCreate(MythicRPCFileCreateMessage(
+                    TaskID=taskData.Task.ID,
+                    Comment=f"Loading the following commands: {', '.join(loadingCommands)}\n",
+                    FileContents=total_code.encode(),
+                    Filename=f"apfell load commands",
+                    DeleteAfterFetch=True
+                ))
+                if resp.Success:
+                    taskData.args.add_arg("file_id", resp.AgentFileId)
+                    response.DisplayParams = f"the following commands: {', '.join(loadingCommands)}"
                 else:
-                    raise Exception("Failed to register file: " + resp.error)
+                    raise Exception("Failed to register file: " + resp.Error)
             else:
-                task.status = "completed"
-                task.display_params = f"the following commands: {' '.join(task.args.get_arg('commands'))}"
-                await MythicRPC().execute("create_output", task_id=task.id,
-                                          output="Loaded commands")
+                response.Completed = True
+                response.DisplayParams = f"no commands"
+                return response
         else:
-            raise Exception("Failed to fetch commands from Mythic: " + commands.error)
-        return task
+            raise Exception("Failed to fetch commands from Mythic: " + commands.Error)
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

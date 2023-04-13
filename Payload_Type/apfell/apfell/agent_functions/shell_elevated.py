@@ -59,31 +59,46 @@ WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!
     attackmapping = ["T1059", "T1059.004", "T1548.004"]
     argument_class = ShellElevatedArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="/usr/libexec/security_authtrampoline /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid auth 15 /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
-            artifact_type="Process Create",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
-            artifact_type="Process Create",
-        )
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(task.args.get_arg("command")),
-            artifact_type="Process Create",
-        )
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="/bin/sh -c {}".format(task.args.get_arg("command")),
-            artifact_type="Process Create",
-        )
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="{}".format(task.args.get_arg("command")),
-            artifact_type="Process Create",
-        )
-        if task.args.get_parameter_group_name() == "manual_creds":
-            task.args.add_arg("user", task.args.get_arg("user")["account"])
-            task.args.add_arg("credential", task.args.get_arg("credential")["credential"])
-        return task
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage="/usr/libexec/security_authtrampoline /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid auth 15 /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(taskData.args.get_arg("command")),
+            BaseArtifactType="Process Create"
+        ))
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(taskData.args.get_arg("command")),
+            BaseArtifactType="Process Create"
+        ))
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(taskData.args.get_arg("command")),
+            BaseArtifactType="Process Create"
+        ))
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage="/System/Library/ScriptingAdditions/StandardAdditions.osax/Contents/MacOS/uid /bin/sh -c {}".format(taskData.args.get_arg("command")),
+            BaseArtifactType="Process Create"
+        ))
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage="/bin/sh -c {}".format(taskData.args.get_arg("command")),
+            BaseArtifactType="Process Create"
+        ))
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage="{}".format(taskData.args.get_arg("command")),
+            BaseArtifactType="Process Create"
+        ))
+        if taskData.args.get_parameter_group_name() == "manual_creds":
+            taskData.args.add_arg("user", taskData.args.get_arg("user")["account"])
+            taskData.args.add_arg("credential", taskData.args.get_arg("credential")["credential"])
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

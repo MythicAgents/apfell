@@ -50,18 +50,23 @@ class TerminalsSendCommand(CommandBase):
     attackmapping = ["T1552", "T1559", "T1548.003", "T1059.004"]
     argument_class = TerminalsSendArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="{}".format(
-                task.args.get_arg("command"),
-            ),
-            artifact_type="Process Create",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="Target Application of Terminal",
-            artifact_type="AppleEvent Sent",
-        )
-        return task
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"{taskData.args.get_arg('command')}",
+            BaseArtifactType="Process Create"
+        ))
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"Target Application of Terminal",
+            BaseArtifactType="AppleEvent"
+        ))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

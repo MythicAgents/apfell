@@ -1,6 +1,4 @@
 from mythic_container.MythicCommandBase import *
-import json
-from mythic_container.MythicRPC import *
 
 
 class ListEntitlementsArguments(TaskArguments):
@@ -40,12 +38,17 @@ class ListEntitlementsCommand(CommandBase):
     supported_ui_features = ["list_entitlements:list"]
     browser_script = BrowserScript(script_name="list_entitlements_new", author="@its_a_feature_", for_new_ui=True)
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        if task.args.get_arg("pid") == -1:
-            task.display_params = "for all running applications"
+    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
+        response = PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        if taskData.args.get_arg("pid") == -1:
+            response.DisplayParams = "for all running applications"
         else:
-            task.display_params = "for pid " + str(task.args.get_arg("pid"))
-        return task
+            response.DisplayParams = "for pid " + str(taskData.args.get_arg("pid"))
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

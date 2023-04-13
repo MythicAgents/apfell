@@ -41,22 +41,26 @@ class JsimportCommand(CommandBase):
     attackmapping = ["T1020", "T1030", "T1041", "T1620", "T1105"]
     argument_class = JsimportArguments
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        file_resp = await MythicRPC().execute("get_file",
-                                              file_id=task.args.get_arg("file"),
-                                              task_id=task.id,
-                                              get_contents=False)
-        if file_resp.status == MythicRPCStatus.Success:
-            original_file_name = file_resp.response[0]["filename"]
+    async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
+        response = PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        file_resp = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+            AgentFileId=taskData.args.get_arg("file"),
+            TaskID=taskData.Task.ID,
+        ))
+        if file_resp.Success:
+            original_file_name = file_resp.Files[0].Filename
         else:
-            raise Exception("Error from Mythic: " + str(file_resp.error))
-        task.display_params = f"{original_file_name} into memory"
-        file_resp = await MythicRPC().execute("update_file",
-                                              file_id=task.args.get_arg("file"),
-                                              delete_after_fetch=False,
-                                              comment="Uploaded into memory for jsimport")
+            raise Exception("Error from Mythic: " + str(file_resp.Error))
+        response.DisplayParams = f"{original_file_name} into memory"
+        await SendMythicRPCFileUpdate(MythicRPCFileUpdateMessage(
+            AgentFileID=taskData.args.get_arg("file"),
+            Comment="Uploaded into memory for jsimport"
+        ))
+        return response
 
-        return task
-
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

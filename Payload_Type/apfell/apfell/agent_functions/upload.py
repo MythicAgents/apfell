@@ -2,6 +2,7 @@ from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 import sys
 
+
 class UploadArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
@@ -59,25 +60,29 @@ class UploadArguments(TaskArguments):
 
     async def get_files(self, callback: PTRPCDynamicQueryFunctionMessage) -> PTRPCDynamicQueryFunctionMessageResponse:
         response = PTRPCDynamicQueryFunctionMessageResponse()
-        file_resp = await MythicRPC().execute("get_file", callback_id=callback.Callback,
-                                              limit_by_callback=False,
-                                              get_contents=False,
-                                              filename="",
-                                              max_results=-1)
-        if file_resp.status == MythicRPCStatus.Success:
+        file_resp = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+            CallbackID=callback.Callback,
+            LimitByCallback=False,
+            IsDownloadFromAgent=False,
+            IsScreenshot=False,
+            IsPayload=False,
+            Filename="",
+        ))
+        if file_resp.Success:
             file_names = []
-            print(file_resp.response)
-            for f in file_resp.response:
-                # await MythicRPC().execute("get_file_contents", agent_file_id=f["agent_file_id"])
-                if f["filename"] not in file_names:
-                    file_names.append(f["filename"])
+            for f in file_resp.Files:
+                if f.Filename not in file_names:
+                    file_names.append(f.Filename)
             response.Success = True
             response.Choices = file_names
             return response
         else:
-            await MythicRPC().execute("create_event_message", warning=True,
-                                      message=f"Failed to get files: {file_resp.error}")
-            response.Error = f"Failed to get files: {file_resp.error}"
+            await SendMythicRPCOperationEventLogCreate(MythicRPCOperationEventLogCreateMessage(
+                CallbackId=callback.Callback,
+                Message=f"Failed to get files: {file_resp.Error}",
+                MessageLevel="warning"
+            ))
+            response.Error = f"Failed to get files: {file_resp.Error}"
             return response
 
 
@@ -97,44 +102,51 @@ class UploadCommand(CommandBase):
         suggested_command=True
     )
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
         try:
-            groupName = task.args.get_parameter_group_name()
+            groupName = taskData.args.get_parameter_group_name()
             if groupName == "Default":
-                file_resp = await MythicRPC().execute("get_file",
-                                                    file_id=task.args.get_arg("file"),
-                                                    task_id=task.id,
-                                                    get_contents=False)
-                if file_resp.status == MythicRPCStatus.Success:
-                    if len(file_resp.response) > 0:
-                        original_file_name = file_resp.response[0]["filename"]
-                        if len(task.args.get_arg("remote_path")) == 0:
-                            task.args.add_arg("remote_path", original_file_name)
-                        elif task.args.get_arg("remote_path")[-1] == "/":
-                            task.args.add_arg("remote_path", task.args.get_arg("remote_path") + original_file_name)
-                        task.display_params = f"{original_file_name} to {task.args.get_arg('remote_path')}"
+                file_resp = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+                    TaskID=taskData.Task.ID,
+                    AgentFileID=taskData.args.get_arg("file")
+                ))
+                if file_resp.Success:
+                    if len(file_resp.Files) > 0:
+                        original_file_name = file_resp.Files[0].Filename
+                        if len(taskData.args.get_arg("remote_path")) == 0:
+                            taskData.args.add_arg("remote_path", original_file_name)
+                        elif taskData.args.get_arg("remote_path")[-1] == "/":
+                            taskData.args.add_arg("remote_path", taskData.args.get_arg("remote_path") + original_file_name)
+                        response.DisplayParams = f"{original_file_name} to {taskData.args.get_arg('remote_path')}"
                     else:
                         raise Exception("Failed to find that file")
                 else:
-                    raise Exception("Error from Mythic trying to get file: " + str(file_resp.error))
+                    raise Exception("Error from Mythic trying to get file: " + str(file_resp.Error))
             elif groupName == "specify already uploaded file by name":
                 # we're trying to find an already existing file and use that
-                file_resp = await MythicRPC().execute("get_file", task_id=task.id,
-                                                      filename=task.args.get_arg("filename"),
-                                                      limit_by_callback=False,
-                                                      get_contents=False)
-                if file_resp.status == MythicRPCStatus.Success:
-                    if len(file_resp.response) > 0:
-                        task.args.add_arg("file", file_resp.response[0]["agent_file_id"])
-                        task.args.remove_arg("filename")
-                        task.display_params = f"existing {file_resp.response[0]['filename']} to {task.args.get_arg('remote_path')}"
-                    elif len(file_resp.response) == 0:
+                file_resp = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+                    TaskID=taskData.Task.ID,
+                    Filename=taskData.args.get_arg("filename"),
+                    LimitByCallback=False,
+                    MaxResults=1
+                ))
+                if file_resp.Success:
+                    if len(file_resp.Files) > 0:
+                        taskData.args.add_arg("file", file_resp.Files[0].AgentFileId)
+                        taskData.args.remove_arg("filename")
+                        response.DisplayParams = f"existing {file_resp.Files[0].Filename} to {taskData.args.get_arg('remote_path')}"
+                    elif len(file_resp.Files) == 0:
                         raise Exception("Failed to find the named file. Have you uploaded it before? Did it get deleted?")
                 else:
-                    raise Exception("Error from Mythic trying to search files:\n" + str(file_resp.error))
+                    raise Exception("Error from Mythic trying to search files:\n" + str(file_resp.Error))
         except Exception as e:
             raise Exception("Error from Mythic: " + str(sys.exc_info()[-1].tb_lineno) + " : " + str(e))
-        return task
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

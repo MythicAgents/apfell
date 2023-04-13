@@ -1,6 +1,5 @@
-Chainbreaker2
+Chainbreaker
 ============
-
 Chainbreaker can be used to extract the following types of information from an OSX keychain in a forensically sound manner: 
 
 * Hashed Keychain password, suitable for cracking with [hashcat](https://hashcat.net/hashcat/) or
@@ -18,9 +17,34 @@ Given the keychain unlock password, a master key obtained using [volafox](https:
 also provide plaintext passwords.
 
 Without one of these methods of unlocking the Keychain, Chainbreaker will display all other available information.
+## Install and run
+You can either just run the code from source, or import it as a module and run as a module.
+To run the code from source, just clone/download the sourcecode, make sure you have installed the dependencies and run ``chainbreaker.py`` as a script.
+
+### Build the module
+1) Navigate to the directory containing the file `setup.py`
+2) Enter the command (from terminal): `$ python setup.py bdist_wheel -d dist`.
+This creates a wheel file (extension: `.whl`) in the `/dist` folder.
+3) Install the wheelfile with pip, or (if in the same directory containing `setup.py`) run: `$ pip install -e .`
+
+### Running chainbreaker as a module
+After succesfully installing the wheelfile, you can use the module from the command-line (allowing you to use input arguments) as follows:
+
+```$ python -m chainbreaker```
+
+Or you can import it nicely within other scripts like so:
+
+```python
+import chainbreaker 
+keychain = chainbreaker.Chainbreaker('path/to/keychain/file/login.keychain', unlock_password='SecretPasswordHere')
+```
+
+And this returns a keychain object which you can use in your script.
+
+
 
 ## Supported OS's
-Snow Leopard, Lion, Mountain Lion, Mavericks, Yosemite, El Capitan, (High) Sierra, Mojave, Catalina
+OS X Snow Leopard(10.6) to macOS Ventura(13) 
 
 ## Target Keychain file
 Any valid .keychain or .keychain-db can be supplied. Common Keychain locations include: 
@@ -34,7 +58,7 @@ Any valid .keychain or .keychain-db can be supplied. Common Keychain locations i
 
 ## Help:
 ```
-$ python ./chainbreaker.py --help
+$ python -m chainbreaker --help
 usage: chainbreaker.py [-h] [--dump-all] [--dump-keychain-password-hash]
                        [--dump-generic-passwords] [--dump-internet-passwords]
                        [--dump-appleshare-passwords] [--dump-private-keys]
@@ -120,12 +144,9 @@ Output Options:
 
 ## Example Usage
 ```
-./chainbreaker.py --password=TestPassword -a test_keychain.keychain
+python -m chainbreaker -pa test_keychain.keychain -o output
 2020-11-12 15:58:18,925 - INFO - 
 
-ChainBreaker 2 - https://github.com/gaddie-3/chainbreaker
-
-2020-11-12 15:58:18,925 - INFO - Runtime Command: chainbreaker.py --password=TestPassword -a test_keychain.keychain
 2020-11-12 15:58:18,925 - INFO - Keychain: test_keychain.keychain
 2020-11-12 15:58:18,925 - INFO - Keychain MD5: eb3abc06c22afa388ca522ea5aa032fc
 2020-11-12 15:58:18,925 - INFO - Keychain 256: 2d76f564ac24fa6a8a22adb6d5cb9b430032785b1ba3effa8ddea38222008441

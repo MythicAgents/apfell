@@ -46,22 +46,24 @@ class LsCommand(CommandBase):
     supported_ui_features = ["file_browser:list"]
     argument_class = LsArguments
     browser_script = BrowserScript(script_name="ls_new", author="@its_a_feature_", for_new_ui=True)
-    attributes = CommandAttributes(
-        spawn_and_injectable=True,
-        supported_os=[SupportedOS.MacOS],
-    )
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-            artifact="fileManager.attributesOfItemAtPathError, fileManager.contentsOfDirectoryAtPathError",
-            artifact_type="API Called",
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
         )
-        if task.args.has_arg("file_browser") and task.args.get_arg("file_browser"):
-            host = task.callback.host
-            task.display_params = host + ":" + task.args.get_arg("path")
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID,
+            ArtifactMessage=f"fileManager.attributesOfItemAtPathError, fileManager.contentsOfDirectoryAtPathError",
+            BaseArtifactType="API"
+        ))
+        if taskData.args.has_arg("file_browser") and taskData.args.get_arg("file_browser"):
+            host = taskData.Callback.Host
+            response.DisplayParams = host + ":" + taskData.args.get_arg("path")
         else:
-            task.display_params = task.args.get_arg("path")
-        return task
+            response.DisplayParams = taskData.args.get_arg("path")
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

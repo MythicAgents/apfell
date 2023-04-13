@@ -50,21 +50,19 @@ WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!"""
         )
         return response
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                                         artifact="/bin/sh -c {}".format(task.args.get_arg("command")),
-                                         artifact_type="Process Create",
-                                         )
-        resp = await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
-            TaskID=task.id, ArtifactMessage="{}".format(task.args.get_arg("command")),
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+            TaskID=taskData.Task.ID, ArtifactMessage="{}".format(taskData.args.get_arg("command")),
             BaseArtifactType="Process Create"
         ))
-        # resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-        #    artifact="{}".format(task.args.get_arg("command")),
-        #    artifact_type="Process Create",
-        # )
-        task.display_params = task.args.get_arg("command")
-        return task
 
-    async def process_response(self, response: AgentResponse):
-        pass
+        response.DisplayParams = taskData.args.get_arg("command")
+        return response
+
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

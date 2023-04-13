@@ -55,18 +55,26 @@ class ClipboardCommand(CommandBase):
     supported_ui_features = ["clipboard:list"]
     browser_script = BrowserScript(script_name="clipboard_new", author="@its_a_feature_", for_new_ui=True)
 
-    async def create_tasking(self, task: MythicTask) -> MythicTask:
-        if task.args.get_arg("data") != "":
-            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="$.NSPasteboard.generalPasteboard.setStringForType",
-                artifact_type="API Called",
-            )
-        else:
-            resp = await MythicRPC().execute("create_artifact", task_id=task.id,
-                artifact="$.NSPasteboard.generalPasteboard.dataForType",
-                artifact_type="API Called",
-            )
-        return task
+    async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
+        response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
+            TaskID=taskData.Task.ID,
+            Success=True,
+        )
 
-    async def process_response(self, response: AgentResponse):
-        pass
+        if taskData.args.get_arg("data") != "":
+            await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+                TaskID=taskData.Task.ID,
+                ArtifactMessage=f"$.NSPasteboard.generalPasteboard.setStringForType",
+                BaseArtifactType="API"
+            ))
+        else:
+            await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
+                TaskID=taskData.Task.ID,
+                ArtifactMessage=f"$.NSPasteboard.generalPasteboard.dataForType",
+                BaseArtifactType="API"
+            ))
+        return response
+
+    async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
+        resp = PTTaskProcessResponseMessageResponse(TaskID=task.Task.ID, Success=True)
+        return resp
