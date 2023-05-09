@@ -1,4 +1,4 @@
-FROM itsafeaturemythic/mythic_base:latest
+FROM itsafeaturemythic/mythic_python_base:latest
 
 WORKDIR /Mythic/
 

