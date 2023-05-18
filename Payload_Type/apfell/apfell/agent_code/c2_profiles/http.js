@@ -304,7 +304,9 @@ class customC2 extends baseC2{
 				let response = Ref();
 				let error = Ref();
 				let session_config = $.NSURLSessionConfiguration.ephemeralSessionConfiguration;
-				session_config.connectionProxyDictionary = $(this.proxy_dict);
+				if(Object.keys(this.proxy_dict).length > 0){
+					session_config.connectionProxyDictionary = $(this.proxy_dict);
+				}
 				let session = $.NSURLSession.sessionWithConfiguration(session_config);
 				let finished = false;
 				let responseData;
