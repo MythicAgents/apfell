@@ -205,8 +205,12 @@ class AddUserCommand(CommandBase):
                 ArtifactMessage=f"chown -R {taskData.args.get_arg('user')}:staff \"{taskData.args.get_arg('homedir')}\"",
                 BaseArtifactType="Process Create"
             ))
-        taskData.args.add_arg("passwd", taskData.args.get_arg("passwd")["credential"])
-        taskData.args.add_arg("user", taskData.args.get_arg("user")["account"])
+        cred = taskData.args.get_arg("passwd")["credential"]
+        user = taskData.args.get_arg("user")["account"]
+        taskData.args.remove_arg("passwd")
+        taskData.args.remove_arg("user")
+        taskData.args.add_arg("passwd", cred)
+        taskData.args.add_arg("user", user)
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
