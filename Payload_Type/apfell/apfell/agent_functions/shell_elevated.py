@@ -95,8 +95,12 @@ WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!
             BaseArtifactType="Process Create"
         ))
         if taskData.args.get_parameter_group_name() == "manual_creds":
-            taskData.args.add_arg("user", taskData.args.get_arg("user")["account"])
-            taskData.args.add_arg("credential", taskData.args.get_arg("credential")["credential"])
+            cred = taskData.args.get_arg("credential")["credential"]
+            user = taskData.args.get_arg("user")["account"]
+            taskData.args.remove_arg("credential")
+            taskData.args.remove_arg("user")
+            taskData.args.add_arg("credential", cred)
+            taskData.args.add_arg("user", user)
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
