@@ -304,8 +304,9 @@ class customC2 extends baseC2{
             if(value === undefined){value = "";}
             if(value === "message"){value = data;}
             value = this.create_value(value, endpoint['QueryParameters'][i]['transforms']);
-            value = $(value).stringByReplacingOccurrencesOfStringWithString($("/"), $("_"))
-            value = value.stringByReplacingOccurrencesOfStringWithString($("+"), $("-")).js
+            // don't make this URL safe because we're funneling into one base64 decoder overall
+            let NSCharacterSet = $.NSCharacterSet.characterSetWithCharactersInString("/+=\n").invertedSet;
+            value = $(value).stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet).js;
             query_string += endpoint['QueryParameters'][i]['name'] + "=" + value + "&";
         }
         base_uri += query_string.slice(0, -1); //take off trailing & or ?
