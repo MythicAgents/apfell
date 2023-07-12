@@ -10,6 +10,9 @@ exports.prompt = function(task, command, params){
 	let answer = "";
 	if(config.hasOwnProperty("answer") && config['answer'] !== "" && config["answer"] !== null){answer = config['answer'];}
 	try{
+		if(!does_file_exist(icon)){
+			return {"user_output": "Icon file path doesn't exist on disk, please choose another", "status": "error", "completed": true};
+		}
 		let cbID = currentApp.systemAttribute('__CFBundleIdentifier').toString()
 		let contextApp = Application(cbID)
 		contextApp.includeStandardAdditions = true;

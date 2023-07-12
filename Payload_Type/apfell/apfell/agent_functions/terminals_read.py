@@ -36,9 +36,6 @@ Ex: terminals_read history
     author = "@its_a_feature_"
     attackmapping = ["T1552.003", "T1056", "T1552", "T1559"]
     argument_class = TerminalsReadArguments
-    browser_script = BrowserScript(
-        script_name="terminals_read", author="@its_a_feature_"
-    )
 
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
