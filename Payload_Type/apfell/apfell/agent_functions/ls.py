@@ -29,7 +29,7 @@ class LsArguments(TaskArguments):
                 self.add_arg("path", dictionary["path"] + dictionary["file"])
             else:
                 self.add_arg("path", dictionary["path"] + "/" + dictionary["file"])
-
+            self.add_arg("host", dictionary["host"])
             self.add_arg("file_browser", type=ParameterType.Boolean, value=True)
         else:
             self.load_args_from_dictionary(dictionary)
@@ -47,6 +47,25 @@ class LsCommand(CommandBase):
     argument_class = LsArguments
     browser_script = BrowserScript(script_name="ls_new", author="@its_a_feature_", for_new_ui=True)
 
+    async def opsec_pre(self, taskData: PTTaskMessageAllData) -> PTTTaskOPSECPreTaskMessageResponse:
+        if taskData.args.has_arg("host"):
+            if taskData.args.get_arg("host") != taskData.Callback.Host:
+                await SendMythicRPCOperationEventLogCreate(MythicRPCOperationEventLogCreateMessage(
+                    TaskID=taskData.Task.ID,
+                    Message="Apfell can't access files on a different host. Did you mean to task a different agent?"
+                ))
+                return PTTTaskOPSECPreTaskMessageResponse(
+                    TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=True,
+                    OpsecPreBypassRole="operator",
+                    OpsecPreMessage="You're trying to task apfell to list data on a different host. Apfell does not have this capability!",
+                )
+        else:
+            return PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="You're trying to list contents on the same host where apfell is running, this is ok!",
+            )
+
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
             TaskID=taskData.Task.ID,
@@ -62,6 +81,8 @@ class LsCommand(CommandBase):
             response.DisplayParams = host + ":" + taskData.args.get_arg("path")
         else:
             response.DisplayParams = taskData.args.get_arg("path")
+        if taskData.args.has_arg("host"):
+            taskData.args.remove_arg("host")
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:

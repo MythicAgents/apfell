@@ -23,6 +23,7 @@ class RmArguments(TaskArguments):
                     # this means we have tasking from the file browser rather than the popup UI
                     # the apfell agent doesn't currently have the ability to do _remote_ listings, so we ignore it
                     self.add_arg("path", temp_json["path"] + "/" + temp_json["file"])
+                    self.add_arg("host", temp_json["host"])
                 else:
                     self.add_arg("path", temp_json["path"])
             else:
@@ -42,6 +43,25 @@ class RmCommand(CommandBase):
     attackmapping = ["T1106", "T1070.004"]
     argument_class = RmArguments
 
+    async def opsec_pre(self, taskData: PTTaskMessageAllData) -> PTTTaskOPSECPreTaskMessageResponse:
+        if taskData.args.has_arg("host"):
+            if taskData.args.get_arg("host") != taskData.Callback.Host:
+                await SendMythicRPCOperationEventLogCreate(MythicRPCOperationEventLogCreateMessage(
+                    TaskID=taskData.Task.ID,
+                    Message="Apfell can't access files on a different host. Did you mean to task a different agent?"
+                ))
+                return PTTTaskOPSECPreTaskMessageResponse(
+                    TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=True,
+                    OpsecPreBypassRole="operator",
+                    OpsecPreMessage="You're trying to task apfell to remove data on a different host. Apfell does not have this capability!",
+                )
+        else:
+            return PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="You're trying to remove a file on the same host where apfell is running, this is ok!",
+            )
+
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
             TaskID=taskData.Task.ID,
@@ -52,6 +72,8 @@ class RmCommand(CommandBase):
             ArtifactMessage=f"fileManager.removeItemAtPathError",
             BaseArtifactType="API"
         ))
+        if taskData.args.has_arg("host"):
+            taskData.args.remove_arg("host")
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:

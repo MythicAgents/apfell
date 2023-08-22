@@ -59,6 +59,20 @@ WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!
     attackmapping = ["T1059", "T1059.004", "T1548.004"]
     argument_class = ShellElevatedArguments
 
+    async def opsec_pre(self, taskData: PTTaskMessageAllData) -> PTTTaskOPSECPreTaskMessageResponse:
+        if "sudo" in taskData.args.command_line:
+            return PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=True,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="This could hang your agent!",
+            )
+        else:
+            return PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="This doesn't contain sudo!",
+            )
+
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
             TaskID=taskData.Task.ID,

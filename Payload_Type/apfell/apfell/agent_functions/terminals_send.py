@@ -50,6 +50,47 @@ class TerminalsSendCommand(CommandBase):
     attackmapping = ["T1552", "T1559", "T1548.003", "T1059.004"]
     argument_class = TerminalsSendArguments
 
+    async def opsec_pre(self, taskData: PTTaskMessageAllData) -> PTTTaskOPSECPreTaskMessageResponse:
+        tasks = await SendMythicRPCTaskSearch(MythicRPCTaskSearchMessage(
+            TaskID=taskData.Task.ID,
+            SearchHost=taskData.Callback.Host,
+            SearchCommandNames=[self.cmd]
+        ))
+        response = PTTTaskOPSECPreTaskMessageResponse(
+            TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+            OpsecPreBypassRole="operator",
+            OpsecPreMessage="This could cause a popup between your current context and Google Chrome!",
+        )
+        found = False
+        if tasks.Success:
+            logger.info(tasks.Tasks)
+            for t in tasks.Tasks:
+                logger.info(t.to_json())
+                if t.Completed:
+                    found = True
+                    response = PTTTaskOPSECPreTaskMessageResponse(
+                        TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+                        OpsecPreBypassRole="operator",
+                        Error="Another instance already caused a popup, letting this one go",
+                        OpsecPreMessage="This will cause a popup between your current context and Terminal.app!",
+                    )
+                    break
+        else:
+            found = True
+            response = PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=False, OpsecPreBlocked=True,
+                OpsecPreBypassRole="operator",
+                Error="Failed to search for tasks on this host",
+                OpsecPreMessage="This will cause a popup between your current context and Terminal.app!",
+            )
+        if not found:
+            response = PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=True,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="This will cause a popup between your current context and Terminal.app!",
+            )
+        return response
+
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
             TaskID=taskData.Task.ID,

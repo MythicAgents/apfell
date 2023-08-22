@@ -57,6 +57,8 @@ class UploadArguments(TaskArguments):
 
     async def parse_dictionary(self, dictionary_arguments):
         self.load_args_from_dictionary(dictionary_arguments)
+        if "host" in dictionary_arguments:
+            self.add_arg("host", dictionary_arguments["host"])
 
     async def get_files(self, callback: PTRPCDynamicQueryFunctionMessage) -> PTRPCDynamicQueryFunctionMessageResponse:
         response = PTRPCDynamicQueryFunctionMessageResponse()
@@ -102,6 +104,25 @@ class UploadCommand(CommandBase):
         suggested_command=True
     )
 
+    async def opsec_pre(self, taskData: PTTaskMessageAllData) -> PTTTaskOPSECPreTaskMessageResponse:
+        if taskData.args.has_arg("host"):
+            if taskData.args.get_arg("host") != taskData.Callback.Host:
+                await SendMythicRPCOperationEventLogCreate(MythicRPCOperationEventLogCreateMessage(
+                    TaskID=taskData.Task.ID,
+                    Message="Apfell can't access files on a different host. Did you mean to task a different agent?"
+                ))
+                return PTTTaskOPSECPreTaskMessageResponse(
+                    TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=True,
+                    OpsecPreBypassRole="operator",
+                    OpsecPreMessage="You're trying to task apfell upload a file on a different host. Apfell does not have this capability!",
+                )
+        else:
+            return PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="You're trying to upload a file on the same host where apfell is running, this is ok!",
+            )
+
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
             TaskID=taskData.Task.ID,
@@ -145,6 +166,8 @@ class UploadCommand(CommandBase):
                     raise Exception("Error from Mythic trying to search files:\n" + str(file_resp.Error))
         except Exception as e:
             raise Exception("Error from Mythic: " + str(sys.exc_info()[-1].tb_lineno) + " : " + str(e))
+        if taskData.args.has_arg("host"):
+            taskData.args.remove_arg("host")
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:

@@ -35,12 +35,18 @@ WARNING! THIS IS SINGLE THREADED, IF YOUR COMMAND HANGS, THE AGENT HANGS!"""
     )
 
     async def opsec_pre(self, taskData: PTTaskMessageAllData) -> PTTTaskOPSECPreTaskMessageResponse:
-        response = PTTTaskOPSECPreTaskMessageResponse(
-            TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
-            OpsecPreBypassRole="other_operator",
-            OpsecPreMessage="Implemented, but not blocking, you're welcome!",
-        )
-        return response
+        if "sudo" in taskData.args.command_line:
+            return PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=True,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="This could hang your agent!",
+            )
+        else:
+            return PTTTaskOPSECPreTaskMessageResponse(
+                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+                OpsecPreBypassRole="operator",
+                OpsecPreMessage="This doesn't contain sudo!",
+            )
 
     async def opsec_post(self, taskData: PTTaskMessageAllData) -> PTTTaskOPSECPostTaskMessageResponse:
         response = PTTTaskOPSECPostTaskMessageResponse(
