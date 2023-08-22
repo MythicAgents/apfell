@@ -59,12 +59,11 @@ class LsCommand(CommandBase):
                     OpsecPreBypassRole="operator",
                     OpsecPreMessage="You're trying to task apfell to list data on a different host. Apfell does not have this capability!",
                 )
-        else:
-            return PTTTaskOPSECPreTaskMessageResponse(
-                TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
-                OpsecPreBypassRole="operator",
-                OpsecPreMessage="You're trying to list contents on the same host where apfell is running, this is ok!",
-            )
+        return PTTTaskOPSECPreTaskMessageResponse(
+            TaskID=taskData.Task.ID, Success=True, OpsecPreBlocked=False,
+            OpsecPreBypassRole="operator",
+            OpsecPreMessage="You're trying to list contents on the same host where apfell is running, this is ok!",
+        )
 
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
