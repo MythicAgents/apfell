@@ -97,6 +97,11 @@ exports.ls = function(task, command, params){
 
             if(output['name'] === "Macintosh HD"){output['name'] = "/";}
             if(output['name'] === output['parent_path']){output['parent_path'] = "";}
+            if(command_params['path'] === "/dev"){
+                // /dev is apparently a special case for some reason and doesn't follow the normal fileManager.componentsToDisplayForPath
+                output["name"] = "dev";
+                output["parent_path"] = "/";
+            }
             output['size'] = attributes['NSFileSize'];
             output['access_time'] = 0;
             output['modify_time'] = Math.trunc(time_attributes['NSFileModificationDate'].timeIntervalSince1970 * 1000);
