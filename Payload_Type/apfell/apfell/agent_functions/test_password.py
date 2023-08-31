@@ -55,8 +55,13 @@ class TestPasswordCommand(CommandBase):
             ArtifactMessage=f"user.verifyPasswordError",
             BaseArtifactType="API"
         ))
-        taskData.args.add_arg("username", taskData.args.get_arg("username")["account"])
-        taskData.args.add_arg("password", taskData.args.get_arg("password")["credential"])
+        username = taskData.args.get_arg("username")["account"]
+        password = taskData.args.get_arg("credential")["credential"]
+        taskData.args.remove_arg("username")
+        taskData.args.remove_arg("credential")
+        taskData.args.add_arg("username", username)
+        taskData.args.add_arg("password", password)
+        response.DisplayParams = f"for {username} with {password}"
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
