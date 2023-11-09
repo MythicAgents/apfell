@@ -73,6 +73,15 @@ class Apfell(PayloadType):
                     for key, val in c2.get_parameters_dict().items():
                         if key == "AESPSK":
                             c2_code = c2_code.replace(key, val["enc_key"] if val["enc_key"] is not None else "")
+                        if key == "raw_c2_config":
+                            configData = await SendMythicRPCFileGetContent(MythicRPCFileGetContentMessage(
+                                AgentFileId=val
+                            ))
+                            if not configData.Success:
+                                resp.build_stderr = configData.Error
+                                resp.set_status(BuildStatus.Error)
+                                return resp
+                            c2_code = c2_code.replace(key, configData.Content.decode())
                         elif not isinstance(val, str):
                             c2_code = c2_code.replace(key, json.dumps(val))
                         else:

