@@ -97,7 +97,7 @@ def crisp(args: dict) -> None:
                     continue
                 else:
                     print("Working on url: {}".format(url))
-                    urlUserPassDecrypted = (url, user, decrypt(encryptedPass, key=key))
+                    urlUserPassDecrypted = (url, user, decrypt(encryptedPass, key=dk))
                     decryptedList.append(urlUserPassDecrypted)
         out = json.dumps(decryptedList, sort_keys=True, indent=4)
 

