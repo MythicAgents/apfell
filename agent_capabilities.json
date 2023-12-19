@@ -1,0 +1,15 @@
+{
+  "os": ["macOS"],
+  "languages": ["jxa"] ,
+  "dynamic_loading": true,
+  "features": {
+    "mythic": ["artifacts", "file chunking", "screenshots", "file browser", "process browser"],
+    "custom": ["key exchange", "killdate"]
+  },
+  "payload_output": ["js"],
+  "architectures": ["x86_64", "arm_64"],
+  "c2": ["http", "dynamichttp"],
+  "mythic_version": "3.2",
+  "agent_version": "",
+  "supported_wrappers": []
+}
