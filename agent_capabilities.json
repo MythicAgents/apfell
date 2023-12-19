@@ -1,9 +1,8 @@
 {
   "os": ["macOS"],
   "languages": ["jxa"] ,
-  "dynamic_loading": true,
   "features": {
-    "mythic": ["artifacts", "file chunking", "screenshots", "file browser", "process browser"],
+    "mythic": ["artifacts", "file chunking", "screenshots", "file browser", "process browser", "dynamic loading"],
     "custom": ["key exchange", "killdate"]
   },
   "payload_output": ["js"],
