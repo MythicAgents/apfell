@@ -2,7 +2,8 @@
   "os": ["macOS"],
   "languages": ["jxa"] ,
   "features": {
-    "mythic": ["artifacts", "file chunking", "screenshots", "file browser", "process browser", "dynamic loading"],
+    "mythic": ["adjust commands", "artifacts", "browser scripts", "credentials", "docker", "dynamic loading",
+    "file browser", "file chunking", "opsec checks", "process browser", "process responses", "screenshots"],
     "custom": ["key exchange", "killdate"]
   },
   "payload_output": ["js"],
