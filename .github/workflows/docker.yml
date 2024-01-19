@@ -68,8 +68,8 @@ jobs:
       - name: Build and push the server container image
         uses: docker/build-push-action@v5 # ref: https://github.com/marketplace/actions/build-and-push-docker-images
         with:
-          context: ${{ AGENT_PATH }}
-          file: ${{ AGENT_DOCKERFILE_PATH }}
+          context: ${{ env.AGENT_PATH }}
+          file: ${{ env.AGENT_DOCKERFILE_PATH }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:${{ env.VERSION }}
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:latest
