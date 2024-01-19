@@ -1,4 +1,4 @@
-#FROM ghcr.io/mythicagents/apfell:v0.0.0.6
+#FROM ghcr.io/mythicagents/apfell:v0.0.0.8
 FROM itsafeaturemythic/mythic_python_base:latest
 
 WORKDIR /Mythic/
