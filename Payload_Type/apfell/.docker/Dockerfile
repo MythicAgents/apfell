@@ -1,6 +1,8 @@
 FROM python:3.11-bookworm as build
 
-RUN python3 -m pip install mythic-container
+COPY ["requirements.txt", "requirements.txt"]
+RUN python3 -m pip install -r requirements.txt
+
 
 # "Default" stage:
 FROM python:3.11-alpine
