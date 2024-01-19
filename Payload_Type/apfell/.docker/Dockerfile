@@ -1,6 +1,6 @@
 FROM python:3.11-bookworm as build
 
-COPY ["requirements.txt", "requirements.txt"]
+COPY [".docker/requirements.txt", "requirements.txt"]
 RUN python3 -m pip install -r requirements.txt
 
 
