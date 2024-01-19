@@ -33,9 +33,6 @@ env:
   #VERSION: ${{ github.event.release.tag_name }}
   VERSION: ${{ github.event.head_commit.message }}
 
-  AGENT_PATH: Payload_Type/apfell
-  AGENT_DOCKERFILE_PATH: Payload_Type/apfell/.docker/Dockerfile
-
   # Branch for pushing release changes (TODO: Change this to the main branch when the rewrite is finished)
   RELEASE_BRANCH: docker_testing
 
@@ -68,8 +65,8 @@ jobs:
       - name: Build and push the server container image
         uses: docker/build-push-action@v5 # ref: https://github.com/marketplace/actions/build-and-push-docker-images
         with:
-          context: ${{ env.AGENT_PATH }}
-          file: ${{ env.AGENT_DOCKERFILE_PATH }}
+          context: Payload_Type/apfell
+          file: Payload_Type/apfell/.docker/Dockerfile
           tags: |
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:${{ env.VERSION }}
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:latest
@@ -102,9 +99,9 @@ jobs:
       # The Dockerfile which Mythic uses to pull in the base container image needs to be
       # updated to reference the newly built container image
       - name: Fix the server Dockerfile reference to reference the new release tag
-        working-directory: ${{ AGENT_PATH }}
+        working-directory: Payload_Type/apfell
         run: |
-          sed -i "s|^FROM ghcr\.io.*$|FROM ${REGISTRY}/${AGENT_IMAGE_NAME}:${VERSION}|" Dockerfile
+          sed -i "s|^#FROM ghcr\.io.*$|#FROM ${REGISTRY}/${AGENT_IMAGE_NAME}:${VERSION}|" Dockerfile
 
       # Push the changes to the Dockerfile
       - name: Push the updated base Dockerfile image reference changes
