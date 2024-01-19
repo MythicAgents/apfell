@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.11-bookworm
 
 RUN python3 -m pip install mythic-container
 
