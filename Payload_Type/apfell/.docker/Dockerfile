@@ -1,6 +1,6 @@
 FROM python:3.11-alpine
 
-RUN pip3 install mythic-container
+RUN python3 -m pip install mythic-container
 
 WORKDIR /Mythic/
 
