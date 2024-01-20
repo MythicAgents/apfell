@@ -1,6 +1,6 @@
-#FROM ghcr.io/mythicagents/apfell:v0.0.1-rc1
-FROM itsafeaturemythic/mythic_python_base:latest
+FROM ghcr.io/mythicagents/apfell:v0.0.1-rc1
+#FROM itsafeaturemythic/mythic_python_base:latest
 
-WORKDIR /Mythic/
+#WORKDIR /Mythic/
 
-CMD ["python3", "main.py"]
+#CMD ["python3", "main.py"]
