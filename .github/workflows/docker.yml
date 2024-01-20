@@ -10,6 +10,8 @@ on:
   push:
     branches:
       - 'docker_testing'
+    tags:
+      - "v*.*.*"
 
 # Variables holding configuration settings
 env:
@@ -30,8 +32,8 @@ env:
   IMAGE_LICENSE: BSD-3-Clause
 
   # Set the container image version to the Github release tag
-  #VERSION: ${{ github.event.release.tag_name }}
-  VERSION: ${{ github.event.head_commit.message }}
+  VERSION: ${{ GITHUB_REF_NAME }}
+  #VERSION: ${{ github.event.head_commit.message }}
 
   # Branch for pushing release changes (TODO: Change this to the main branch when the rewrite is finished)
   RELEASE_BRANCH: docker_testing
@@ -70,7 +72,8 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:${{ env.VERSION }}
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:latest
-          push: true
+          #push: ${{ github.ref_type == 'tag' }}
+          push: false
           # These container metadata labels allow configuring the package in Github
           # packages. The source will link the package to this Github repository
           labels: |
@@ -105,6 +108,7 @@ jobs:
 
       # Push the changes to the Dockerfile
       - name: Push the updated base Dockerfile image reference changes
+        if: ${{ github.ref_type == 'tag' }}
         uses: EndBug/add-and-commit@v9 # ref: https://github.com/marketplace/actions/add-commit
         with:
           # Only add the Dockerfile changes. Nothing else should have been modified
@@ -117,10 +121,10 @@ jobs:
           message: "Bump Dockerfile tag to match release '${{ env.VERSION }}'"
 
           # Overwrite the current git tag with the new changes
-          #tag: '${{ env.VERSION }} --force'
+          tag: '${{ env.VERSION }} --force'
 
           # Push the new changes with the tag overwriting the current one
-          #tag_push: '--force'
+          tag_push: '--force'
 
           # Push the commits to the branch marked as the release branch
           push: origin HEAD:${{ env.RELEASE_BRANCH }} --set-upstream
