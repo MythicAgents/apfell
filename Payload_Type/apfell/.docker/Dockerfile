@@ -6,11 +6,8 @@ RUN apt-get -y update && \
     apt-get install --no-install-recommends \
       software-properties-common apt-utils make build-essential libssl-dev zlib1g-dev libbz2-dev \
       xz-utils tk-dev libffi-dev liblzma-dev libsqlite3-dev protobuf-compiler \
-      binutils-aarch64-linux-gnu libc-dev-arm64-cross -y  && \
-    apt-get purge -y && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
-RUN python3 -m wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
+      binutils-aarch64-linux-gnu libc-dev-arm64-cross -y
+RUN python3 -m pip wheel --wheel-dir /wheels -r requirements.txt
 
 FROM python:3.11-slim-bookworm
 
