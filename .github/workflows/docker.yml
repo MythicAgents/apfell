@@ -110,7 +110,7 @@ jobs:
         with:
           file: config.json
           field: remote_image
-          value: ${REGISTRY}/${AGENT_IMAGE_NAME}:${VERSION}
+          value: ${{env.REGISTRY}}/${{env.AGENT_IMAGE_NAME}}:${{env.VERSION}}
 
       # Push the changes to the Dockerfile
       - name: Push the updated base Dockerfile image reference changes
