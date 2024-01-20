@@ -9,7 +9,8 @@ on:
   #  types: [published]
   push:
     branches:
-      - 'docker_testing'
+      - 'master'
+      - 'main'
     tags:
       - "v*.*.*"
 
@@ -35,8 +36,7 @@ env:
   VERSION: ${{ github.ref_name }}
   #VERSION: ${{ github.event.head_commit.message }}
 
-  # Branch for pushing release changes (TODO: Change this to the main branch when the rewrite is finished)
-  RELEASE_BRANCH: docker_testing
+  RELEASE_BRANCH: master
 
 jobs:
   # Builds the base container image and pushes it to the container registry
@@ -103,7 +103,7 @@ jobs:
       - name: Fix the server Dockerfile reference to reference the new release tag
         working-directory: Payload_Type/apfell
         run: |
-          sed -i "s|^#FROM ghcr\.io.*$|#FROM ${REGISTRY}/${AGENT_IMAGE_NAME}:${VERSION}|" Dockerfile
+          sed -i "s|^FROM ghcr\.io.*$|FROM ${REGISTRY}/${AGENT_IMAGE_NAME}:${VERSION}|" Dockerfile
 
       # Push the changes to the Dockerfile
       - name: Push the updated base Dockerfile image reference changes
