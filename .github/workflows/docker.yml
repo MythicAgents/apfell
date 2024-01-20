@@ -32,7 +32,7 @@ env:
   IMAGE_LICENSE: BSD-3-Clause
 
   # Set the container image version to the Github release tag
-  VERSION: ${{ GITHUB_REF_NAME }}
+  VERSION: ${{ github.ref_name }}
   #VERSION: ${{ github.event.head_commit.message }}
 
   # Branch for pushing release changes (TODO: Change this to the main branch when the rewrite is finished)
