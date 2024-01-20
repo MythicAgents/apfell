@@ -1,8 +1,8 @@
 {
-	"exclude_payload_type": false,
-	"exclude_c2_profiles": false,
-	"exclude_documentation_payload": false,
-	"exclude_documentation_c2": false,
-	"exclude_agent_icons": false,
-	"remote_image": "ghcr.io/mythicagents/apfell:v0.0.1"
+  "exclude_payload_type": false,
+  "exclude_c2_profiles": false,
+  "exclude_documentation_payload": false,
+  "exclude_documentation_c2": false,
+  "exclude_agent_icons": false,
+  "remote_image": "${REGISTRY}/${AGENT_IMAGE_NAME}:${VERSION}"
 }
