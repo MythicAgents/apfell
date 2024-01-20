@@ -3,5 +3,6 @@
 	"exclude_c2_profiles": false,
 	"exclude_documentation_payload": false,
 	"exclude_documentation_c2": false,
-	"exclude_agent_icons": false
+	"exclude_agent_icons": false,
+	"remote_image": "ghcr.io/mythicagents/apfell:v0.0.1"
 }
