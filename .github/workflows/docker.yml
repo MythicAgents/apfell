@@ -72,8 +72,7 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:${{ env.VERSION }}
             ${{ env.REGISTRY }}/${{ env.AGENT_IMAGE_NAME }}:latest
-          #push: ${{ github.ref_type == 'tag' }}
-          push: false
+          push: ${{ github.ref_type == 'tag' }}
           # These container metadata labels allow configuring the package in Github
           # packages. The source will link the package to this Github repository
           labels: |
