@@ -1,16 +1,13 @@
 # Apfell
 
-Apfell is a JavaScript for Automation (JXA) payload for macOS. This version currently supports Mythic 2.3.7 and will update as necessary. It will not work with Mythic 2.2 and lower.
-
-The agent has `mythic_payloadtype_container==0.1.7` PyPi package installed and reports to Mythic as version "12".
-
+Apfell is a JavaScript for Automation (JXA) payload for macOS. This version currently supports Mythic 2.3.+ and will update as necessary. It will not work with Mythic 2.2 and lower.
 
 ## How to install an agent in this format within Mythic
 
 When it's time for you to test out your install or for another user to install your agent, it's pretty simple. Within Mythic you can run the `mythic-cli` binary to install this in one of three ways:
 
 * `sudo ./mythic-cli install github https://github.com/user/repo` to install the main branch
-* `sudo ./mythic-cli install github https://github.com/user/repo branchname` to install a specific branch of that repo
+* `sudo ./mythic-cli install github https://github.com/user/repo -b branchname` to install a specific branch of that repo
 * `sudo ./mythic-cli install folder /path/to/local/folder/cloned/from/github` to install from an already cloned down version of an agent repo
 
 Now, you might be wondering _when_ should you or a user do this to properly add your agent to their Mythic instance. There's no wrong answer here, just depends on your preference. The three options are:
