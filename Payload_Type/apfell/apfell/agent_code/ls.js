@@ -65,8 +65,14 @@ exports.ls = function(task, command, params){
                         file_add['permissions']['owner'] = attr['NSFileOwnerAccountName'] + "(" + attr['NSFileOwnerAccountID'] + ")";
                         file_add['permissions']['group'] = attr['NSFileGroupOwnerAccountName'] + "(" + attr['NSFileGroupOwnerAccountID'] + ")";
                         file_add['permissions']['hidden'] = attr['NSFileExtensionAttribute'] === true;
-                        file_add['permissions']['create_time'] = Math.trunc(time_attr['NSFileCreationDate'].timeIntervalSince1970 * 1000);
-                        file_add['modify_time'] = Math.trunc(time_attr['NSFileModificationDate'].timeIntervalSince1970 * 1000);
+                        file_add['permissions']['create_time'] = Math.floor(Math.trunc(time_attr['NSFileCreationDate'].timeIntervalSince1970 * 1000));
+                        if(file_add['permissions']['create_time'] < 0){
+                            file_add['permissions']['create_time'] = 0;
+                        }
+                        file_add['modify_time'] = Math.floor(Math.trunc(time_attr['NSFileModificationDate'].timeIntervalSince1970 * 1000));
+                        if(file_add['modify_time'] < 0){
+                            file_add['modify_time'] = 0;
+                        }
                         file_add['access_time'] = 0;
                         files_data.push(file_add);
                     }
@@ -104,7 +110,10 @@ exports.ls = function(task, command, params){
             }
             output['size'] = attributes['NSFileSize'];
             output['access_time'] = 0;
-            output['modify_time'] = Math.trunc(time_attributes['NSFileModificationDate'].timeIntervalSince1970 * 1000);
+            output['modify_time'] = Math.floor(Math.trunc(time_attributes['NSFileModificationDate'].timeIntervalSince1970 * 1000));
+            if(output["modify_time"] < 0){
+                output["modify_time"] = 0;
+            }
             if(attributes['NSFileExtendedAttributes'] !== undefined){
                 let extended = {};
                 let perms = attributes['NSFileExtendedAttributes'].js;
@@ -115,7 +124,10 @@ exports.ls = function(task, command, params){
             }else{
                 output['permissions'] = {};
             }
-            output['permissions']['create_time'] = Math.trunc(time_attributes['NSFileCreationDate'].timeIntervalSince1970 * 1000);
+            output['permissions']['create_time'] = Math.floor(Math.trunc(time_attributes['NSFileCreationDate'].timeIntervalSince1970 * 1000));
+            if(output['permissions']['create_time'] < 0){
+                output['permissions']['create_time'] = 0;
+            }
             output['permissions']['posix'] =((nsposix >> 6) & 0x7).toString() + ((nsposix >> 3) & 0x7).toString() + (nsposix & 0x7).toString();
             output['permissions']['owner'] = attributes['NSFileOwnerAccountName'] + "(" + attributes['NSFileOwnerAccountID'] + ")";
             output['permissions']['group'] = attributes['NSFileGroupOwnerAccountName'] + "(" + attributes['NSFileGroupOwnerAccountID'] + ")";
