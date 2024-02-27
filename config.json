@@ -5,6 +5,6 @@
   "exclude_documentation_c2": false,
   "exclude_agent_icons": false,
   "remote_images": {
-    "apfell": "ghcr.io/mythicagents/apfell:v0.0.1.1-rc4"
+    "apfell": "ghcr.io/mythicagents/apfell:v0.0.1.2"
   }
 }
