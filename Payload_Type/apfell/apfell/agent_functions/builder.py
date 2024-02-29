@@ -13,7 +13,7 @@ class Apfell(PayloadType):
     supported_os = [SupportedOS.MacOS]
     wrapper = False
     wrapped_payloads = []
-    note = """This payload uses JavaScript for Automation (JXA) for execution on macOS boxes. Version 0.1.2"""
+    note = """This payload uses JavaScript for Automation (JXA) for execution on macOS boxes. Version 0.1.3"""
     supports_dynamic_loading = True
     c2_profiles = ["http", "dynamichttp"]
     mythic_encrypts = True

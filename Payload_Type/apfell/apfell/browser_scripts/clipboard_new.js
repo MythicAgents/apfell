@@ -12,50 +12,26 @@ function(task, responses){
                 try{
                     let data = JSON.parse(responses[0]);
                     let output_table = [];
-                    let all_keys = [];
                     for(const [k,v] of Object.entries(data)){
-                        all_keys.push(k);
-                        if(k === "public.utf8-plain-text"){
-                            output_table.push({
-                                "key":{"plaintext": k},
-                                "value": {"plaintext": atob(v), "copyIcon": v.length > 0},
-                                "fetch": {"button": {
-                                    "name": "Fetch Data",
-                                    "type": "task",
-                                    "ui_feature": "clipboard:list",
-                                    "parameters": {"read": [k]}
-                                }},
-                                "view": {"button": {
-                                    "name": v=== "" ? "Empty": "View",
-                                    "type": "dictionary",
-                                    "value": {[k]:atob(v)},
-                                    "disabled": v === "",
-                                    "leftColumnTitle": "Key",
-                                    "rightColumnTitle": "Values",
-                                    "title": "Viewing " + k
-                                }}
-                            })
-                        }else{
-                            output_table.push({
-                                "key":{"plaintext": k},
-                                "value": {"plaintext": v, "copyIcon": v.length > 0},
-                                "fetch": {"button": {
-                                    "name": "Fetch Data",
-                                    "type": "task",
-                                    "ui_feature": "clipboard:list",
-                                    "parameters":{"read": [k]}
-                                }},
-                                "view": {"button": {
-                                    "name": v=== "" ? "Empty": "View",
-                                    "type": "dictionary",
-                                    "value": {[k]:v},
-                                    "disabled": v === "",
-                                    "leftColumnTitle": "Key",
-                                    "rightColumnTitle": "Values",
-                                    "title": "Viewing " + k
-                                }}
-                            })
-                        }
+                        output_table.push({
+                            "key":{"plaintext": k},
+                            "value": {"plaintext": atob(v), "copyIcon": v.length > 0},
+                            "fetch": {"button": {
+                                "name": "Fetch Data",
+                                "type": "task",
+                                "ui_feature": "clipboard:list",
+                                "parameters":{"read": [k]}
+                            }},
+                            "view": {"button": {
+                                "name": v=== "" ? "Empty": "View",
+                                "type": "dictionary",
+                                "value": {[k]:atob(v)},
+                                "disabled": v === "",
+                                "leftColumnTitle": "Key",
+                                "rightColumnTitle": "Values",
+                                "title": "Viewing " + k
+                            }}
+                        })
                     }
                     output_table.push({
                         "key":{"plaintext": "Fetch All Clipboard Data"},
@@ -80,8 +56,8 @@ function(task, responses){
                         "table": [
                             {
                                 "headers": [
-                                    {"plaintext": "fetch", "type": "button", "width": 150, "disableSort": true},
-                                    {"plaintext": "view", "type": "button", "width": 100, "disableSort": true},
+                                    {"plaintext": "fetch", "type": "button", "width": 70, "disableSort": true},
+                                    {"plaintext": "view", "type": "button", "width": 70, "disableSort": true},
                                     {"plaintext": "key", "type": "string", "fillWidth": true},
                                     {"plaintext": "value", "type": "string", "fillWidth": true},
 

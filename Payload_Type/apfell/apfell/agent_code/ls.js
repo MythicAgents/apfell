@@ -46,9 +46,8 @@ exports.ls = function(task, command, params){
                         let time_attr = ObjC.unwrap(fileManager.attributesOfItemAtPathError($(path + sub_files[i]), error));
                         let file_add = {};
                         file_add['name'] = sub_files[i];
-                        file_add['is_file'] = attr['NSFileType'] !== "NSFileTypeDirectory";
                         let plistPerms = ObjC.unwrap(fileManager.attributesOfItemAtPathError($(path + sub_files[i]), $()));
-                        if(plistPerms['NSFileExtendedAttributes'] !== undefined){
+                        if(plistPerms !== undefined && plistPerms['NSFileExtendedAttributes'] !== undefined){
                             let extended = {};
                             let perms = plistPerms['NSFileExtendedAttributes'].js;
                             for(let j in perms){
@@ -58,22 +57,27 @@ exports.ls = function(task, command, params){
                         }else{
                             file_add['permissions'] = {};
                         }
-                        file_add['size'] = attr['NSFileSize'];
-                        let nsposix = attr['NSFilePosixPermissions'];
-                        // we need to fix this mess to actually be real permission bits that make sense
-                        file_add['permissions']['posix'] = ((nsposix >> 6) & 0x7).toString() + ((nsposix >> 3) & 0x7).toString() + (nsposix & 0x7).toString();
-                        file_add['permissions']['owner'] = attr['NSFileOwnerAccountName'] + "(" + attr['NSFileOwnerAccountID'] + ")";
-                        file_add['permissions']['group'] = attr['NSFileGroupOwnerAccountName'] + "(" + attr['NSFileGroupOwnerAccountID'] + ")";
-                        file_add['permissions']['hidden'] = attr['NSFileExtensionAttribute'] === true;
-                        file_add['permissions']['create_time'] = Math.floor(Math.trunc(time_attr['NSFileCreationDate'].timeIntervalSince1970 * 1000));
-                        if(file_add['permissions']['create_time'] < 0){
-                            file_add['permissions']['create_time'] = 0;
+                        if(attr !== undefined){
+                            file_add['is_file'] = attr['NSFileType'] !== "NSFileTypeDirectory";
+                            file_add['size'] = attr['NSFileSize'];
+                            let nsposix = attr['NSFilePosixPermissions'];
+                            // we need to fix this mess to actually be real permission bits that make sense
+                            file_add['permissions']['posix'] = ((nsposix >> 6) & 0x7).toString() + ((nsposix >> 3) & 0x7).toString() + (nsposix & 0x7).toString();
+                            file_add['permissions']['owner'] = attr['NSFileOwnerAccountName'] + "(" + attr['NSFileOwnerAccountID'] + ")";
+                            file_add['permissions']['group'] = attr['NSFileGroupOwnerAccountName'] + "(" + attr['NSFileGroupOwnerAccountID'] + ")";
+                            file_add['permissions']['hidden'] = attr['NSFileExtensionAttribute'] === true;
+                            file_add['permissions']['create_time'] = Math.floor(Math.trunc(time_attr['NSFileCreationDate'].timeIntervalSince1970 * 1000));
+                            if(file_add['permissions']['create_time'] < 0){
+                                file_add['permissions']['create_time'] = 0;
+                            }
+                            file_add['modify_time'] = Math.floor(Math.trunc(time_attr['NSFileModificationDate'].timeIntervalSince1970 * 1000));
+                            if(file_add['modify_time'] < 0){
+                                file_add['modify_time'] = 0;
+                            }
+                            file_add['access_time'] = 0;
+                        } else {
+
                         }
-                        file_add['modify_time'] = Math.floor(Math.trunc(time_attr['NSFileModificationDate'].timeIntervalSince1970 * 1000));
-                        if(file_add['modify_time'] < 0){
-                            file_add['modify_time'] = 0;
-                        }
-                        file_add['access_time'] = 0;
                         files_data.push(file_add);
                     }
                     output['files'] = files_data;
