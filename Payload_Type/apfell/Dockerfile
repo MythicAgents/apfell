@@ -1,1 +1,1 @@
-FROM ghcr.io/mythicagents/apfell:v0.0.1.2
+FROM ghcr.io/mythicagents/apfell:v0.0.1.3
