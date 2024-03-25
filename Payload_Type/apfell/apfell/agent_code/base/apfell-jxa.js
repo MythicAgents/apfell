@@ -25,6 +25,7 @@ class agent{
 		this.args = ObjC.deepUnwrap(this.procInfo.arguments);
 		this.osVersion = this.procInfo.operatingSystemVersionString.js;
 		this.uuid = "UUID_HERE";
+        this.checked_in = false;
 	}
 }
 var apfell = new agent();
