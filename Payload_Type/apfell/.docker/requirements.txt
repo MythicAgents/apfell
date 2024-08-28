@@ -1,3 +1,2 @@
-psutil==5.9.4
 pycryptodome
 mythic-container==0.5.9
