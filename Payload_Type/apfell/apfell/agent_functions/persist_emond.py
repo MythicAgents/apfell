@@ -59,7 +59,7 @@ class PersistEmondCommand(CommandBase):
     WARNING: emond is NOT present on macOS Ventura!"""
     version = 1
     author = "@its_a_feature_"
-    attackmapping = ["T1547.011", "T1053", "T1546.014"]
+    attackmapping = ["T1053", "T1546.014"]
     argument_class = PersistEmondArguments
 
     async def create_go_tasking(self, taskData: PTTaskMessageAllData) -> PTTaskCreateTaskingMessageResponse:
