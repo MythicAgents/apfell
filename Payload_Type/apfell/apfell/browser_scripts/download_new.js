@@ -8,10 +8,10 @@ function(task, responses){
     }else if(task.completed){
         try{
             let data = JSON.parse(responses[0]);
-            return {"download":[{
+            let filename_pieces = task.display_params.split("/");
+            return {"media":[{
                 "agent_file_id": data["agent_file_id"],
-                "variant": "contained",
-                "name": "Download file"
+                    "filename": `${filename_pieces[filename_pieces.length -1]}`
             }]};
         }catch(error){
             const combined = responses.reduce( (prev, cur) => {

