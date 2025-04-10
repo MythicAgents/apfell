@@ -253,7 +253,10 @@ class customC2 extends baseC2{
 				//let task = this.htmlPostData(this.url, data, apfell.id);
 				let task = this.htmlGetData();
 				//console.log("tasking got back: " + JSON.stringify(task));
-				return task['tasks'];
+				if(task['tasks'] !== undefined){
+					return task['tasks'];
+				}
+				return [];
 			}
 			catch(error){
 				//console.log(error.toString());

@@ -1,3 +1,10 @@
+
+## [v0.1.7] - 2025-04-10
+
+### Changed
+
+- Updated the handling of get tasking in http profile to return [] in more cases
+
 ## [v0.1.6] - 2025-02-21
 
 ### Changed
