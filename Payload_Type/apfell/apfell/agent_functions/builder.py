@@ -5,10 +5,12 @@ from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 import json
 
-version = "0.1.7"
+version = "0.1.8"
+
+
 class Apfell(PayloadType):
     name = "apfell"
-    file_extension = "js"
+    file_extension = "js"  # helps create default filename in UI builder
     author = "@its_a_feature_"
     supported_os = [SupportedOS.MacOS]
     wrapper = False
@@ -17,7 +19,7 @@ class Apfell(PayloadType):
     supports_dynamic_loading = True
     c2_profiles = ["http", "dynamichttp"]
     mythic_encrypts = True
-    translation_container = None # "myPythonTranslation"
+    translation_container = None
     build_parameters = []
     agent_path = pathlib.Path(".") / "apfell"
     agent_icon_path = agent_path / "agent_functions" / "apfell.svg"
@@ -33,8 +35,6 @@ class Apfell(PayloadType):
         resp = BuildResponse(status=BuildStatus.Success)
         # create the payload
         build_msg = ""
-
-        #create_payload = await MythicRPC().execute("create_callback", payload_uuid=self.uuid, c2_profile="http")
         try:
             command_code = ""
             for cmd in self.commands.get_commands():

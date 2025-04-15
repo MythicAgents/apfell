@@ -66,11 +66,11 @@ exports.ls = function(task, command, params){
                             file_add['permissions']['owner'] = attr['NSFileOwnerAccountName'] + "(" + attr['NSFileOwnerAccountID'] + ")";
                             file_add['permissions']['group'] = attr['NSFileGroupOwnerAccountName'] + "(" + attr['NSFileGroupOwnerAccountID'] + ")";
                             file_add['permissions']['hidden'] = attr['NSFileExtensionAttribute'] === true;
-                            file_add['permissions']['create_time'] = Math.floor(Math.trunc(time_attr['NSFileCreationDate'].timeIntervalSince1970 * 1000));
+                            file_add['permissions']['create_time'] = Math.floor(Math.trunc(time_attr['NSFileCreationDate']?.timeIntervalSince1970 * 1000 || 0));
                             if(file_add['permissions']['create_time'] < 0){
                                 file_add['permissions']['create_time'] = 0;
                             }
-                            file_add['modify_time'] = Math.floor(Math.trunc(time_attr['NSFileModificationDate'].timeIntervalSince1970 * 1000));
+                            file_add['modify_time'] = Math.floor(Math.trunc(time_attr['NSFileModificationDate']?.timeIntervalSince1970 * 1000 || 0));
                             if(file_add['modify_time'] < 0){
                                 file_add['modify_time'] = 0;
                             }

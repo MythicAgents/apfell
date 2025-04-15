@@ -1,4 +1,11 @@
 
+## [v0.1.8] - 2025-04-15
+
+### Changed
+
+- Fixed a double / bug in the ls file browser
+- Fixed a bug with ls if there's no file creation date
+
 ## [v0.1.7] - 2025-04-10
 
 ### Changed

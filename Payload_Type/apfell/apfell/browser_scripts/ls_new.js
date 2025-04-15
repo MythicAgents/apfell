@@ -17,7 +17,9 @@ function(task, responses){
         let ls_path = "";
         if(data["parent_path"] === "/"){
             ls_path = data["parent_path"] + data["name"];
-        }else{
+        }else if(data["parent_path"] === ""){
+            ls_path = data["name"];
+        } else {
             ls_path = data["parent_path"] + "/" + data["name"];
         }
         let headers = [
@@ -29,54 +31,59 @@ function(task, responses){
             {"plaintext": "posix", "type": "string", "width": 100, "disableSort": true},
 
         ];
-        let rows = [{
-            "rowStyle":{},
-            "name": {"plaintext": data["name"], "startIcon": data["is_file"] ? "file": "folder"},
-            "size": {"plaintext": data["size"]},
-            "owner": {"plaintext": data["permissions"]["owner"]},
-            "group": {"plaintext": data["permissions"]["group"]},
-            "posix": {"plaintext": data["permissions"]["posix"]},
-            "actions": {"button": {
-                "name": "Actions",
-                "type": "menu",
-                "value": [
-                        {
-                            "name": "View XATTRs",
-                            "type": "dictionary",
-                            "value": data["permissions"],
-                            "leftColumnTitle": "XATTR",
-                            "rightColumnTitle": "Values",
-                            "title": "Viewing XATTRs"
-                        },
-                        {
-                            "name": "Get Code Signatures",
-                            "type": "task",
-                            "ui_feature": "code_signatures:list",
-                            "parameters": {"path": ls_path},
-                        },
-                        {
-                            "name": "LS Path",
-                            "type": "task",
-                            "ui_feature": "file_browser:list",
-                            "parameters": ls_path
-                        },
-                        {
-                            "name": "Download File",
-                            "type": "task",
-                            "disabled": !data["is_file"],
-                            "ui_feature": "file_browser:download",
-                            "parameters": ls_path,
-                            "startIcon": "download"
-                        }
-                    ]
-                }}
-        }];
+        let rows = [];
+        if(data["is_file"]){
+            rows.push({
+                "rowStyle":{},
+                "name": {"plaintext": data["name"], "startIcon": data["is_file"] ? "file": "folder"},
+                "size": {"plaintext": data["size"]},
+                "owner": {"plaintext": data["permissions"]["owner"]},
+                "group": {"plaintext": data["permissions"]["group"]},
+                "posix": {"plaintext": data["permissions"]["posix"]},
+                "actions": {"button": {
+                        "name": "Actions",
+                        "type": "menu",
+                        "value": [
+                            {
+                                "name": "View XATTRs",
+                                "type": "dictionary",
+                                "value": data["permissions"],
+                                "leftColumnTitle": "XATTR",
+                                "rightColumnTitle": "Values",
+                                "title": "Viewing XATTRs"
+                            },
+                            {
+                                "name": "Get Code Signatures",
+                                "type": "task",
+                                "ui_feature": "code_signatures:list",
+                                "parameters": {"path": ls_path},
+                            },
+                            {
+                                "name": "LS Path",
+                                "type": "task",
+                                "ui_feature": "file_browser:list",
+                                "parameters": ls_path
+                            },
+                            {
+                                "name": "Download File",
+                                "type": "task",
+                                "disabled": !data["is_file"],
+                                "ui_feature": "file_browser:download",
+                                "parameters": ls_path,
+                                "startIcon": "download"
+                            }
+                        ]
+                    }}
+            });
+        }
         for(let i = 0; i < data["files"].length; i++){
             let ls_path = "";
-            if(data["parent_path"] === "/"){
+            if(data["parent_path"] === "/") {
                 ls_path = data["parent_path"] + data["name"] + "/" + data["files"][i]["name"];
+            } else if(data["parent_path"] === ""){
+                ls_path = data["name"] + "/" + data["files"][i]["name"];
             }else{
-                ls_path = data["parent_path"] + "/" + data["name"] + "/" + data["files"][i]["name"];
+                ls_path = data["parent_path"] + data["name"] + "/" + data["files"][i]["name"];
             }
             let row = {
                 "rowStyle": {},
