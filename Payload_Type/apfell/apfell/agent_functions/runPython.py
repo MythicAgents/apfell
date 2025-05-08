@@ -40,6 +40,10 @@ class RunCommand(CommandBase):
     author = "@robot"
     attackmapping = ["T1059"]
     argument_class = RunArguments
+    attributes = CommandAttributes(
+        supported_os=[SupportedOS.MacOS],
+        load_only=True,
+    )
 
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
