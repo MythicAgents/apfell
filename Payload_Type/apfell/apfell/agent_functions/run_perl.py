@@ -11,7 +11,7 @@ class RunArguments(TaskArguments):
                 cli_name="script", 
                 display_name="Script to Run", 
                 type=ParameterType.File, 
-                description="Select ruby script to run",
+                description="Select perl script to run",
                 parameter_group_info=[ 
                     ParameterGroupInfo(
                         required=True,
@@ -31,15 +31,19 @@ class RunArguments(TaskArguments):
 
 
 class RunCommand(CommandBase):
-    cmd = "runRuby"
+    cmd = "run_perl"
     needs_admin = False
-    help_cmd = "runRuby"
-    description = "The command uses the ObjectiveC bridge to spawn ruby interactively and capture standard input. The supplied script is passed to the new ruby process, evaluated, and the output is returned."
+    help_cmd = "run_perl"
+    description = "The command uses the ObjectiveC bridge to spawn perl and capture standard input. The supplied script is passed to the new perl process, evaluated, and the output is returned."
     version = 1
     supported_ui_features = ["file_browser:upload"]
     author = "@robot"
     attackmapping = ["T1059"]
     argument_class = RunArguments
+    attributes = CommandAttributes(
+        supported_os=[SupportedOS.MacOS],
+        load_only=True,
+    )
 
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
         response = MythicCommandBase.PTTaskCreateTaskingMessageResponse(
@@ -48,7 +52,7 @@ class RunCommand(CommandBase):
         )
         await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
             TaskID=taskData.Task.ID,
-            ArtifactMessage=f"/usr/bin/ruby -",
+            ArtifactMessage=f"/usr/bin/perl",
             BaseArtifactType="Process Create"
         ))
         return response

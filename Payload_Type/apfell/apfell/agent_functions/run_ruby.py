@@ -11,7 +11,7 @@ class RunArguments(TaskArguments):
                 cli_name="script", 
                 display_name="Script to Run", 
                 type=ParameterType.File, 
-                description="Select python3 script to run",
+                description="Select ruby script to run",
                 parameter_group_info=[ 
                     ParameterGroupInfo(
                         required=True,
@@ -31,10 +31,10 @@ class RunArguments(TaskArguments):
 
 
 class RunCommand(CommandBase):
-    cmd = "runPython"
+    cmd = "run_ruby"
     needs_admin = False
-    help_cmd = "runPython"
-    description = "The command uses the ObjectiveC bridge to spawn python3 interactively and capture standard input. The supplied script is passed to the new python process, evaluated, and the output is returned."
+    help_cmd = "run_ruby"
+    description = "The command uses the ObjectiveC bridge to spawn ruby and capture standard input. The supplied script is passed to the new ruby process, evaluated, and the output is returned."
     version = 1
     supported_ui_features = ["file_browser:upload"]
     author = "@robot"
@@ -52,7 +52,7 @@ class RunCommand(CommandBase):
         )
         await SendMythicRPCArtifactCreate(MythicRPCArtifactCreateMessage(
             TaskID=taskData.Task.ID,
-            ArtifactMessage=f"/usr/bin/python3",
+            ArtifactMessage=f"/usr/bin/ruby -",
             BaseArtifactType="Process Create"
         ))
         return response
