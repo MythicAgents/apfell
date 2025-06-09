@@ -2,20 +2,20 @@ from mythic_container.MythicCommandBase import *
 import json
 from mythic_container.MythicRPC import *
 
-class RunRubyArguments(TaskArguments):
+class RunScriptArguments(TaskArguments):
     def __init__(self, command_line, **kwargs):
         super().__init__(command_line, **kwargs)
         self.args = [
             CommandParameter(
                 name="file",
                 cli_name="file",
-                display_name="Script to Run",
+                display_name="File to execute",
                 type=ParameterType.File,
-                description="Select ruby script to run",
+                description="Run a script via stdin for a given process",
                 parameter_group_info=[
                     ParameterGroupInfo(
-                        required=True,
-                        group_name="Default",
+                        required=False,
+                        group_name="New File",
                         ui_position=0
                     )
                 ]
@@ -24,14 +24,54 @@ class RunRubyArguments(TaskArguments):
                 name="filename",
                 cli_name="filename",
                 display_name="Name of an already uploaded file to Mythic to execute",
-                type=ParameterType.String,
+                type=ParameterType.ChooseOne,
                 dynamic_query_function=self.get_files,
                 description="Run a script via stdin for a given process",
                 parameter_group_info=[
                     ParameterGroupInfo(
-                        required=True,
+                        required=False,
                         group_name="Existing File",
                         ui_position=0
+                    )
+                ]
+            ),
+            CommandParameter(
+                name="interpreter",
+                cli_name="interpreter",
+                display_name="Interpreter Path",
+                default_value="/usr/bin/python3",
+                type=ParameterType.String,
+                description="Absolute path to the interpreter to use",
+                parameter_group_info=[
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="Existing File",
+                        ui_position=1
+                    ),
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="New File",
+                        ui_position=1
+                    )
+                ]
+            ),
+            CommandParameter(
+                name="args",
+                cli_name="args",
+                display_name="Args",
+                type=ParameterType.Array,
+                default_value=[],
+                description="Array of args to pass to the process on start",
+                parameter_group_info=[
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="Existing File",
+                        ui_position=2
+                    ),
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="New File",
+                        ui_position=2
                     )
                 ]
             ),
@@ -57,7 +97,7 @@ class RunRubyArguments(TaskArguments):
         if file_resp.Success:
             file_names = []
             for f in file_resp.Files:
-                if f.Filename not in file_names and f.Filename.endswith(".rb"):
+                if f.Filename not in file_names:
                     file_names.append(f.Filename)
             response.Success = True
             response.Choices = file_names
@@ -72,20 +112,19 @@ class RunRubyArguments(TaskArguments):
             return response
 
 
-class RunRubyCommand(CommandBase):
-    cmd = "run_ruby"
+
+class RunScriptCommand(CommandBase):
+    cmd = "run_script"
     needs_admin = False
-    help_cmd = "run_ruby -filename program.rb"
-    description = "The command uses the ObjectiveC bridge to spawn ruby and capture standard input. The supplied script is passed to the new ruby process, evaluated, and the output is returned."
+    help_cmd = "run_script -interpreter /usr/bin/python3 -filename Attacker.py"
+    description = "The command uses the ObjectiveC bridge to spawn a process and capture standard input. The supplied script is passed to the new process, evaluated, and the output is returned."
     version = 1
     supported_ui_features = []
     author = "@robot"
     attackmapping = ["T1059"]
-    script_only = True
-    argument_class = RunRubyArguments
+    argument_class = RunScriptArguments
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS],
-        dependencies=["run_script"]
     )
 
     async def create_go_tasking(self, taskData: MythicCommandBase.PTTaskMessageAllData) -> MythicCommandBase.PTTaskCreateTaskingMessageResponse:
@@ -107,7 +146,7 @@ class RunRubyCommand(CommandBase):
                     if len(file_resp.Files) > 0:
                         taskData.args.add_arg("file", file_resp.Files[0].AgentFileId)
                         taskData.args.remove_arg("filename")
-                        response.DisplayParams = f"-filename {file_resp.Files[0].Filename}"
+                        response.DisplayParams = f"-filename {file_resp.Files[0].Filename} -interpreter {taskData.args.get_arg('interpreter')}"
                     elif len(file_resp.Files) == 0:
                         raise Exception("Failed to find the named file. Have you uploaded it before? Did it get deleted?")
                 else:
@@ -123,14 +162,11 @@ class RunRubyCommand(CommandBase):
                     if len(file_resp.Files) > 0:
                         taskData.args.add_arg("file", file_resp.Files[0].AgentFileId)
                         taskData.args.remove_arg("filename")
-                        response.DisplayParams = f"-filename {file_resp.Files[0].Filename}"
+                        response.DisplayParams = f"-filename {file_resp.Files[0].Filename} -interpreter {taskData.args.get_arg('interpreter')}"
                     elif len(file_resp.Files) == 0:
                         raise Exception("Failed to find the named file. Have you uploaded it before? Did it get deleted?")
                 else:
                     raise Exception("Error from Mythic trying to search files:\n" + str(file_resp.Error))
-            taskData.args.add_arg("interpreter", "/usr/bin/ruby")
-            taskData.args.add_arg("args", type=ParameterType.Array, value=["-"])
-            response.CommandName = "run_script"
         except Exception as e:
             raise Exception("Error from Mythic: " + str(sys.exc_info()[-1].tb_lineno) + " : " + str(e))
         return response
