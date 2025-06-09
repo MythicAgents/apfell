@@ -81,7 +81,6 @@ class RunPerlCommand(CommandBase):
     supported_ui_features = []
     author = "@robot"
     attackmapping = ["T1059"]
-    script_only = True
     argument_class = RunPerlArguments
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS],

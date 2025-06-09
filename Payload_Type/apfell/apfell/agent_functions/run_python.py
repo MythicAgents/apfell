@@ -81,7 +81,6 @@ class RunPythonCommand(CommandBase):
     supported_ui_features = []
     author = "@robot"
     attackmapping = ["T1059"]
-    script_only = True
     argument_class = RunPythonArguments
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS],

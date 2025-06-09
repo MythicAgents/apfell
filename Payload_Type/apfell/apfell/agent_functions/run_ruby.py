@@ -81,7 +81,6 @@ class RunRubyCommand(CommandBase):
     supported_ui_features = []
     author = "@robot"
     attackmapping = ["T1059"]
-    script_only = True
     argument_class = RunRubyArguments
     attributes = CommandAttributes(
         supported_os=[SupportedOS.MacOS],
