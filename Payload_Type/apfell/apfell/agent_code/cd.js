@@ -5,7 +5,9 @@ exports.cd = function(task, command, params){
         let fileManager = $.NSFileManager.defaultManager;
         let success = fileManager.changeCurrentDirectoryPath(command_params['path']);
         if(success){
-            return {"user_output": "New cwd: " + fileManager.currentDirectoryPath.js, "completed": true};
+            return {"user_output": "New cwd: " + fileManager.currentDirectoryPath.js, "completed": true, "callback": {
+                "cwd": fileManager.currentDirectoryPath.js
+                }};
         }else{
             return {"user_output": "Failed to change directory", "completed": true, "status": "error"};
         }

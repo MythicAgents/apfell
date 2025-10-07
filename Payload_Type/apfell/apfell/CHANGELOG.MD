@@ -1,4 +1,12 @@
 
+## [v0.1.9] - 2025-10-07
+
+### Changed
+
+- Updated to dynamic build parameters
+- Added semver tracking
+- Updated tracking for `cwd` values
+
 ## [v0.1.8] - 2025-04-15
 
 ### Changed

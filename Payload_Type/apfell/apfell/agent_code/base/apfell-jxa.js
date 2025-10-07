@@ -157,12 +157,21 @@ function sleepWakeUp(){
         let command = "";
         try{
         	//console.log(JSON.stringify(task));
+            if(task === undefined){
+                continue;
+            }
         	if(task.length === 0){
         		continue;
         	}
         	task = task[0];
+            if(task === undefined){
+                continue;
+            }
         	//console.log(JSON.stringify(task));
             command = task["command"];
+            if (command === undefined){
+                continue
+            }
             try{
                 output = commands_dict[command](task, command, task['parameters']);
             }

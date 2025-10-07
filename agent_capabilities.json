@@ -9,7 +9,7 @@
   "payload_output": ["js"],
   "architectures": ["x86_64", "arm_64"],
   "c2": ["http", "dynamichttp"],
-  "mythic_version": "3.3.1-rc65",
-  "agent_version": "0.1.8",
+  "mythic_version": "3.4.0",
+  "agent_version": "0.1.9",
   "supported_wrappers": []
 }

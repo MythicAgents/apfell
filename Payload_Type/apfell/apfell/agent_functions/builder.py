@@ -5,7 +5,7 @@ from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 import json
 
-version = "0.1.8"
+version = "0.1.9"
 
 
 class Apfell(PayloadType):
@@ -15,12 +15,13 @@ class Apfell(PayloadType):
     supported_os = [SupportedOS.MacOS]
     wrapper = False
     wrapped_payloads = []
-    note = f"This payload uses JavaScript for Automation (JXA) for execution on macOS boxes. Version {version}"
+    note = f"This payload uses JavaScript for Automation (JXA) for execution on macOS boxes."
     supports_dynamic_loading = True
     c2_profiles = ["http", "dynamichttp"]
     mythic_encrypts = True
     translation_container = None
     build_parameters = []
+    semver = version
     agent_path = pathlib.Path(".") / "apfell"
     agent_icon_path = agent_path / "agent_functions" / "apfell.svg"
     agent_code_path = agent_path / "agent_code"

