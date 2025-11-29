@@ -40,7 +40,7 @@ exports.persist_launch = function(task, command, params){
             path = $(path).stringByExpandingTildeInPath;
             var fileManager = $.NSFileManager.defaultManager;
             if(!fileManager.fileExistsAtPath(path)){
-                $.fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(path, false, $(), $());
+                fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(path, false, $(), $());
             }
             path = path.js + "/" + label + ".plist";
             response = write_data_to_file(template, path) + " to " + path;
