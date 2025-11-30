@@ -7,9 +7,9 @@ exports.list_apps = function(task, command, params){
             let info = {};
             info['frontMost'] = procs[i].active;
             info['hidden'] = procs[i].hidden;
-            info['bundle'] = procs[i].bundleIdentifier.js;
-            info['bundleURL'] = procs[i].bundleURL.path.js;
-            info['bin_path'] = procs[i].executableURL.path.js;
+            info['bundle'] = procs[i].bundleIdentifier ? procs[i].bundleIdentifier.js : "";
+            info['bundleURL'] = (procs[i].bundleURL && procs[i].bundleURL.path) ? procs[i].bundleURL.path.js : "";
+            info['bin_path'] = (procs[i].executableURL && procs[i].executableURL.path) ? procs[i].executableURL.path.js : "";
             info['process_id'] = procs[i].processIdentifier;
             info['name'] = procs[i].localizedName.js;
             if(procs[i].executableArchitecture === "16777223"){
