@@ -28,10 +28,10 @@ exports.list_entitlements = function(task, command, params){
                 	ent = {};
                 }
                 entitlements["pid"] = procs[i].processIdentifier;
-                entitlements['bundle'] = procs[i].bundleIdentifier.js;
-            	entitlements['bundleURL'] = procs[i].bundleURL.path.js;
-            	entitlements['bin_path'] = procs[i].executableURL.path.js;
-            	entitlements['name'] = procs[i].localizedName.js;
+                entitlements['bundle'] = procs[i].bundleIdentifier ? procs[i].bundleIdentifier.js : "";
+            	entitlements['bundleURL'] = (procs[i].bundleURL && procs[i].bundleURL.path) ? procs[i].bundleURL.path.js : "";
+            	entitlements['bin_path'] = (procs[i].executableURL && procs[i].executableURL.path) ? procs[i].executableURL.path.js : "";
+            	entitlements['name'] = procs[i].localizedName ? procs[i].localizedName.js : "";
             	entitlements["entitlements"] = ent;
                 output.push(entitlements);
             }

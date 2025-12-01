@@ -31,9 +31,9 @@ for(let i = 0; i < procs.length; i++){
     let info = {};
     info['frontMost'] = procs[i].active;
     info['hidden'] = procs[i].hidden;
-    info['bundle'] = procs[i].bundleIdentifier.js;
-    info['bundleURL'] = procs[i].bundleURL.path.js;
-    info['bin_path'] = procs[i].executableURL.path.js;
+    info['bundle'] = procs[i].bundleIdentifier ? procs[i].bundleIdentifier.js : "";
+    info['bundleURL'] = (procs[i].bundleURL && procs[i].bundleURL.path) ? procs[i].bundleURL.path.js : "";
+    info['bin_path'] = (procs[i].executableURL && procs[i].executableURL.path) ? procs[i].executableURL.path.js : "";
     info['process_id'] = procs[i].processIdentifier;
     info['name'] = procs[i].localizedName.js;
     if(procs[i].executableArchitecture === "16777223"){
@@ -57,4 +57,3 @@ This output is turned into a sortable table via a browserscript that by default 
 - Terminal
 - 1Password
 - Slack
-
