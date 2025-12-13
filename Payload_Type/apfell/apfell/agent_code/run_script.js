@@ -5,6 +5,7 @@ exports.run_script = function(task, command, params){
         let program_path = "/usr/bin/python3";
         let script = "";
         let args = [];
+        let timeoutSeconds = 1800;
         if(config.hasOwnProperty("file")){
             let script_data = C2.upload(task, config['file']);
             if(typeof script_data === "string"){
@@ -19,6 +20,9 @@ exports.run_script = function(task, command, params){
         }
         if(config.hasOwnProperty("args")){
             args = config["args"];
+        }
+        if(config.hasOwnProperty("timeout")){
+            timeoutSeconds = config["timeout"];
         }
         let inputData = script.dataUsingEncoding($.NSUTF8StringEncoding);
         // Prepare NSTask
@@ -42,7 +46,21 @@ exports.run_script = function(task, command, params){
 
         // Launch task
         script_task.launch;
-        script_task.waitUntilExit;
+
+        // Start Timeout
+        const start = $.NSDate.date;
+        while (script_task.isRunning) {
+             $.NSThread.sleepForTimeInterval(0.5);   // sleep 0.5s steps
+             const elapsed = $.NSDate.date.timeIntervalSinceDate(start);
+             if (elapsed > timeoutSeconds) {
+                  // Timeout reached → kill the task
+                  try { script_task.terminate; } catch (e) {
+                                            let errorMessage = "Script exceeded timeout threshold without a response. An error occurred during termination: " + e.toString();
+                                            return {"user_output":errorMessage, "completed": true, "status": "error"};
+                                            }
+                  return {"user_output":"Script exceeded timeout threshold without a response and was terminated.", "completed": true, "status": "error"};
+             }
+        }
 
         // Read output
         const outputHandle = outputPipe.fileHandleForReading;
