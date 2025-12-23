@@ -35,6 +35,26 @@ class RunRubyArguments(TaskArguments):
                     )
                 ]
             ),
+            CommandParameter(
+                name="timeout",
+                cli_name="timeout",
+                display_name="Timeout in Seconds",
+                default_value=1800,
+                type=ParameterType.Number,
+                description="The amount of seconds after which the script will be terminated if no output has been returned.",   
+                parameter_group_info=[
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="Default",
+                        ui_position=1
+                    ),
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="Existing File",
+                        ui_position=1
+                    )
+                ]
+            ),
         ]
 
     async def parse_arguments(self):
