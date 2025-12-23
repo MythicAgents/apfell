@@ -1,4 +1,10 @@
 
+## [v0.1.10] - 2025-12-23
+
+### Changed
+
+- Merged in PR for adding timeout to run_script tasks
+
 ## [v0.1.9] - 2025-10-07
 
 ### Changed
