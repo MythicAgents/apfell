@@ -58,7 +58,7 @@ class RunPythonArguments(TaskArguments):
             CommandParameter(   
                 name="async",     
                 cli_name="async", 
-                display_name="async",
+                display_name="Async",
                 default_value=False,
                 type=ParameterType.Boolean,
                 description="Run the script asynchronously without waiting for output. (Timeout will be ignored)",
