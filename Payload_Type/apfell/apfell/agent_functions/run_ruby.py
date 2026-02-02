@@ -55,6 +55,26 @@ class RunRubyArguments(TaskArguments):
                     )
                 ]
             ),
+            CommandParameter(   
+                name="async",     
+                cli_name="async", 
+                display_name="Async",
+                default_value=False,
+                type=ParameterType.Boolean,
+                description="Run the script asynchronously without waiting for output. (Timeout will be ignored)",
+                parameter_group_info=[ 
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="Default",
+                        ui_position=2
+                    ),
+                    ParameterGroupInfo(
+                        required=False,
+                        group_name="Existing File",
+                        ui_position=2
+                    )
+                ]
+            ),
         ]
 
     async def parse_arguments(self):
