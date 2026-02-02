@@ -82,9 +82,10 @@ exports.run_script = function(task, command, params){
         responsepy = response1py + response2py;
         }
         else {
-            responsepy = "+ Asynchronous Task Created +";
+            responsepy = "+ Asynchronous Task Created +\n";
+            responsepy += "PID: " + script_task.processIdentifier;
         }
-        return {"user_output":responsepy, "completed": true};
+        return {"user_output":responsepy, "completed": true, 'artifacts': [{'base_artifact': 'Process Create', 'artifact': "PID: " + script_task.processIdentifier}]};
      }catch(error){
         return {"user_output":error.toString(), "completed": true, "status": "error"};
     }

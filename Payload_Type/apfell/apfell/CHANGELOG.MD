@@ -1,4 +1,10 @@
 
+## [v0.1.11] - 2026-02-02
+
+### Changed
+
+- Merged in PR for async tracking of scripts
+
 ## [v0.1.10] - 2025-12-23
 
 ### Changed

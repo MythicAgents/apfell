@@ -5,7 +5,7 @@ from mythic_container.MythicCommandBase import *
 from mythic_container.MythicRPC import *
 import json
 
-version = "0.1.10"
+version = "0.1.11"
 
 
 class Apfell(PayloadType):
