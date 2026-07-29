@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bookworm as builder
+FROM python:3.11-slim-bookworm AS builder
 
 COPY [".docker/requirements.txt", "requirements.txt"]
 RUN apt-get -y update && \

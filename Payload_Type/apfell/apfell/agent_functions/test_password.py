@@ -10,12 +10,32 @@ class TestPasswordArguments(TaskArguments):
             CommandParameter(
                 name="credential",
                 type=ParameterType.Credential_JSON,
-                description="Password to test",
+                description="Stored credential to test",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=True,
+                    ui_position=1,
+                    group_name="Stored Credential",
+                )]
             ),
             CommandParameter(
                 name="username",
-                type=ParameterType.Credential_JSON,
+                type=ParameterType.String,
                 description="Local user to test against",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=True,
+                    ui_position=1,
+                    group_name="Default",
+                )]
+            ),
+            CommandParameter(
+                name="password",
+                type=ParameterType.String,
+                description="Local user to test against",
+                parameter_group_info=[ParameterGroupInfo(
+                    required=True,
+                    ui_position=2,
+                    group_name="Default",
+                )]
             ),
         ]
 
@@ -33,7 +53,7 @@ class TestPasswordArguments(TaskArguments):
 class TestPasswordCommand(CommandBase):
     cmd = "test_password"
     needs_admin = False
-    help_cmd = "test_password username password"
+    help_cmd = "test_password -username username -password password"
     description = "Tests a password against a user to see if it's valid via an API call"
     version = 1
     author = "@its_a_feature_"
@@ -55,13 +75,18 @@ class TestPasswordCommand(CommandBase):
             ArtifactMessage=f"user.verifyPasswordError",
             BaseArtifactType="API"
         ))
-        username = taskData.args.get_arg("username")["account"]
-        password = taskData.args.get_arg("credential")["credential"]
-        taskData.args.remove_arg("username")
-        taskData.args.remove_arg("credential")
-        taskData.args.add_arg("username", username)
-        taskData.args.add_arg("password", password)
-        response.DisplayParams = f"for {username} with {password}"
+        if taskData.args.get_parameter_group_name() == "Default":
+            username = taskData.args.get_arg("username")
+            password = taskData.args.get_arg("password")
+            response.DisplayParams = f"for {username} with {password}"
+        else:
+            username = taskData.args.get_arg("credential")["account"]
+            password = taskData.args.get_arg("credential")["credential"]
+            taskData.args.remove_arg("username")
+            taskData.args.remove_arg("password")
+            taskData.args.remove_arg("credential")
+            taskData.args.add_arg("username", username)
+            taskData.args.add_arg("password", password)
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:
