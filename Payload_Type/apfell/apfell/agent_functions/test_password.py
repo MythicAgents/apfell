@@ -82,6 +82,7 @@ class TestPasswordCommand(CommandBase):
         else:
             username = taskData.args.get_arg("credential")["account"]
             password = taskData.args.get_arg("credential")["credential"]
+            response.DisplayParams = f"-credential {taskData.Task.RevertKeywords(taskData.args.get_arg('credential'), 'credential')}"
             taskData.args.remove_arg("username")
             taskData.args.remove_arg("password")
             taskData.args.remove_arg("credential")
