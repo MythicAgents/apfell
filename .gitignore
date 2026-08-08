@@ -144,3 +144,17 @@ _ReSharper*/
 
 # vscode
 .vscode/
+
+# Python testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+.cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Claude Code settings
+.claude/
